@@ -1,21 +1,21 @@
 <template>
-  <div id="app">
-    <MindMap
-      :height="this.MindMapHeight"
-      :width="this.MindMapWidth"
-      :locationVert="this.MindMapLocationVert"
-      :colors="this.MindMapColors"
-    />
+  <div id="app" :style="this.appStyle">
+      <div id="mindMapContainer" style="height:70%; width:100%;">
+        <MindMapUI
+          :locationVert="this.MindMapLocationVert"
+          :colors="this.MindMapColors"
+        />
+      </div>
   </div>
 </template>
 
 <script>
-import MindMap from "./components/MindMap.vue";
+import MindMapUI from "./components/MindMapUI.vue";
 
 export default {
   name: "app",
   components: {
-    MindMap
+    MindMapUI
   },
   computed: {
     MindMapHeight: function() {
@@ -35,8 +35,17 @@ export default {
     },
     MindMapColors: function() {
       return {
-        background: "rgb(233,233,233)",
-        theme: "rgb(255,103,103)"
+        background: [0, 0, 89, 1],
+        theme: [0, 100, 70, 1]
+      };
+    },
+    appStyle: function() {
+      return {
+        height: `${this.$store.state.window_height}px`,
+        width: `${this.$store.state.window_width}px`,
+        position: 'absolute',
+        top: '0px',
+        left: '0px',
       };
     }
   },
