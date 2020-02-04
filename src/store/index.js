@@ -23,14 +23,13 @@ export default new Vuex.Store({
   },
   getters: {
     //validateAPI(state) {
-      validateAPI() {
+    validateAPI() {
       //var url_ =  state.apiUrl;
       // todo: validate url_
       var isValid = true;
       return isValid;
     }
   },
-  actions: {
-  },
+  actions: {},
   modules: {}
 });
