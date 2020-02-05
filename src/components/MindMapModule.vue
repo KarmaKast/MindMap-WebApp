@@ -1,6 +1,11 @@
 <template>
   <div class="container" :style="this.containerStyle">
-    <MindMapCanvas :apiUrl="this.url_" :height="this.height" :width="this.width"></MindMapCanvas>
+    <MindMapCanvas
+      :height="this.height"
+      :width="this.width"
+      :colors="this.colors"
+    >
+    </MindMapCanvas>
 
     <div
       class="debug"
@@ -24,12 +29,18 @@
           />
         </button>
         <div id="menuItems" :style="this.mainItemsStyle">
-          <button-one :colors="this.colors" style="order:1;"></button-one>
+          <button-one
+            :colors="colors"
+            :style="{ order: 0 }"
+          ></button-one>
           <button-two
-            :colors="this.colors"
-            buttonText="Load Database"
-            @takeAction="this.loadDatabase"
-            style="order:2;"
+            v-for="(button,index) in menuButtons"
+            :key="index"
+            
+            :colors="colors"
+            :buttonText="button['text']"
+            @takeAction="button['action']"
+            :style="{order:index}"
           ></button-two>
         </div>
       </div>
@@ -61,11 +72,17 @@ export default {
   data: function() {
     return {
       respo: "",
-      showMenu: false
+      showMenu: false,
+      menuButtons: [
+        {text: "Load Database" ,action: this.loadDatabase},
+        {text: "Clear Database" ,action: this.clearDatabase},
+        {text: "Save Database" ,action: this.saveDatabase},
+        {text: "Archive Database" ,action: this.archiveDatabase}
+      ]
     };
   },
   computed: {
-    url_: function() {
+    apiUrl: function() {
       return this.$store.state.apiUrl;
     },
     colorsProcessed: function() {
@@ -139,8 +156,18 @@ export default {
   },
   methods: {
     loadDatabase() {
-      var url_ = this.$store.state.apiUrl;
-      this.$axios.get(url_ + "/load");
+      this.$axios.get(this.apiUrl + "/load");
+      // todo: get a list of nodeIDs and create a list of nodes in the canvas
+
+    },
+    clearDatabase() {
+      this.$axios.post(this.apiUrl + "/clear");
+    },
+    saveDatabase() {
+      this.$axios.post(this.apiUrl + "/save");
+    },
+    archiveDatabase() {
+      this.$axios.post(this.apiUrl + "/archive/save");
     },
     toggleMenu() {
       if (this.showMenu) {
@@ -156,10 +183,12 @@ export default {
   watch: {
     apiUrl(newValue, oldValue) {
       // validate newValue
+      console.log(`watching from ${oldValue} to ${newValue}`);
       var isValid = this.$store.getters.validateAPI();
       if (!isValid) {
         this.$store.commit("update_apiUrl", oldValue);
       }
+      this.$store.commit("update_apiUrlValidity", isValid);
     }
   }
 };

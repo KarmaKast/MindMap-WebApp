@@ -6,7 +6,7 @@
     </p>
     <button
       :style="this.buttonStyle"
-      @click.left="takeAction"
+      @click.left="emitTakeAction"
       @mouseover="setButtonHovered('main')"
       @mouseout="unsetButtonHovered('main')"
     ></button>
@@ -125,7 +125,7 @@ export default {
         this.mainButtonIsHovered = false;
       }
     },
-    takeAction() {
+    emitTakeAction() {
         this.$emit('takeAction');
     }
   }
