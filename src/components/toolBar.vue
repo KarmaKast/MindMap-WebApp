@@ -1,13 +1,11 @@
 <template>
-    
+  <div></div>
 </template>
 
 <script>
 export default {
-    name: "toolBar"
-}
+  name: "toolBar"
+};
 </script>
 
-<style lang="sass" scoped>
-
-</style>
+<style lang="sass" scoped></style>

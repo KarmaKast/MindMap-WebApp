@@ -32,7 +32,7 @@
 export default {
   name: "buttonOne",
   props: {
-    colors: Object,
+    colors: Object
   },
   data: function() {
     return {
@@ -41,7 +41,7 @@ export default {
       mainButtonIsHovered: false,
       testButtonIsHovered: false,
       size: [32, 174],
-      urlInField: "",
+      urlInField: ""
     };
   },
   computed: {
@@ -184,7 +184,7 @@ export default {
         this.mainButtonIsHovered = true;
       }
       if (bttn == "test") {
-        this.testButtonIsHovered = true
+        this.testButtonIsHovered = true;
       }
     },
     unsetButtonHovered(bttn) {
@@ -192,7 +192,7 @@ export default {
         this.mainButtonIsHovered = false;
       }
       if (bttn == "test") {
-        this.testButtonIsHovered = false
+        this.testButtonIsHovered = false;
       }
     }
   }

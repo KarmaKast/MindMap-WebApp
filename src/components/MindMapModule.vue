@@ -4,6 +4,8 @@
       :height="this.height"
       :width="this.width"
       :colors="this.colors"
+      :nodes="this.nodes"
+      :apiUrl="this.apiUrl"
     >
     </MindMapCanvas>
 
@@ -29,18 +31,14 @@
           />
         </button>
         <div id="menuItems" :style="this.mainItemsStyle">
-          <button-one
-            :colors="colors"
-            :style="{ order: 0 }"
-          ></button-one>
+          <button-one :colors="colors" :style="{ order: 0 }"></button-one>
           <button-two
-            v-for="(button,index) in menuButtons"
+            v-for="(button, index) in menuButtons"
             :key="index"
-            
             :colors="colors"
             :buttonText="button['text']"
             @takeAction="button['action']"
-            :style="{order:index}"
+            :style="{ order: index }"
           ></button-two>
         </div>
       </div>
@@ -74,17 +72,16 @@ export default {
       respo: "",
       showMenu: false,
       menuButtons: [
-        {text: "Load Database" ,action: this.loadDatabase},
-        {text: "Clear Database" ,action: this.clearDatabase},
-        {text: "Save Database" ,action: this.saveDatabase},
-        {text: "Archive Database" ,action: this.archiveDatabase}
-      ]
+        { text: "Load Database", action: this.loadDatabase },
+        { text: "Clear Database", action: this.clearDatabase },
+        { text: "Save Database", action: this.saveDatabase },
+        { text: "Archive Database", action: this.archiveDatabase }
+      ],
+      nodes: [],
+      apiUrl: ""
     };
   },
   computed: {
-    apiUrl: function() {
-      return this.$store.state.apiUrl;
-    },
     colorsProcessed: function() {
       var colors_ = {};
       for (var key in this.colors) {
@@ -156,18 +153,26 @@ export default {
   },
   methods: {
     loadDatabase() {
-      this.$axios.get(this.apiUrl + "/load");
+      var url_ = this.apiUrl;
+      this.$axios.get(url_ + "/load");
       // todo: get a list of nodeIDs and create a list of nodes in the canvas
-
+      console.log(`getting list of nodes\n${url_}`);
+      this.$axios.get(url_ + "/get/nodeIDs").then(response => {
+        console.log(response);
+        this.nodes = response["data"]["IDs"];
+      });
     },
     clearDatabase() {
-      this.$axios.post(this.apiUrl + "/clear");
+      var url_ = this.apiUrl;
+      this.$axios.post(url_ + "/clear");
     },
     saveDatabase() {
-      this.$axios.post(this.apiUrl + "/save");
+      var url_ = this.apiUrl;
+      this.$axios.post(url_ + "/save");
     },
     archiveDatabase() {
-      this.$axios.post(this.apiUrl + "/archive/save");
+      var url_ = this.apiUrl;
+      this.$axios.post(url_ + "/archive/save");
     },
     toggleMenu() {
       if (this.showMenu) {
@@ -179,18 +184,17 @@ export default {
   },
   created: function() {
     //this.testAPI();
-  },
-  watch: {
-    apiUrl(newValue, oldValue) {
-      // validate newValue
-      console.log(`watching from ${oldValue} to ${newValue}`);
-      var isValid = this.$store.getters.validateAPI();
-      if (!isValid) {
-        this.$store.commit("update_apiUrl", oldValue);
+
+    this.$store.subscribe((mutation, state) => {
+      if (mutation.type === "update_apiUrl") {
+        console.log(`updating validity ${state.apiUrl}`);
+        this.apiUrl = state.apiUrl[0];
+        var isValid = this.$store.getters.validateAPI;
+        this.$store.commit("update_apiUrlValidity", isValid);
       }
-      this.$store.commit("update_apiUrlValidity", isValid);
-    }
-  }
+    });
+  },
+  watch: {}
 };
 </script>
 

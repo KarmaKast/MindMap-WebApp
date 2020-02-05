@@ -18,13 +18,13 @@ export default {
   name: "buttonTwo",
   props: {
     colors: Object,
-    buttonText: String,
+    buttonText: String
   },
   data: function() {
     return {
       active: false,
       mainButtonIsHovered: false,
-      size: [32, 174],
+      size: [32, 174]
     };
   },
   computed: {
@@ -103,7 +103,7 @@ export default {
         //backdropFilter: "blur(4px)",
         borderRadius: "inherit"
       };
-    },
+    }
   },
   methods: {
     setActive() {
@@ -126,7 +126,7 @@ export default {
       }
     },
     emitTakeAction() {
-        this.$emit('takeAction');
+      this.$emit("takeAction");
     }
   }
 };

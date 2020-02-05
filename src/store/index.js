@@ -7,7 +7,7 @@ export default new Vuex.Store({
   state: {
     window_height: window.innerHeight,
     window_width: window.innerWidth,
-    apiUrl: ["",false],
+    apiUrl: ["", false],
     theme: []
   },
   mutations: {
@@ -25,10 +25,10 @@ export default new Vuex.Store({
     }
   },
   getters: {
-    validateAPI(state) {
-      var url_ =  state.apiUrl;
+    validateAPI: state => {
+      var url_ = state.apiUrl;
       // todo: validate url_
-      var isValid = (url_!=="") ? true: false;
+      var isValid = url_ !== "" ? true : false;
       return isValid;
     }
   },

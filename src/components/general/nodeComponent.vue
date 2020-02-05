@@ -44,7 +44,7 @@
 export default {
   name: "nodeComponent",
   props: {
-    ID:String,
+    ID: String,
     apiUrl: String,
     canvasSize: Object,
     defaultColors: Object
