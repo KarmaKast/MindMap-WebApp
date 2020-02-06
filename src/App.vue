@@ -1,42 +1,41 @@
 <template>
-  <div id="app">
-    <MindMap
-      :height="this.MindMapHeight"
-      :width="this.MindMapWidth"
-      :locationVert="this.MindMapLocationVert"
-      :colors="this.MindMapColors"
-    />
+  <div id="app" :style="this.appStyle">
+    <div
+      id="mindMapContainer"
+      :style="{
+        height: '100%',
+        width: '100%',
+        marginTop: '0px',
+        marginLeft: '0px',
+      }"
+    >
+      <MindMapModule :colors="this.MindMapColors" />
+    </div>
   </div>
 </template>
 
 <script>
-import MindMap from "./components/MindMap.vue";
+import MindMapModule from "./components/MindMapModule.vue";
 
 export default {
   name: "app",
   components: {
-    MindMap
+    MindMapModule
   },
   computed: {
-    MindMapHeight: function() {
-      // 70% of window Height
-      //return window.innerHeight * 0.7;
-      return this.$store.state.window_height * 0.7;
-    },
-    MindMapWidth: function() {
-      // 70% of window Height
-      return this.$store.state.window_width * 1;
-    },
-    MindMapLocationVert: function() {
-      return { marginTop: 100 };
-    },
-    MindMapLocationHor: function() {
-      return { left: 0 };
-    },
     MindMapColors: function() {
       return {
-        background: "rgb(233,233,233)",
-        theme: "rgb(255,103,103)"
+        background: [0, 0, 100, 0.5],
+        theme: [358, 97, 67, 1]
+      };
+    },
+    appStyle: function() {
+      return {
+        height: `${this.$store.state.window_height}px`,
+        width: `${this.$store.state.window_width}px`,
+        position: "absolute",
+        top: "0px",
+        left: "0px"
       };
     }
   },
