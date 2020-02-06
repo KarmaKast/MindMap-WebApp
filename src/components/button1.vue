@@ -66,8 +66,7 @@ export default {
         display: "grid",
         gridDirection: "row",
         gridTemplateColumns: this.active ? templateC : "unset",
-        justifyContent: "center",
-        alignItems: "center",
+        placeItems: "center",
         borderRadius: "inherit",
         padding: "0px",
       };
@@ -128,15 +127,16 @@ export default {
         order: "1",
         background: "none",
         height: "80%",
-        width: "100%",
-        margin: "0 auto",
-        padding: "0px",
+        width: "90%",
+
         border: "none",
         outline: "none",
         borderBottom: `1px solid ${this.colorsProcessed["theme"]}`,
         boxSizing: "border-box",
-        borderRadius: "4px",
-        fontSize: "10px"
+        borderRadius: "1px",
+        fontSize: "10px",
+        pointerEvents: 'all',
+        cursor: 'text',
       };
     },
     testButtonStyle: function() {
@@ -149,7 +149,7 @@ export default {
         margin: "0 auto",
         padding: "0px",
         height: `80%`,
-        width: `80%`,
+        width: `100%`,
         borderRadius: "10px",
         background: this.testButtonIsHovered
           ? "rgba(255, 255, 255, 0.9)"
