@@ -7,6 +7,8 @@ export default new Vuex.Store({
   state: {
     window_height: window.innerHeight,
     window_width: window.innerWidth,
+    canvas_height: 0,
+    canvas_width: 0,
     apiUrl: ["", false],
     theme: []
   },
@@ -16,6 +18,12 @@ export default new Vuex.Store({
     },
     update_window_width(state, val) {
       state.window_width = val;
+    },
+    update_canvas_height(state, val) {
+      state.canvas_height = val;
+    },
+    update_canvas_width(state, val) {
+      state.canvas_width = val;
     },
     update_apiUrl(state, url) {
       state.apiUrl[0] = url;

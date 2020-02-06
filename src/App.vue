@@ -1,12 +1,15 @@
 <template>
   <div id="app" :style="this.appStyle">
-    <div id="mindMapContainer" style="height:70%; width:100%;">
-      <MindMapModule
-        :locationVert="this.MindMapLocationVert"
-        :colors="this.MindMapColors"
-        :height="this.MindMapHeight"
-        :width="this.MindMapWidth"
-      />
+    <div
+      id="mindMapContainer"
+      :style="{
+        height: '100%',
+        width: '100%',
+        marginTop: '0px',
+        marginLeft: '0px',
+      }"
+    >
+      <MindMapModule :colors="this.MindMapColors" />
     </div>
   </div>
 </template>
@@ -20,21 +23,6 @@ export default {
     MindMapModule
   },
   computed: {
-    MindMapHeight: function() {
-      // 70% of window Height
-      //return window.innerHeight * 0.7;
-      return this.$store.state.window_height * 0.7;
-    },
-    MindMapWidth: function() {
-      // 70% of window Height
-      return this.$store.state.window_width * 1;
-    },
-    MindMapLocationVert: function() {
-      return { marginTop: 100 };
-    },
-    MindMapLocationHor: function() {
-      return { left: 0 };
-    },
     MindMapColors: function() {
       return {
         background: [358, 97, 67, 1],

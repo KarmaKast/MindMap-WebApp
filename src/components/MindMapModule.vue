@@ -1,8 +1,6 @@
 <template>
   <div class="container" :style="this.containerStyle">
     <MindMapCanvas
-      :height="this.height"
-      :width="this.width"
       :colors="this.colors"
       :nodes="this.nodes"
       :apiUrl="this.apiUrl"
@@ -75,13 +73,8 @@ export default {
     buttonTwo
   },
   props: {
-    locationVert: Object,
-    // locationVert: {'top':value} or {'bottom':value}
-    locationHor: Object,
     // locationHor: {'left':value} or {'right':value}
-    colors: Object,
-    height: Number,
-    width: Number
+    colors: Object
   },
   data: function() {
     return {
@@ -114,14 +107,6 @@ export default {
         height: "100%",
         width: "100%"
       };
-      if (this.locationVert !== undefined) {
-        if ("marginTop" in this.locationVert) {
-          style["marginTop"] = this.locationVert["marginTop"] + "px";
-        }
-        if ("marginBottom" in this.locationVert) {
-          style["marginBottom"] = this.locationVert + "px";
-        }
-      }
       if (this.colors !== undefined) {
         if ("background" in this.colors) {
           style["backgroundColor"] = `${this.colorsProcessed["background"]}`;
@@ -199,9 +184,9 @@ export default {
       }
     }
   },
+  watch: {},
   created: function() {
     //this.testAPI();
-
     this.$store.subscribe((mutation, state) => {
       if (mutation.type === "update_apiUrl") {
         console.log(`updating validity ${state.apiUrl}`);
@@ -211,7 +196,8 @@ export default {
       }
     });
   },
-  watch: {}
+  mounted: function() {},
+  updated: function() {}
 };
 </script>
 

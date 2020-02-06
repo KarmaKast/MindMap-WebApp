@@ -11,7 +11,7 @@
         :ID="nodeID"
         :apiUrl="apiUrl"
         :canvasSize="{ height: height, width: width }"
-        :canvasLocation="{ x: 0, y: 0 }"
+        :canvasLocation="canvasLocation"
         :defaultColors="colors"
       >
       </nodeComponent>
@@ -45,8 +45,6 @@ export default {
     nodeComponent
   },
   props: {
-    height: Number,
-    width: Number,
     colors: Object,
     nodes: Array,
     apiUrl: String
@@ -59,6 +57,12 @@ export default {
     };
   },
   computed: {
+    height: function() {
+      return this.$store.state.canvas_height;
+    },
+    width: function() {
+      return this.$store.state.canvas_width;
+    },
     canvasConfig: function() {
       return {
         height: this.height,
@@ -77,7 +81,25 @@ export default {
     }
   },
   watch: {},
-  mounted: function() {}
+  created: function() {},
+  mounted: function() {
+    var box = this.$refs.canvasContainer.getBoundingClientRect();
+    this.$store.commit("update_canvas_height", box.height);
+    this.$store.commit("update_canvas_width", box.width);
+
+    this.$store.subscribe((mutation) => {
+      if (
+        ["update_window_height", "update_window_width"].includes(mutation.type)
+      ) {
+        box = this.$refs.canvasContainer.getBoundingClientRect();
+        this.$store.commit("update_canvas_height", box.height);
+        this.$store.commit("update_canvas_width", box.width);
+        // todo: WIP
+      }
+    });
+    //console.log(box);
+  },
+  updated: function() {}
 };
 </script>
 <style lang="sass" scoped></style>
