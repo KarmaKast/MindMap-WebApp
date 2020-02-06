@@ -2,28 +2,38 @@
   <div
     id="canvasContainer"
     ref="canvasContainer"
-    style="height:100%; width:100%;"
+    style="height:100%; width:100%; position:relative; overflow: hidden;"
   >
-    <v-stage
-      ref="stage"
-      :config="canvasConfig"
-      @dragstart="handleDragstart"
-      @dragend="handleDragend"
-    >
-      <v-layer>
-        <v-group>
-          <nodeComponent
-            v-for="nodeID in nodes"
-            :key="nodeID"
-            :ID="nodeID"
-            :apiUrl="apiUrl"
-            :canvasSize="{ height: height, width: width }"
-            :defaultColors="colors"
+    <div id="nodes">
+      <nodeComponent
+        v-for="nodeID in nodes"
+        :key="nodeID"
+        :ID="nodeID"
+        :apiUrl="apiUrl"
+        :canvasSize="{ height: height, width: width }"
+        :canvasLocation="{ x: 0, y: 0 }"
+        :defaultColors="colors"
+      >
+      </nodeComponent>
+    </div>
+
+    <div id="relationWires" :style="{ pointerEvents: 'none' }">
+      <v-stage
+        ref="stage"
+        :config="canvasConfig"
+        @dragstart="handleDragstart"
+        @dragend="handleDragend"
+      >
+        <v-layer>
+          <v-group
+            :config="{
+              draggable: true
+            }"
           >
-          </nodeComponent>
-        </v-group>
-      </v-layer>
-    </v-stage>
+          </v-group>
+        </v-layer>
+      </v-stage>
+    </div>
   </div>
 </template>
 <script>

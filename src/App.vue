@@ -37,7 +37,7 @@ export default {
     },
     MindMapColors: function() {
       return {
-        background: [0, 0, 89, 1],
+        background: [358, 97, 67, 1],
         theme: [0, 100, 70, 1]
       };
     },

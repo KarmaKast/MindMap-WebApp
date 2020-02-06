@@ -18,11 +18,27 @@
     <div id="UI" style="position: absolute; top: 0px; left: 0px;">
       <div
         id="mainMenu"
-        style="position: absolute; margin-top: 15px; margin-left: 15px; z-index:5000;"
+        style="position: absolute; margin-top: 15px; margin-left: 15px; z-index:unset;"
       >
         <button
           id="burgerTimeButton"
-          style="position: relative; top: 0px; left:0px; height: 38px;width: 48px;background: rgba(255, 255, 255, 0.5);border: 0.5px dashed rgb(255, 164, 164);backdrop-filter: blur(4px);border-radius: 12px; padding: 0px;"
+          :style="{
+            position: 'relative',
+            top: '0px',
+            left: '0px',
+            height: '38px',
+            width: '48px',
+            background: 'rgba(255, 255, 255, 0.5)',
+            border: '0.5px dashed rgb(255, 164, 164)',
+            backdropFilter: 'blur(4px)',
+            borderRadius: '12px',
+            padding: '0px',
+            boxShadow: this.showMenu
+              ? 'hsla(0, 0%, 0%, 0.16) 0px 0px 19px 1px'
+              : 'hsla(0, 0%, 0%, 0.2) 0px 0px 1px 1px',
+            cursor: 'pointer',
+            outline: 'none'
+          }"
           @click.left="toggleMenu"
         >
           <img
@@ -77,7 +93,7 @@ export default {
         { text: "Save Database", action: this.saveDatabase },
         { text: "Archive Database", action: this.archiveDatabase }
       ],
-      nodes: [],
+      nodes: ["__test_ID__"],
       apiUrl: ""
     };
   },
@@ -147,7 +163,8 @@ export default {
         border: `0.5px dashed ${this.colorsProcessed["theme"]}`,
         boxSizing: "border-box",
         backdropFilter: "blur(4px)",
-        borderRadius: "10px"
+        borderRadius: "10px",
+        boxShadow: "hsla(0, 0%, 0%, 0.16) 0px 0px 19px 1px"
       };
     }
   },

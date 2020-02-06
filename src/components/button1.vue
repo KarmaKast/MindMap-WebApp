@@ -112,12 +112,9 @@ export default {
         height: `${this.size[0]}px`,
         width: `${this.size[1]}px`,
 
+        outline: "none",
         background: "none",
         border: "none",
-        //background: this.mainButtonIsHovered ? "rgba(255, 255, 255, 0.9)" : "rgba(255, 255, 255, 0.5)",
-        //border: `0.5px dashed ${this.colorsProcessed["theme"]}`,
-        //boxSizing: "border-box",
-        //backdropFilter: "blur(4px)",
         borderRadius: "inherit"
       };
     },
@@ -155,7 +152,8 @@ export default {
           ? "rgba(255, 255, 255, 0.9)"
           : "rgba(255, 255, 255, 0.3)",
         border: `0.5px dashed ${this.colorsProcessed["theme"]}`,
-        backdropFilter: "blur(4px)"
+        backdropFilter: "blur(4px)",
+        outline: "none"
       };
     }
   },

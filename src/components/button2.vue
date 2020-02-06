@@ -97,11 +97,8 @@ export default {
 
         background: "none",
         border: "none",
-        //background: this.mainButtonIsHovered ? "rgba(255, 255, 255, 0.9)" : "rgba(255, 255, 255, 0.5)",
-        //border: `0.5px dashed ${this.colorsProcessed["theme"]}`,
-        //boxSizing: "border-box",
-        //backdropFilter: "blur(4px)",
-        borderRadius: "inherit"
+        borderRadius: "inherit",
+        outline: "none"
       };
     }
   },
