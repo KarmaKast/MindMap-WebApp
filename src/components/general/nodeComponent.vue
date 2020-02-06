@@ -107,17 +107,17 @@ export default {
   methods: {
     startdrag(event) {
       this.dragging = true;
-      console.log(
-        `started dragging Loc(${this.nodeLocation["x"]},${this.nodeLocation["y"]})`
-      );
+      //console.log(
+      //  `started dragging Loc(${this.nodeLocation["x"]},${this.nodeLocation["y"]})`
+      //);
 
-      console.log(event);
+      //console.log(event);
       var boundingBox = this.$refs.nodeContainer.getBoundingClientRect();
       // context: draggingDeltas are ---
       this.draggingDeltas["x"] = event.clientX - boundingBox.x;
       this.draggingDeltas["y"] = event.clientY - boundingBox.y;
 
-      console.log(`x:${this.draggingDeltas.x}, y:${this.draggingDeltas.y}`);
+      //console.log(`x:${this.draggingDeltas.x}, y:${this.draggingDeltas.y}`);
     },
     dodrag() {
       if (this.dragging) {
@@ -127,9 +127,9 @@ export default {
     },
     stopdrag() {
       this.dragging = false;
-      console.log(
-        `ended dragging Loc(${this.nodeLocation["x"]},${this.nodeLocation["y"]})`
-      );
+      //console.log(
+      //  `ended dragging Loc(${this.nodeLocation["x"]},${this.nodeLocation["y"]})`
+      //);
       this.draggingDeltas = { x: 0, y: 0 };
     }
   },

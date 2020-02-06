@@ -1,11 +1,11 @@
 <template>
   <div class="container" :style="this.containerStyle">
-    <MindMapCanvas
+    <mind-map-canvas
       :colors="this.colors"
       :nodes="this.nodes"
       :apiUrl="this.apiUrl"
     >
-    </MindMapCanvas>
+    </mind-map-canvas>
 
     <div
       class="debug"
@@ -76,13 +76,18 @@
           ></button-two>
         </div>
       </div>
-      <div id="statusBar" :style="statusBarStyle"></div>
+      <status-bar
+        :colors="this.colorsProcessed"
+        :apiValidity="this.apiValidity"
+      >
+      </status-bar>
     </div>
   </div>
 </template>
 
 <script>
 import MindMapCanvas from "./MindMapCanvas.vue";
+import statusBar from "./statusBar.vue"
 import buttonOne from "./button1.vue";
 import buttonTwo from "./button2.vue";
 
@@ -90,6 +95,7 @@ export default {
   name: "MindMapModule",
   components: {
     MindMapCanvas,
+    statusBar,
     buttonOne,
     buttonTwo
   },
@@ -127,7 +133,8 @@ export default {
     containerStyle: function() {
       var style = {
         height: "100%",
-        width: "100%"
+        width: "100%",
+        overflow: "hidden"
       };
       if (this.colors !== undefined) {
         if ("background" in this.colors) {
@@ -174,17 +181,6 @@ export default {
         boxShadow: "hsla(0, 0%, 0%, 0.16) 0px 0px 19px 1px"
       };
     },
-    statusBarStyle: function() {
-      return {
-        position: "absolute",
-        bottom: "0px",
-        left: "0px",
-        width: `${this.$store.state.canvas_width}px`,
-        height: "15px",
-
-        backgroundColor: `${this.colorsProcessed["background"]}`
-      };
-    }
   },
   methods: {
     loadDatabase() {
@@ -222,11 +218,11 @@ export default {
     //this.testAPI();
     this.$store.subscribe((mutation, state) => {
       if (mutation.type === "update_apiUrl") {
-        console.log(`updating validity ${state.apiUrl}`);
+        //console.log(`updating validity ${state.apiUrl}`);
         this.apiUrl = state.apiUrl[0];
         var isValid = this.$store.getters.validateAPI;
         this.apiValidity = isValid;
-        this.$store.commit("update_apiUrlValidity", isValid);
+        //this.$store.commit("update_apiUrlValidity", isValid);
       }
     });
   },
