@@ -32,7 +32,8 @@
 export default {
   name: "buttonOne",
   props: {
-    colors: Object
+    colors: Object,
+    validity: Boolean
   },
   data: function() {
     return {
@@ -64,11 +65,11 @@ export default {
         width: `${this.size[1]}px`,
         display: "grid",
         gridDirection: "row",
-        gridTemplateColumns: this.active ? templateC : "none",
+        gridTemplateColumns: this.active ? templateC : "unset",
         justifyContent: "center",
         alignItems: "center",
         borderRadius: "inherit",
-        padding: "0px"
+        padding: "0px",
       };
     },
     backgroundStyle: function() {
@@ -111,6 +112,8 @@ export default {
         padding: "0px",
         height: `${this.size[0]}px`,
         width: `${this.size[1]}px`,
+        pointerEvents: 'all',
+        cursor: 'pointer',
 
         outline: "none",
         background: "none",
@@ -153,7 +156,9 @@ export default {
           : "rgba(255, 255, 255, 0.3)",
         border: `0.5px dashed ${this.colorsProcessed["theme"]}`,
         backdropFilter: "blur(4px)",
-        outline: "none"
+        outline: "none",
+        pointerEvents: 'all',
+        cursor: 'pointer',
       };
     }
   },

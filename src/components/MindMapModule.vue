@@ -13,10 +13,25 @@
       style="display: block; position: relative; bottom: 0px; margin: 0px auto;"
     ></div>
 
-    <div id="UI" style="position: absolute; top: 0px; left: 0px;">
+    <div
+      id="UI"
+      :style="{
+        position: 'absolute',
+        top: '0px',
+        left: '0px',
+        height: '100%',
+        width: '100%',
+        pointerEvents: 'none'
+      }"
+    >
       <div
         id="mainMenu"
-        style="position: absolute; margin-top: 15px; margin-left: 15px; z-index:unset;"
+        :style="{
+          position: 'absolute',
+          marginTop: '15px',
+          marginLeft: '15px',
+          zIndex: 'unset'
+        }"
       >
         <button
           id="burgerTimeButton"
@@ -35,7 +50,8 @@
               ? 'hsla(0, 0%, 0%, 0.16) 0px 0px 19px 1px'
               : 'hsla(0, 0%, 0%, 0.2) 0px 0px 1px 1px',
             cursor: 'pointer',
-            outline: 'none'
+            outline: 'none',
+            pointerEvents: 'all'
           }"
           @click.left="toggleMenu"
         >
@@ -45,7 +61,11 @@
           />
         </button>
         <div id="menuItems" :style="this.mainItemsStyle">
-          <button-one :colors="colors" :style="{ order: 0 }"></button-one>
+          <button-one
+            :validity="this.apiValidity"
+            :colors="colors"
+            :style="{ order: 0 }"
+          ></button-one>
           <button-two
             v-for="(button, index) in menuButtons"
             :key="index"
@@ -56,6 +76,7 @@
           ></button-two>
         </div>
       </div>
+      <div id="statusBar" :style="statusBarStyle"></div>
     </div>
   </div>
 </template>
@@ -87,7 +108,8 @@ export default {
         { text: "Archive Database", action: this.archiveDatabase }
       ],
       nodes: ["__test_ID__"],
-      apiUrl: ""
+      apiUrl: "",
+      apiValidity: false
     };
   },
   computed: {
@@ -109,7 +131,7 @@ export default {
       };
       if (this.colors !== undefined) {
         if ("background" in this.colors) {
-          style["backgroundColor"] = `${this.colorsProcessed["background"]}`;
+          style["backgroundColor"] = `${this.colorsProcessed["theme"]}`;
         }
       }
       return style;
@@ -150,6 +172,17 @@ export default {
         backdropFilter: "blur(4px)",
         borderRadius: "10px",
         boxShadow: "hsla(0, 0%, 0%, 0.16) 0px 0px 19px 1px"
+      };
+    },
+    statusBarStyle: function() {
+      return {
+        position: "absolute",
+        bottom: "0px",
+        left: "0px",
+        width: `${this.$store.state.canvas_width}px`,
+        height: "15px",
+
+        backgroundColor: `${this.colorsProcessed["background"]}`
       };
     }
   },
@@ -192,6 +225,7 @@ export default {
         console.log(`updating validity ${state.apiUrl}`);
         this.apiUrl = state.apiUrl[0];
         var isValid = this.$store.getters.validateAPI;
+        this.apiValidity = isValid;
         this.$store.commit("update_apiUrlValidity", isValid);
       }
     });

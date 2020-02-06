@@ -25,8 +25,8 @@ export default {
   computed: {
     MindMapColors: function() {
       return {
-        background: [358, 97, 67, 1],
-        theme: [0, 100, 70, 1]
+        background: [0, 0, 100, 0.5],
+        theme: [358, 97, 67, 1]
       };
     },
     appStyle: function() {
