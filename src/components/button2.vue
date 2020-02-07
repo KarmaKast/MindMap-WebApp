@@ -24,7 +24,8 @@ export default {
     return {
       active: false,
       mainButtonIsHovered: false,
-      size: [32, 174]
+      size: [32, 174],
+      isHovered: false
     };
   },
   computed: {

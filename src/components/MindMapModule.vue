@@ -71,7 +71,7 @@
             :key="index"
             :colors="colors"
             :buttonText="button['text']"
-            @takeAction="button['action']"
+            @takeAction="button['action'](...button['args'])"
             :style="{ order: index }"
           ></button-two>
         </div>
@@ -81,6 +81,11 @@
         :apiValidity="this.apiValidity"
       >
       </status-bar>
+      <about-page
+        :showPage="this.showAboutPage"
+        @closePage="this.aboutPageDisplay"
+      >
+      </about-page>
     </div>
   </div>
 </template>
@@ -88,6 +93,8 @@
 <script>
 import MindMapCanvas from "./MindMapCanvas.vue";
 import statusBar from "./statusBar.vue";
+import aboutPage from "./aboutPage.vue";
+
 import buttonOne from "./button1.vue";
 import buttonTwo from "./button2.vue";
 
@@ -96,6 +103,8 @@ export default {
   components: {
     MindMapCanvas,
     statusBar,
+    aboutPage,
+
     buttonOne,
     buttonTwo
   },
@@ -109,7 +118,8 @@ export default {
       showMenu: false,
       nodes: ["__test_ID__"],
       apiUrl: "",
-      apiValidity: false
+      apiValidity: false,
+      showAboutPage: false
     };
   },
   computed: {
@@ -118,22 +128,38 @@ export default {
         {
           text: "Load Database",
           action: this.loadDatabase,
+          args: [],
           if: this.apiValidity
         },
         {
           text: "Clear Database",
           action: this.clearDatabase,
+          args: [],
           if: this.apiValidity
         },
         {
           text: "Save Database",
           action: this.saveDatabase,
+          args: [],
           if: this.apiValidity
         },
         {
           text: "Archive Database",
           action: this.archiveDatabase,
+          args: [],
           if: this.apiValidity
+        },
+        {
+          text: "settings",
+          action: function() {},
+          args: [],
+          if: true
+        },
+        {
+          text: "about",
+          action: this.aboutPageDisplay,
+          args: [true],
+          if: true
         }
       ];
       function process(value) {
@@ -234,6 +260,11 @@ export default {
       } else {
         this.showMenu = true;
       }
+    },
+    aboutPageDisplay(showOrHide) {
+      //var win = window.open('https://github.com/KarmaKast/MindMap-WebApp/tree/develop', '_blank');
+      //win.focus();
+      this.showAboutPage = showOrHide;
     }
   },
   watch: {},

@@ -136,13 +136,14 @@ export default {
   },
   created: function() {
     if (this.ID === undefined) {
+      // create new node using the nodeAPI and take its ID
       console.log(this.ID);
     }
   },
   mounted: function() {
-    if (this.ID === undefined) {
-      // create new node using the nodeAPI and take its ID
+    if (this.ID !== undefined) {
       console.log(this.ID);
+      // todo: get node_label, relation_claims, data from the API using the nodeID
     }
   },
   updated() {}
