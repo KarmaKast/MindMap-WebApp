@@ -6,7 +6,7 @@
         height: '100%',
         width: '100%',
         marginTop: '0px',
-        marginLeft: '0px',
+        marginLeft: '0px'
       }"
     >
       <MindMapModule :colors="this.MindMapColors" />

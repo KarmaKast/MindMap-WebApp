@@ -68,7 +68,7 @@ export default {
         gridTemplateColumns: this.active ? templateC : "unset",
         placeItems: "center",
         borderRadius: "inherit",
-        padding: "0px",
+        padding: "0px"
       };
     },
     backgroundStyle: function() {
@@ -111,8 +111,8 @@ export default {
         padding: "0px",
         height: `${this.size[0]}px`,
         width: `${this.size[1]}px`,
-        pointerEvents: 'all',
-        cursor: 'pointer',
+        pointerEvents: "all",
+        cursor: "pointer",
 
         outline: "none",
         background: "none",
@@ -135,8 +135,8 @@ export default {
         boxSizing: "border-box",
         borderRadius: "1px",
         fontSize: "10px",
-        pointerEvents: 'all',
-        cursor: 'text',
+        pointerEvents: "all",
+        cursor: "text"
       };
     },
     testButtonStyle: function() {
@@ -149,7 +149,7 @@ export default {
         margin: "0 auto",
         padding: "0px",
         height: `80%`,
-        width: `100%`,
+        width: `80%`,
         borderRadius: "10px",
         background: this.testButtonIsHovered
           ? "rgba(255, 255, 255, 0.9)"
@@ -157,8 +157,8 @@ export default {
         border: `0.5px dashed ${this.colorsProcessed["theme"]}`,
         backdropFilter: "blur(4px)",
         outline: "none",
-        pointerEvents: 'all',
-        cursor: 'pointer',
+        pointerEvents: "all",
+        cursor: "pointer"
       };
     }
   },
@@ -178,7 +178,7 @@ export default {
       isAPI = true;
       if (isAPI) {
         //this.apiUrl = this.urlInField;
-        this.$store.commit("update_apiUrl", this.urlInField);
+        this.$store.dispatch("update_apiUrl", this.urlInField);
         this.active = false;
       }
     },

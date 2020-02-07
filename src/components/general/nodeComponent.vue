@@ -131,11 +131,18 @@ export default {
       //  `ended dragging Loc(${this.nodeLocation["x"]},${this.nodeLocation["y"]})`
       //);
       this.draggingDeltas = { x: 0, y: 0 };
+      // todo: update the new location to the API
+    }
+  },
+  created: function() {
+    if (this.ID === undefined) {
+      console.log(this.ID);
     }
   },
   mounted: function() {
     if (this.ID === undefined) {
       // create new node using the nodeAPI and take its ID
+      console.log(this.ID);
     }
   },
   updated() {}

@@ -94,8 +94,8 @@ export default {
         padding: "0px",
         height: `${this.size[0]}px`,
         width: `${this.size[1]}px`,
-        pointerEvents: 'all',
-        cursor: 'pointer',
+        pointerEvents: "all",
+        cursor: "pointer",
 
         background: "none",
         border: "none",

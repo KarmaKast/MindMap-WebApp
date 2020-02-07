@@ -87,7 +87,7 @@
 
 <script>
 import MindMapCanvas from "./MindMapCanvas.vue";
-import statusBar from "./statusBar.vue"
+import statusBar from "./statusBar.vue";
 import buttonOne from "./button1.vue";
 import buttonTwo from "./button2.vue";
 
@@ -107,18 +107,42 @@ export default {
     return {
       respo: "",
       showMenu: false,
-      menuButtons: [
-        { text: "Load Database", action: this.loadDatabase },
-        { text: "Clear Database", action: this.clearDatabase },
-        { text: "Save Database", action: this.saveDatabase },
-        { text: "Archive Database", action: this.archiveDatabase }
-      ],
       nodes: ["__test_ID__"],
       apiUrl: "",
       apiValidity: false
     };
   },
   computed: {
+    menuButtons: function() {
+      var list = [
+        {
+          text: "Load Database",
+          action: this.loadDatabase,
+          if: this.apiValidity
+        },
+        {
+          text: "Clear Database",
+          action: this.clearDatabase,
+          if: this.apiValidity
+        },
+        {
+          text: "Save Database",
+          action: this.saveDatabase,
+          if: this.apiValidity
+        },
+        {
+          text: "Archive Database",
+          action: this.archiveDatabase,
+          if: this.apiValidity
+        }
+      ];
+      function process(value) {
+        // method to process menu list
+        return value["if"];
+      }
+      var processedList = list.filter(process);
+      return processedList;
+    },
     colorsProcessed: function() {
       var colors_ = {};
       for (var key in this.colors) {
@@ -166,7 +190,6 @@ export default {
     mainItemsStyle: function() {
       return {
         display: this.showMenu ? "grid" : "none",
-        justifyContent: "start",
         gridRowGap: "8px",
         position: "absolute",
         top: "0px",
@@ -180,7 +203,7 @@ export default {
         borderRadius: "10px",
         boxShadow: "hsla(0, 0%, 0%, 0.16) 0px 0px 19px 1px"
       };
-    },
+    }
   },
   methods: {
     loadDatabase() {
@@ -216,13 +239,18 @@ export default {
   watch: {},
   created: function() {
     //this.testAPI();
-    this.$store.subscribe((mutation, state) => {
-      if (mutation.type === "update_apiUrl") {
-        //console.log(`updating validity ${state.apiUrl}`);
+
+    //this.$store.subscribeAction((action) => {
+    //  if (action.type === "update_apiUrl") {
+    //    //console.log(`updating validity ${state.apiUrl}`);
+    //    this.apiurl = this.$store.state.apiUrl[0];
+    //    this.apiValidity = this.$store.state.apiUrl[1];
+    //  }
+    //});
+    this.$store.subscribeAction({
+      after: (action, state) => {
         this.apiUrl = state.apiUrl[0];
-        var isValid = this.$store.getters.validateAPI;
-        this.apiValidity = isValid;
-        //this.$store.commit("update_apiUrlValidity", isValid);
+        this.apiValidity = state.apiUrl[1];
       }
     });
   },

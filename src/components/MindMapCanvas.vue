@@ -87,7 +87,7 @@ export default {
     this.$store.commit("update_canvas_height", box.height);
     this.$store.commit("update_canvas_width", box.width);
 
-    this.$store.subscribe((mutation) => {
+    this.$store.subscribe(mutation => {
       if (
         ["update_window_height", "update_window_width"].includes(mutation.type)
       ) {
