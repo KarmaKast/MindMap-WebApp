@@ -111,7 +111,7 @@ export default {
         padding: "0px",
         height: `${this.size[0]}px`,
         width: `${this.size[1]}px`,
-        pointerEvents: "all",
+        pointerEvents: "initial",
         cursor: "pointer",
 
         outline: "none",
@@ -135,7 +135,7 @@ export default {
         boxSizing: "border-box",
         borderRadius: "1px",
         fontSize: "10px",
-        pointerEvents: "all",
+        pointerEvents: "initial",
         cursor: "text"
       };
     },
@@ -157,7 +157,7 @@ export default {
         border: `0.5px dashed ${this.colorsProcessed["theme"]}`,
         backdropFilter: "blur(4px)",
         outline: "none",
-        pointerEvents: "all",
+        pointerEvents: "initial",
         cursor: "pointer"
       };
     }

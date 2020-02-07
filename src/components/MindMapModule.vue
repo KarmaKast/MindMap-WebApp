@@ -51,7 +51,7 @@
               : 'hsla(0, 0%, 0%, 0.2) 0px 0px 1px 1px',
             cursor: 'pointer',
             outline: 'none',
-            pointerEvents: 'all'
+            pointerEvents: 'initial'
           }"
           @click.left="toggleMenu"
         >
@@ -150,13 +150,13 @@ export default {
           if: this.apiValidity
         },
         {
-          text: "settings",
+          text: "Settings",
           action: function() {},
           args: [],
           if: true
         },
         {
-          text: "about",
+          text: "About",
           action: this.aboutPageDisplay,
           args: [true],
           if: true
