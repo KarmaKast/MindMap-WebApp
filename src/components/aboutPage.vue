@@ -84,7 +84,7 @@ export default {
         padding: "0px",
         display: "grid",
         placeItems: "center",
-        outline: 'none',
+        outline: "none"
       };
     },
     pStyle: function() {

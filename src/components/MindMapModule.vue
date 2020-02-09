@@ -1,5 +1,5 @@
 <template>
-  <div class="container" :style="this.containerStyle">
+  <div class="MindMapModule" :style="this.containerStyle">
     <mind-map-canvas
       :colors="this.colors"
       :nodes="this.nodes"

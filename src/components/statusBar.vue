@@ -25,7 +25,7 @@ export default {
         position: "absolute",
         bottom: "0px",
         left: "0px",
-        width: `${this.$store.state.canvas_width}px`,
+        width: `100%`,
         height: `${this.height}px`,
         boxSizing: "border-box",
         padding: `${this.padding}px`,
