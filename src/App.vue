@@ -3,10 +3,10 @@
     <div
       id="mindMapContainer"
       :style="{
-        height: '100%',
-        width: '100%',
-        marginTop: '0px',
-        marginLeft: '0px'
+        height: '80%',
+        width: '80%',
+        marginTop: '10px',
+        marginLeft: '10px'
       }"
     >
       <MindMapModule :colors="this.MindMapColors" />
@@ -26,7 +26,8 @@ export default {
     MindMapColors: function() {
       return {
         background: [0, 0, 100, 0.5],
-        theme: [358, 97, 67, 1]
+        theme: [358, 97, 67, 1],
+        theme_light: [0, 100, 84, 1]
       };
     },
     appStyle: function() {

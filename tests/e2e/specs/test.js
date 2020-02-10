@@ -30,6 +30,7 @@ describe("Main Tests", () => {
       .siblings("input#input-field")
       .type(`${url_}{enter}`);
 
+    // doing: asserting color change
     cy.get("#api-status-indicator").should(
       "have.css",
       "background-color",

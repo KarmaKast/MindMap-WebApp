@@ -21,7 +21,7 @@
       @keyup.esc="setNotActive"
     />
     <button
-      id="submit-button"
+      id="secondary-button"
       :style="this.testButtonStyle"
       @click.left="testAPI"
       @mouseover="setButtonHovered('test')"
@@ -38,7 +38,7 @@ export default {
     validity: Boolean,
     index: {
       default: 1,
-      type: Number 
+      type: Number
     }
   },
   data: function() {
@@ -48,7 +48,7 @@ export default {
       mainButtonIsHovered: false,
       testButtonIsHovered: false,
       size: [32, 174],
-      urlInField: "",
+      urlInField: ""
     };
   },
   computed: {

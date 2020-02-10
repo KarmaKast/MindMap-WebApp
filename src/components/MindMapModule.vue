@@ -1,10 +1,6 @@
 <template>
   <div class="MindMapModule" :style="this.containerStyle">
-    <mind-map-canvas
-      :colors="this.colors"
-      :nodes="this.nodes"
-      :apiUrl="this.apiUrl"
-    >
+    <mind-map-canvas :colors="this.colors" :apiUrl="this.apiUrl">
     </mind-map-canvas>
 
     <div
@@ -21,7 +17,8 @@
         left: '0px',
         height: '100%',
         width: '100%',
-        pointerEvents: 'none'
+        pointerEvents: 'none',
+        borderRadius: 'inherit'
       }"
     >
       <div
@@ -77,8 +74,9 @@
         </div>
       </div>
       <status-bar
-        :colors="this.colorsProcessed"
-        :apiValidity="this.apiValidity"
+        :colors="colorsProcessed"
+        :apiUrl="apiUrl"
+        :apiValidity="apiValidity"
       >
       </status-bar>
       <about-page
@@ -116,7 +114,6 @@ export default {
     return {
       respo: "",
       showMenu: false,
-      nodes: ["__test_ID__", "__test_ID__", "__test_ID__", "__test_ID__", "__test_ID__", "__test_ID__"],
       apiUrl: "",
       apiValidity: false,
       showAboutPage: false
@@ -184,11 +181,16 @@ export default {
       var style = {
         height: "100%",
         width: "100%",
-        overflow: "hidden"
+        overflow: "hidden",
+        borderRadius: "5px",
+        position: "relative"
       };
       if (this.colors !== undefined) {
         if ("background" in this.colors) {
           style["backgroundColor"] = `${this.colorsProcessed["theme"]}`;
+          style[
+            "boxShadow"
+          ] = `0px 0px 0 2px ${this.colorsProcessed["theme_light"]}`;
         }
       }
       return style;

@@ -37,7 +37,7 @@
   </div>
 </template>
 <script>
-import nodeComponent from "./general/nodeComponent";
+import nodeComponent from "./nodeComponent";
 
 export default {
   name: "MindMapCanvas",
@@ -46,11 +46,11 @@ export default {
   },
   props: {
     colors: Object,
-    nodes: Array,
     apiUrl: String
   },
   data: function() {
     return {
+      nodes: ["__test_ID__", "__test_ID2__"],
       mindmapCanvas: null,
       dragItemId: null,
       canvasLocation: { x: 0, y: 0 }
