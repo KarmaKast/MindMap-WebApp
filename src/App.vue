@@ -22,6 +22,9 @@ export default {
   components: {
     MindMapModule
   },
+  data: function() {
+    return {};
+  },
   computed: {
     MindMapColors: function() {
       return {

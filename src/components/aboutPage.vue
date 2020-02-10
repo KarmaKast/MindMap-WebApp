@@ -14,19 +14,17 @@
         />
       </button>
       <p :style="pStyle">
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
-        tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
-        veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
-        commodo consequat. Duis aute irure dolor in reprehenderit in voluptate
-        velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint
-        occaecat cupidatat non proident, sunt in culpa qui officia deserunt
-        mollit anim id est laborum. <br />
+        A Mindmap web app that used <a href="">nodeLib</a> graph DBMS library.
+        Currently in prototyping state. <br />
+        <br />
         <a
           href="https://github.com/KarmaKast/MindMap-WebApp/tree/develop"
           :style="{ pointerEvents: 'initial' }"
         >
-          github repo
+          Github Repo
         </a>
+        <br />
+        Version : {{ version }}
       </p>
     </div>
   </div>
@@ -39,7 +37,8 @@ export default {
   },
   data: function() {
     return {
-      isHovered: false
+      isHovered: false,
+      version: "0.1.0"
     };
   },
   computed: {
