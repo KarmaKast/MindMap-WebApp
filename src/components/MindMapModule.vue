@@ -116,7 +116,7 @@ export default {
     return {
       respo: "",
       showMenu: false,
-      nodes: ["__test_ID__"],
+      nodes: ["__test_ID__", "__test_ID__", "__test_ID__", "__test_ID__", "__test_ID__", "__test_ID__"],
       apiUrl: "",
       apiValidity: false,
       showAboutPage: false

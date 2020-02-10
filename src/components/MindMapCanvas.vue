@@ -6,8 +6,8 @@
   >
     <div id="nodes">
       <nodeComponent
-        v-for="nodeID in nodes"
-        :key="nodeID"
+        v-for="(nodeID, index) in nodes"
+        :key="index"
         :ID="nodeID"
         :apiUrl="apiUrl"
         :canvasSize="{ height: height, width: width }"

@@ -5,6 +5,7 @@
       {{ this.buttonText }}
     </p>
     <button
+      id="primary-button"
       :style="this.buttonStyle"
       @click.left="setActive"
       @mouseover="setButtonHovered('main')"
@@ -12,6 +13,7 @@
     ></button>
     <input
       v-model="urlInField"
+      id="input-field"
       ref="inputField"
       placeholder="Connect to API"
       :style="this.inputFieldStyle"
@@ -19,7 +21,7 @@
       @keyup.esc="setNotActive"
     />
     <button
-      id="testButton"
+      id="submit-button"
       :style="this.testButtonStyle"
       @click.left="testAPI"
       @mouseover="setButtonHovered('test')"
@@ -33,7 +35,11 @@ export default {
   name: "buttonOne",
   props: {
     colors: Object,
-    validity: Boolean
+    validity: Boolean,
+    index: {
+      default: 1,
+      type: Number 
+    }
   },
   data: function() {
     return {
@@ -42,7 +48,7 @@ export default {
       mainButtonIsHovered: false,
       testButtonIsHovered: false,
       size: [32, 174],
-      urlInField: ""
+      urlInField: "",
     };
   },
   computed: {

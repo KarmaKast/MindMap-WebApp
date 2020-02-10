@@ -2,7 +2,7 @@
   <div id="statusBar" :style="statusBarStyle">
     <div></div>
     <div id="apiStatusContainer" :style="apiStatusContainerStyle">
-      <div id="apiStatus" :style="apiStatusStyle"></div>
+      <div id="api-status-indicator" :style="apiStatusStyle"></div>
     </div>
   </div>
 </template>
@@ -52,8 +52,8 @@ export default {
         height: "100%",
         width: "100%",
         backgroundColor: this.apiValidity
-          ? "hsl(130, 100%, 40%)"
-          : "hsl(0, 100%, 60%)",
+          ? "hsla(130, 100%, 40%, 0.95)"
+          : "hsla(0, 100%, 60%, 0.95)",
         borderRadius: `${this.height}px`,
         boxShadow: "0px 0px 3px 1px hsla(0, 0%, 0%, 0.32)"
       };
