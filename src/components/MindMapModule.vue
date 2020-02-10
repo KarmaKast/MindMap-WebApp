@@ -1,6 +1,6 @@
 <template>
   <div class="MindMapModule" :style="this.containerStyle">
-    <mind-map-canvas :colors="this.colors" :apiUrl="this.apiUrl">
+    <mind-map-canvas :colors="this.colors" :apiUrl="this.apiUrl" :nodes="nodes">
     </mind-map-canvas>
 
     <div
@@ -116,6 +116,7 @@ export default {
       showMenu: false,
       apiUrl: "",
       apiValidity: false,
+      nodes: ["__test_ID__", "__test_ID2__"],
       showAboutPage: false
     };
   },
