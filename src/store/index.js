@@ -32,14 +32,15 @@ export default new Vuex.Store({
       state.apiUrl[1] = isValid;
     }
   },
-  getters: {
-    validateAPI: state => {
-      var url_ = state.apiUrl;
-      // todo: validate url_
-      var isValid = url_ !== "" ? true : false;
-      return isValid;
+  getters: {},
+  actions: {
+    update_apiUrl(context, url) {
+      console.log("doing action");
+      context.commit("update_apiUrl", url);
+
+      var isValid = url === "" ? false : true;
+      context.commit("update_apiUrlValidity", isValid);
     }
   },
-  actions: {},
   modules: {}
 });

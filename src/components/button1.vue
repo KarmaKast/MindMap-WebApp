@@ -5,6 +5,7 @@
       {{ this.buttonText }}
     </p>
     <button
+      id="primary-button"
       :style="this.buttonStyle"
       @click.left="setActive"
       @mouseover="setButtonHovered('main')"
@@ -12,6 +13,7 @@
     ></button>
     <input
       v-model="urlInField"
+      id="input-field"
       ref="inputField"
       placeholder="Connect to API"
       :style="this.inputFieldStyle"
@@ -19,7 +21,7 @@
       @keyup.esc="setNotActive"
     />
     <button
-      id="testButton"
+      id="secondary-button"
       :style="this.testButtonStyle"
       @click.left="testAPI"
       @mouseover="setButtonHovered('test')"
@@ -33,7 +35,11 @@ export default {
   name: "buttonOne",
   props: {
     colors: Object,
-    validity: Boolean
+    validity: Boolean,
+    index: {
+      default: 1,
+      type: Number
+    }
   },
   data: function() {
     return {
@@ -66,10 +72,9 @@ export default {
         display: "grid",
         gridDirection: "row",
         gridTemplateColumns: this.active ? templateC : "unset",
-        justifyContent: "center",
-        alignItems: "center",
+        placeItems: "center",
         borderRadius: "inherit",
-        padding: "0px",
+        padding: "0px"
       };
     },
     backgroundStyle: function() {
@@ -112,8 +117,8 @@ export default {
         padding: "0px",
         height: `${this.size[0]}px`,
         width: `${this.size[1]}px`,
-        pointerEvents: 'all',
-        cursor: 'pointer',
+        pointerEvents: "initial",
+        cursor: "pointer",
 
         outline: "none",
         background: "none",
@@ -128,15 +133,16 @@ export default {
         order: "1",
         background: "none",
         height: "80%",
-        width: "100%",
-        margin: "0 auto",
-        padding: "0px",
+        width: "90%",
+
         border: "none",
         outline: "none",
         borderBottom: `1px solid ${this.colorsProcessed["theme"]}`,
         boxSizing: "border-box",
-        borderRadius: "4px",
-        fontSize: "10px"
+        borderRadius: "1px",
+        fontSize: "10px",
+        pointerEvents: "initial",
+        cursor: "text"
       };
     },
     testButtonStyle: function() {
@@ -157,8 +163,8 @@ export default {
         border: `0.5px dashed ${this.colorsProcessed["theme"]}`,
         backdropFilter: "blur(4px)",
         outline: "none",
-        pointerEvents: 'all',
-        cursor: 'pointer',
+        pointerEvents: "initial",
+        cursor: "pointer"
       };
     }
   },
@@ -178,7 +184,7 @@ export default {
       isAPI = true;
       if (isAPI) {
         //this.apiUrl = this.urlInField;
-        this.$store.commit("update_apiUrl", this.urlInField);
+        this.$store.dispatch("update_apiUrl", this.urlInField);
         this.active = false;
       }
     },

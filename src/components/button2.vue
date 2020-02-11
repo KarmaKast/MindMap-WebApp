@@ -24,7 +24,8 @@ export default {
     return {
       active: false,
       mainButtonIsHovered: false,
-      size: [32, 174]
+      size: [32, 174],
+      isHovered: false
     };
   },
   computed: {
@@ -94,8 +95,8 @@ export default {
         padding: "0px",
         height: `${this.size[0]}px`,
         width: `${this.size[1]}px`,
-        pointerEvents: 'all',
-        cursor: 'pointer',
+        pointerEvents: "initial",
+        cursor: "pointer",
 
         background: "none",
         border: "none",
