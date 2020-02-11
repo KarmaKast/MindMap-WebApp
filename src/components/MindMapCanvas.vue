@@ -17,6 +17,7 @@
         :canvasMousePos="value.canvasMousePos"
         :defaultColors="colors"
         :dragging="value.dragging"
+        :newNode="value.newNode"
         @startDrag="startDrag"
       >
       </nodeComponent>
@@ -47,7 +48,8 @@ export default {
   props: {
     colors: Object,
     nodes: Array,
-    apiUrl: String
+    apiUrl: String,
+    apiValidity: Boolean
   },
   data: function() {
     return {
@@ -71,7 +73,8 @@ export default {
             nodeID === this.nodeDragging.nodeID
               ? this.nodeDragging.state
               : false,
-          canvasMousePos: this.canvasMousePos
+          canvasMousePos: this.canvasMousePos,
+          newNode: this.apiValidity ? false : true
         };
       }
       return nodes_;

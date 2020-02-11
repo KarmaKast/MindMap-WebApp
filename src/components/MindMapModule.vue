@@ -1,6 +1,11 @@
 <template>
   <div class="MindMapModule" :style="this.containerStyle">
-    <mind-map-canvas :colors="this.colors" :apiUrl="this.apiUrl" :nodes="nodes">
+    <mind-map-canvas
+      :colors="this.colors"
+      :apiUrl="this.apiUrl"
+      :nodes="nodes"
+      :apiValidity="apiValidity"
+    >
     </mind-map-canvas>
 
     <div
@@ -170,7 +175,6 @@ export default {
     colorsProcessed: function() {
       var colors_ = {};
       for (var key in this.colors) {
-        //var color = `hsla($(this.colors[]))`;
         var color_ = this.colors[key];
         colors_[
           key
@@ -191,7 +195,7 @@ export default {
           style["backgroundColor"] = `${this.colorsProcessed["theme"]}`;
           style[
             "boxShadow"
-          ] = `0px 0px 0 2px ${this.colorsProcessed["theme_light"]}`;
+          ] = `0px 0px 0 2px ${this.colorsProcessed["theme_light"]}, inset 0px 0px 5px 3px hsla(0, 0%, 0%, 0.1`;
         }
       }
       return style;
@@ -241,7 +245,7 @@ export default {
       // todo: get a list of nodeIDs and create a list of nodes in the canvas
       console.log(`getting list of nodes\n${url_}`);
       this.$axios.get(url_ + "/get/nodeIDs").then(response => {
-        console.log(response);
+        //console.log(response);
         this.nodes = response["data"]["IDs"];
       });
     },

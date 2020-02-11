@@ -16,7 +16,7 @@
           pointerEvents: 'none'
         }"
       >
-        {{ nodeLabel }}
+        {{ newNode ? "" : nodeLabel }}
       </p>
     </div>
   </div>
@@ -55,12 +55,17 @@ export default {
   name: "nodeComponent",
   props: {
     ID: String,
+    newNode: Boolean,
     apiUrl: String,
     canvasSize: Object,
     canvasLocation: Object,
     canvasMousePos: Object,
     dragging: {
       default: false,
+      type: Boolean
+    },
+    autoSave: {
+      default: true,
       type: Boolean
     },
     defaultColors: Object
@@ -71,7 +76,7 @@ export default {
       minWidth: 40,
       nodeLocation: { x: 0, y: 0 },
       nodeLabel: "__null__",
-      konvaNode: null,
+      node_data: {},
       nodeSize: { height: 60, width: 160 },
       draggingDeltas: { x: 0, y: 0 }
     };
@@ -129,6 +134,16 @@ export default {
 
       this.$emit("startDrag", event, this.ID);
       //console.log(`x:${this.draggingDeltas.x}, y:${this.draggingDeltas.y}`);
+    },
+    getNodeData() {
+      // todo: get node data from api
+      // todo: check api url validity
+      this.$axios
+        .get(this.apiUrl + `/node/get-data/${this.ID}`)
+        .then(response => {
+          console.log(response["data"]);
+          this.node_data = response["data"]["node_viz_data"];
+        });
     }
   },
   watch: {
@@ -136,6 +151,32 @@ export default {
       if (!this.dragging) {
         this.nodeLocation = this.nodeLocation_;
       }
+    },
+    nodeLocation_() {
+      // todo: save node location to database on drag end
+      if (!this.dragging) {
+        if (!this.newNode) {
+          var msg = `updated location from {x:${this.node_data.viz_props.location[0]},y: ${this.node_data.viz_props.location[1]}} to 
+            {x:${this.nodeLocation_.x},y:${this.nodeLocation_.y}}`;
+          console.log(msg);
+          // todo: WIP
+          console.log((this.nodeLocation_.x, this.nodeLocation_.y, 0));
+          this.$axios({
+            method: "post",
+            url: this.apiUrl + `/updateProps/${this.ID}`,
+            params: {
+              location: `(${this.nodeLocation_.x},${this.nodeLocation_.y}, 0)`
+            }
+          });
+        }
+      }
+    },
+    node_data() {
+      this.nodeLocation = {
+        x: this.node_data.viz_props.location[0],
+        y: this.node_data.viz_props.location[1]
+      };
+      this.nodeLabel = this.node_data.label;
     }
   },
   created: function() {
@@ -148,6 +189,9 @@ export default {
     if (this.ID !== undefined) {
       console.log(`@ mounted ${this.ID}`);
       // todo: get node_label, relation_claims, data from the API using the nodeID
+    }
+    if (!this.newNode) {
+      this.getNodeData();
     }
   },
   updated() {}

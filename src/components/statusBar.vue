@@ -48,7 +48,8 @@ export default {
         boxSizing: "border-box",
         boxShadow: "0px -2px 4px 0px hsla(0, 0%, 0%, 0.18)",
         padding: `${this.padding}px`,
-        borderBottomRadius: "inherit",
+        borderBottomLeftRadius: "inherit",
+        borderBottomRightRadius: "inherit",
 
         display: "grid",
         placeItems: "center",
