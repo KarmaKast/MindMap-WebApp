@@ -14,8 +14,14 @@
         />
       </button>
       <p :style="pStyle">
-        A Mindmap web app that uses <a href="" :style="{ pointerEvents: 'initial' }" target="_blank">nodeLib</a> graph DBMS library.
-        Currently everything is in prototyping state. <br />
+        A Mindmap web app that uses
+        <a
+          href="https://github.com/KarmaKast/nodeLib/tree/develop"
+          :style="{ pointerEvents: 'initial' }"
+          target="_blank"
+          >nodeLib</a
+        >
+        graph DBMS library. Currently everything is in prototyping state. <br />
         <br />
         <a
           href="https://github.com/KarmaKast/MindMap-WebApp/tree/develop"

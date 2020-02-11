@@ -1,11 +1,5 @@
 <template>
-  <div
-    ref="nodeContainer"
-    :style="nodeStyle"
-    @mousedown.left="startdrag"
-    @mousemove="dodrag"
-    @mouseup.left="stopdrag"
-  >
+  <div ref="nodeContainer" :style="nodeStyle" @mousedown.left="startdrag">
     <div
       id="inner"
       :style="{
@@ -17,7 +11,11 @@
         placeItems: 'center'
       }"
     >
-      <p>
+      <p
+        :style="{
+          pointerEvents: 'none'
+        }"
+      >
         {{ nodeLabel }}
       </p>
     </div>
@@ -60,6 +58,11 @@ export default {
     apiUrl: String,
     canvasSize: Object,
     canvasLocation: Object,
+    canvasMousePos: Object,
+    dragging: {
+      default: false,
+      type: Boolean
+    },
     defaultColors: Object
   },
   data: function() {
@@ -70,7 +73,6 @@ export default {
       nodeLabel: "__null__",
       konvaNode: null,
       nodeSize: { height: 60, width: 160 },
-      dragging: false,
       draggingDeltas: { x: 0, y: 0 }
     };
   },
@@ -84,8 +86,8 @@ export default {
     nodeStyle: function() {
       return {
         position: "absolute",
-        top: `${this.canvasCenter["y"] + this.nodeLocation["y"]}px`,
-        left: `${this.canvasCenter["x"] + this.nodeLocation["x"]}px`,
+        top: `${this.canvasCenter["y"] + this.nodeLocation_["y"]}px`,
+        left: `${this.canvasCenter["x"] + this.nodeLocation_["x"]}px`,
         width: `${this.nodeSize["width"]}px`,
         height: `${this.nodeSize["height"]}px`,
         cursor: this.dragging ? "grabbing" : "grab",
@@ -102,36 +104,38 @@ export default {
         gridTemplateColumns: "100%",
         padding: "8px"
       };
+    },
+    nodeLocation_: function() {
+      var nodeLoc = this.nodeLocation;
+      if (this.dragging) {
+        nodeLoc.x =
+          this.canvasMousePos.x - this.draggingDeltas.x - this.canvasCenter.x;
+        nodeLoc.y =
+          this.canvasMousePos.y - this.draggingDeltas.y - this.canvasCenter.y;
+      }
+      //console.log(nodeLoc);
+      return nodeLoc;
     }
   },
   methods: {
     startdrag(event) {
-      this.dragging = true;
-      //console.log(
-      //  `started dragging Loc(${this.nodeLocation["x"]},${this.nodeLocation["y"]})`
-      //);
+      //console.log("drag started at node");
 
-      //console.log(event);
       var boundingBox = this.$refs.nodeContainer.getBoundingClientRect();
+      //console.log(boundingBox);
       // context: draggingDeltas are ---
       this.draggingDeltas["x"] = event.clientX - boundingBox.x;
       this.draggingDeltas["y"] = event.clientY - boundingBox.y;
 
+      this.$emit("startDrag", event, this.ID);
       //console.log(`x:${this.draggingDeltas.x}, y:${this.draggingDeltas.y}`);
-    },
-    dodrag() {
-      if (this.dragging) {
-        this.nodeLocation["x"] += event.offsetX - this.draggingDeltas.x;
-        this.nodeLocation["y"] += event.offsetY - this.draggingDeltas.y;
+    }
+  },
+  watch: {
+    dragging() {
+      if (!this.dragging) {
+        this.nodeLocation = this.nodeLocation_;
       }
-    },
-    stopdrag() {
-      this.dragging = false;
-      //console.log(
-      //  `ended dragging Loc(${this.nodeLocation["x"]},${this.nodeLocation["y"]})`
-      //);
-      this.draggingDeltas = { x: 0, y: 0 };
-      // todo: update the new location to the API
     }
   },
   created: function() {
@@ -142,7 +146,7 @@ export default {
   },
   mounted: function() {
     if (this.ID !== undefined) {
-      console.log(this.ID);
+      console.log(`@ mounted ${this.ID}`);
       // todo: get node_label, relation_claims, data from the API using the nodeID
     }
   },

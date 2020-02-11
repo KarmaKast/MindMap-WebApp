@@ -25,8 +25,8 @@
         id="mainMenu"
         :style="{
           position: 'absolute',
-          marginTop: '15px',
-          marginLeft: '15px',
+          marginTop: '8px',
+          marginLeft: '10px',
           zIndex: 'unset'
         }"
       >
@@ -116,7 +116,7 @@ export default {
       showMenu: false,
       apiUrl: "",
       apiValidity: false,
-      nodes: ["__test_ID__", "__test_ID2__"],
+      nodes: ["__test_ID__", "__test_ID__1"],
       showAboutPage: false
     };
   },
@@ -183,7 +183,7 @@ export default {
         height: "100%",
         width: "100%",
         overflow: "hidden",
-        borderRadius: "5px",
+        borderRadius: "15px 15px 10px 10px",
         position: "relative"
       };
       if (this.colors !== undefined) {
@@ -255,7 +255,7 @@ export default {
     },
     archiveDatabase() {
       var url_ = this.apiUrl;
-      this.$axios.post(url_ + "/archive/save");
+      this.$axios.post(url_ + "/archive/pack");
     },
     toggleMenu() {
       if (this.showMenu) {

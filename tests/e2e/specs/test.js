@@ -7,6 +7,7 @@ describe("Main Tests", () => {
   });
   it("tests if module loaded", () => {
     cy.get(".MindMapModule");
+    // todo: check if its displayed properly
   });
   it("status bar reflects api status", () => {
     // color should be red( rgba(255, 255, 255, 0.5) ) by default

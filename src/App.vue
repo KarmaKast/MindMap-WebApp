@@ -1,14 +1,13 @@
 <template>
   <div id="app" :style="this.appStyle">
     <div
-      id="mindMapContainer"
       :style="{
-        height: '80%',
-        width: '80%',
-        marginTop: '10px',
-        marginLeft: '10px'
+        height: '400px',
+        width: '100%',
+        backgroundColor: 'blue'
       }"
-    >
+    ></div>
+    <div id="mindMapContainer" :style="mindMapContainerStyle">
       <MindMapModule :colors="this.MindMapColors" />
     </div>
   </div>
@@ -23,7 +22,16 @@ export default {
     MindMapModule
   },
   data: function() {
-    return {};
+    return {
+      mindMapContainerStyle: {
+        height: "100%",
+        width: "100%",
+        marginTop: "0px",
+        marginLeft: "0px",
+        boxSizing: "border-box",
+        padding: "20px"
+      }
+    };
   },
   computed: {
     MindMapColors: function() {
@@ -39,7 +47,8 @@ export default {
         width: `${this.$store.state.window_width}px`,
         position: "absolute",
         top: "0px",
-        left: "0px"
+        left: "0px",
+        overflowX: "hidden"
       };
     }
   },

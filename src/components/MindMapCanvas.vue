@@ -3,31 +3,31 @@
     id="canvasContainer"
     ref="canvasContainer"
     style="height:100%; width:100%; position:relative; overflow: hidden;"
+    @mousemove="getMousePos"
+    @mouseup.left="stopDrag"
   >
     <div id="nodes">
       <nodeComponent
-        v-for="(nodeID, index) in nodes"
-        :key="index"
-        :ID="nodeID"
+        v-for="(value, key_) in processedNodes"
+        :key="key_"
+        :ID="key_"
         :apiUrl="apiUrl"
         :canvasSize="{ height: height, width: width }"
         :canvasLocation="canvasLocation"
+        :canvasMousePos="value.canvasMousePos"
         :defaultColors="colors"
+        :dragging="value.dragging"
+        @startDrag="startDrag"
       >
       </nodeComponent>
     </div>
 
     <div id="relationWires" :style="{ pointerEvents: 'none' }">
-      <v-stage
-        ref="stage"
-        :config="canvasConfig"
-        @dragstart="handleDragstart"
-        @dragend="handleDragend"
-      >
+      <v-stage ref="stage" :config="canvasConfig">
         <v-layer>
           <v-group
             :config="{
-              draggable: true
+              draggable: false
             }"
           >
           </v-group>
@@ -53,10 +53,29 @@ export default {
     return {
       mindmapCanvas: null,
       dragItemId: null,
-      canvasLocation: { x: 0, y: 0 }
+      canvasLocation: { x: 0, y: 0 },
+      canvasMousePos: { x: 0, y: 0 },
+      canvasContainerBoxLoc: { x: 0, y: 0 },
+      nodeDragging: {
+        nodeID: undefined,
+        state: undefined
+      }
     };
   },
   computed: {
+    processedNodes: function() {
+      var nodes_ = {};
+      for (var nodeID of this.nodes) {
+        nodes_[nodeID] = {
+          dragging:
+            nodeID === this.nodeDragging.nodeID
+              ? this.nodeDragging.state
+              : false,
+          canvasMousePos: this.canvasMousePos
+        };
+      }
+      return nodes_;
+    },
     height: function() {
       return this.$store.state.canvas_height;
     },
@@ -71,13 +90,31 @@ export default {
     }
   },
   methods: {
-    handleDragstart(e) {
-      // save drag element:
-      this.dragItemId = e.target._id;
-      //console.log(e.target);
+    startDrag(event, ID) {
+      //console.log("drag started at canvas");
+      if (this.nodeDragging.nodeID === undefined) {
+        this.nodeDragging.nodeID = ID;
+        this.nodeDragging.state = true;
+
+        // todo: canvasMousePos currently is relative to window top-left. It should be relative to canvas container bounding box top-left
+        // context: since canvas bounding box x,y is taken once at the start of the drag, if for some reason canvas container position changes relative to the window top-left it will make the drag to malfunction
+        this.canvasContainerBoxLoc.x = this.$refs.canvasContainer.getBoundingClientRect().x;
+        this.canvasContainerBoxLoc.y = this.$refs.canvasContainer.getBoundingClientRect().y;
+
+        this.canvasMousePos.x = event.clientX - this.canvasContainerBoxLoc.x;
+        this.canvasMousePos.y = event.clientY - this.canvasContainerBoxLoc.y;
+      }
     },
-    handleDragend() {
-      this.dragItemId = null;
+    stopDrag() {
+      //console.log("drag stopped at canvas");
+      this.nodeDragging.nodeID = undefined;
+      this.nodeDragging.state = false;
+    },
+    getMousePos(event) {
+      if (this.nodeDragging.state === true) {
+        this.canvasMousePos.x = event.clientX - this.canvasContainerBoxLoc.x;
+        this.canvasMousePos.y = event.clientY - this.canvasContainerBoxLoc.y;
+      }
     }
   },
   watch: {},
@@ -97,7 +134,6 @@ export default {
         // todo: WIP
       }
     });
-    //console.log(box);
   },
   updated: function() {}
 };
