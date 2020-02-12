@@ -121,7 +121,10 @@ export default {
       showMenu: false,
       apiUrl: "",
       apiValidity: false,
-      nodes: ["__test_ID__", "__test_ID__1"],
+      nodes: [
+        { ID: "__test_ID__", newNode: true },
+        { ID: "__test_ID__1", newNode: true }
+      ],
       showAboutPage: false
     };
   },
@@ -246,7 +249,9 @@ export default {
       console.log(`getting list of nodes\n${url_}`);
       this.$axios.get(url_ + "/get/nodeIDs").then(response => {
         //console.log(response);
-        this.nodes = response["data"]["IDs"];
+        this.nodes = response["data"]["IDs"].map(function(ID) {
+          return { ID: ID, newNode: false };
+        });
       });
     },
     clearDatabase() {

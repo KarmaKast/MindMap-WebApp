@@ -49,7 +49,8 @@ export default {
     colors: Object,
     nodes: Array,
     apiUrl: String,
-    apiValidity: Boolean
+    apiValidity: Boolean,
+    canvasSize: Object
   },
   data: function() {
     return {
@@ -67,14 +68,14 @@ export default {
   computed: {
     processedNodes: function() {
       var nodes_ = {};
-      for (var nodeID of this.nodes) {
-        nodes_[nodeID] = {
+      for (var node of this.nodes) {
+        nodes_[node.ID] = {
           dragging:
-            nodeID === this.nodeDragging.nodeID
+            node.ID === this.nodeDragging.nodeID
               ? this.nodeDragging.state
               : false,
           canvasMousePos: this.canvasMousePos,
-          newNode: this.apiValidity ? false : true
+          newNode: node.newNode
         };
       }
       return nodes_;

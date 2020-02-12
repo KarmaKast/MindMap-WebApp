@@ -8,12 +8,16 @@
         backdropFilter: 'blur(2px)',
         pointerEvents: 'none',
         display: 'grid',
-        placeItems: 'center'
+        placeItems: 'center',
+        boxSizing: 'border-box',
+        padding: '10px 15px 10px 15px'
       }"
     >
       <p
         :style="{
-          pointerEvents: 'none'
+          pointerEvents: 'none',
+          margin: '0px',
+          maxWidth: '100px'
         }"
       >
         {{ newNode ? "" : nodeLabel }}
@@ -72,20 +76,21 @@ export default {
   },
   data: function() {
     return {
-      minHeight: 40,
-      minWidth: 40,
+      minHeight: 60,
+      minWidth: 120,
       nodeLocation: { x: 0, y: 0 },
       nodeLabel: "__null__",
       node_data: {},
       nodeSize: { height: 60, width: 160 },
+      nodeSizFinal: { height: 0, width: 0 },
       draggingDeltas: { x: 0, y: 0 }
     };
   },
   computed: {
     canvasCenter: function() {
       return {
-        x: this.canvasSize["width"] / 2 - this.nodeSize.width / 2,
-        y: this.canvasSize["height"] / 2 - this.nodeSize.height / 2
+        x: this.canvasSize["width"] / 2 - this.nodeSizFinal.width / 2,
+        y: this.canvasSize["height"] / 2 - this.nodeSizFinal.height / 2
       };
     },
     nodeStyle: function() {
@@ -93,8 +98,10 @@ export default {
         position: "absolute",
         top: `${this.canvasCenter["y"] + this.nodeLocation_["y"]}px`,
         left: `${this.canvasCenter["x"] + this.nodeLocation_["x"]}px`,
-        width: `${this.nodeSize["width"]}px`,
-        height: `${this.nodeSize["height"]}px`,
+        minWidth: `${this.newNode ? this.minWidth : 0}px`,
+        minHeight: `${this.newNode ? this.minHeight : 0}px`,
+        //width: `${this.nodeSize["width"]}px`,
+        //height: `${this.nodeSize["height"]}px`,
         cursor: this.dragging ? "grabbing" : "grab",
         zIndex: this.dragging ? "5000" : "unset",
 
@@ -107,7 +114,8 @@ export default {
         boxShadow: `0px 0px 4px 1px hsla(0, 0%, 0%, 0.1)`,
         display: "grid",
         gridTemplateColumns: "100%",
-        padding: "8px"
+        padding: "8px",
+        boxSizing: "border-box"
       };
     },
     nodeLocation_: function() {
@@ -127,7 +135,7 @@ export default {
       //console.log("drag started at node");
 
       var boundingBox = this.$refs.nodeContainer.getBoundingClientRect();
-      //console.log(boundingBox);
+      console.log(boundingBox);
       // context: draggingDeltas are ---
       this.draggingDeltas["x"] = event.clientX - boundingBox.x;
       this.draggingDeltas["y"] = event.clientY - boundingBox.y;
@@ -144,6 +152,18 @@ export default {
           console.log(response["data"]);
           this.node_data = response["data"]["node_viz_data"];
         });
+    },
+    updatePropToAPI(propName, data) {
+      this.$axios({
+        method: "post",
+        url: this.apiUrl + `/updateProps/${this.ID}`,
+        params: {
+          [propName]: data
+        }
+      });
+      if (this.autoSave) {
+        // doing: save state to file
+      }
     }
   },
   watch: {
@@ -160,14 +180,11 @@ export default {
             {x:${this.nodeLocation_.x},y:${this.nodeLocation_.y}}`;
           console.log(msg);
           // todo: WIP
-          console.log((this.nodeLocation_.x, this.nodeLocation_.y, 0));
-          this.$axios({
-            method: "post",
-            url: this.apiUrl + `/updateProps/${this.ID}`,
-            params: {
-              location: `(${this.nodeLocation_.x},${this.nodeLocation_.y}, 0)`
-            }
-          });
+          console.log([this.nodeLocation_.x, this.nodeLocation_.y, 0]);
+          this.updatePropToAPI(
+            "location",
+            `(${this.nodeLocation_.x},${this.nodeLocation_.y}, 0)`
+          );
         }
       }
     },
@@ -177,6 +194,14 @@ export default {
         y: this.node_data.viz_props.location[1]
       };
       this.nodeLabel = this.node_data.label;
+    },
+    nodeLabel() {
+      // update nodeSizeFinal
+      var boundingBox = this.$refs.nodeContainer.getBoundingClientRect();
+      this.nodeSizFinal = {
+        width: boundingBox.width,
+        height: boundingBox.height
+      };
     }
   },
   created: function() {
@@ -193,6 +218,11 @@ export default {
     if (!this.newNode) {
       this.getNodeData();
     }
+    var boundingBox = this.$refs.nodeContainer.getBoundingClientRect();
+    this.nodeSizFinal = {
+      width: boundingBox.width,
+      height: boundingBox.height
+    };
   },
   updated() {}
 };
