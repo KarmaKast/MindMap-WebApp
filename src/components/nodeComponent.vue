@@ -1,18 +1,10 @@
 <template>
-  <div ref="nodeContainer" :style="nodeStyle" @mousedown.left="startdrag">
-    <div
-      id="inner"
-      :style="{
-        borderRadius: 'inherit',
-        border: '1.2px dashed rgba(255, 255, 255, 0.28)',
-        backdropFilter: 'blur(2px)',
-        pointerEvents: 'none',
-        display: 'grid',
-        placeItems: 'center',
-        boxSizing: 'border-box',
-        padding: '10px 15px 10px 15px'
-      }"
-    >
+  <div
+    ref="nodeContainer"
+    :style="nodeContainerStyle"
+    @mousedown.left="startdrag"
+  >
+    <div id="node" :style="nodeStyle">
       <p
         :style="{
           pointerEvents: 'none',
@@ -81,7 +73,10 @@ export default {
       minWidth: 120,
       nodeLocation: { x: 0, y: 0 },
       nodeLabel: "__null__",
-      node_data: {},
+      node_data: {
+        label: "",
+        viz_props: { location: [0, 0, 0], color: [166, 89, 45, 1] }
+      },
       nodeSize: { height: 60, width: 160 },
       nodeSizFinal: { height: 0, width: 0 },
       draggingDeltas: { x: 0, y: 0 }
@@ -94,7 +89,7 @@ export default {
         y: this.canvasSize["height"] / 2 - this.nodeSizFinal.height / 2
       };
     },
-    nodeStyle: function() {
+    nodeContainerStyle: function() {
       return {
         position: "absolute",
         top: `${this.canvasCenter["y"] + this.nodeLocation_["y"]}px`,
@@ -106,17 +101,35 @@ export default {
         cursor: this.dragging ? "grabbing" : "grab",
         zIndex: this.dragging ? "5000" : "unset",
 
-        backgroundColor: "rgba(255,255,255,0.2)",
-        border: `0.5px dashed rgb(255, 164, 164)`,
+        backgroundColor: "hsla(0,0%,0%,0.01)",
+        border: `1px dotted rgba(0, 0, 0, 0.2)`,
         borderRadius:
           this.nodeSize["height"] > this.nodeSize["width"]
             ? `${this.nodeSize["height"]}px`
             : `${this.nodeSize["width"]}px`,
-        boxShadow: `0px 0px 4px 1px hsla(0, 0%, 0%, 0.1)`,
+        boxShadow: `${
+          this.dragging
+            ? "rgba(0, 0, 0, 0.2) 0px 0px 13px 4px"
+            : "rgba(0, 0, 0, 0.15) 0px 0px 3px 1px"
+        }, inset 0px 0px 0 7px hsla(${this.node_data.viz_props.color[0]}, 
+        ${this.node_data.viz_props.color[1]}%, 
+        ${this.node_data.viz_props.color[2]}%, 0.12)`,
         display: "grid",
         gridTemplateColumns: "100%",
         padding: "8px",
         boxSizing: "border-box"
+      };
+    },
+    nodeStyle: function() {
+      return {
+        borderRadius: "inherit",
+        border: `1px solid hsla(${this.node_data.viz_props.color[0]},${this.node_data.viz_props.color[1]}%, ${this.node_data.viz_props.color[2]}%, ${this.node_data.viz_props.color[3]})`,
+        backdropFilter: "blur(2px)",
+        pointerEvents: "none",
+        display: "grid",
+        placeItems: "center",
+        boxSizing: "border-box",
+        padding: "10px 15px 10px 15px"
       };
     },
     nodeLocation_: function() {

@@ -45,13 +45,14 @@
             height: '38px',
             width: '48px',
             background: 'rgba(255, 255, 255, 0.5)',
-            border: '0.5px dashed rgb(255, 164, 164)',
+            border: '1px solid rgb(255, 164, 164)',
             backdropFilter: 'blur(4px)',
             borderRadius: '12px',
             padding: '0px',
             boxShadow: this.showMenu
               ? 'hsla(0, 0%, 0%, 0.16) 0px 0px 19px 1px'
               : 'hsla(0, 0%, 0%, 0.2) 0px 0px 1px 1px',
+            boxSizing: 'border-box',
             cursor: 'pointer',
             outline: 'none',
             pointerEvents: 'initial'
@@ -197,7 +198,7 @@ export default {
       };
       if (this.colors !== undefined) {
         if ("background" in this.colors) {
-          style["backgroundColor"] = `${this.colorsProcessed["theme"]}`;
+          style["backgroundColor"] = `${this.colorsProcessed["background"]}`;
           style[
             "boxShadow"
           ] = `0px 0px 0 2px ${this.colorsProcessed["theme_light"]}, inset 0px 0px 5px 3px hsla(0, 0%, 0%, 0.1`;
