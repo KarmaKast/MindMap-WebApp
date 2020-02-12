@@ -1,6 +1,6 @@
 <template>
-  <div v-if="showPage" :style="containerStyle">
-    <div :style="aboutSectionStyle">
+  <div id="aboutPage" v-if="showPage" :style="containerStyle">
+    <div id="aboutSection" :style="aboutSectionStyle">
       <button
         id="closePageBttn"
         :style="closeButtonStyle"
@@ -31,7 +31,9 @@
           Github Repo
         </a>
         <br />
-        Version : {{ version }}
+        App Version : {{ version }}
+        <br />
+        Depends on nodeAPI-0.1.0 (run nodeVizAPI.py)
       </p>
     </div>
   </div>
@@ -45,7 +47,7 @@ export default {
   data: function() {
     return {
       isHovered: false,
-      version: "0.1.0"
+      version: "0.3.0"
     };
   },
   computed: {
@@ -67,7 +69,9 @@ export default {
         borderRadius: "28px",
         padding: "15px",
         height: "fit-content",
-        width: "fit-content",
+        maxWidth: "400px",
+        minWidth: "200px",
+        width: "20%",
         border: "1px dashed hsl(358, 96%, 67%)",
         boxSizing: "border-box",
 
@@ -90,13 +94,14 @@ export default {
         padding: "0px",
         display: "grid",
         placeItems: "center",
-        outline: "none"
+        outline: "none",
+        cursor: "pointer"
       };
     },
     pStyle: function() {
       return {
         height: "auto",
-        width: "250px",
+        width: "auto",
         gridArea: "2 / 1 / 3 / 3",
         pointerEvents: "none",
         boxSizing: "border-box",
