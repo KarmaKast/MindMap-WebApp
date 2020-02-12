@@ -5,6 +5,7 @@
       :apiUrl="this.apiUrl"
       :nodes="nodes"
       :apiValidity="apiValidity"
+      :gridSize="gridSize"
     >
     </mind-map-canvas>
 
@@ -125,7 +126,8 @@ export default {
         { ID: "__test_ID__", newNode: true },
         { ID: "__test_ID__1", newNode: true }
       ],
-      showAboutPage: false
+      showAboutPage: false,
+      gridSize: 1
     };
   },
   computed: {

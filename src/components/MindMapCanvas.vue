@@ -18,6 +18,7 @@
         :defaultColors="colors"
         :dragging="value.dragging"
         :newNode="value.newNode"
+        :gridSize="gridSize"
         @startDrag="startDrag"
       >
       </nodeComponent>
@@ -50,7 +51,11 @@ export default {
     nodes: Array,
     apiUrl: String,
     apiValidity: Boolean,
-    canvasSize: Object
+    canvasSize: Object,
+    gridSize: {
+      default: 1,
+      type: Number
+    }
   },
   data: function() {
     return {

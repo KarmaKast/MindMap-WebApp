@@ -72,6 +72,7 @@ export default {
       default: true,
       type: Boolean
     },
+    gridSize: Number,
     defaultColors: Object
   },
   data: function() {
@@ -123,8 +124,10 @@ export default {
       if (this.dragging) {
         nodeLoc.x =
           this.canvasMousePos.x - this.draggingDeltas.x - this.canvasCenter.x;
+        nodeLoc.x -= nodeLoc.x % this.gridSize;
         nodeLoc.y =
           this.canvasMousePos.y - this.draggingDeltas.y - this.canvasCenter.y;
+        nodeLoc.y -= nodeLoc.y % this.gridSize;
       }
       //console.log(nodeLoc);
       return nodeLoc;
