@@ -19,7 +19,7 @@
         :defaultColors="colors"
         :dragging="value.dragging"
         :newNode="value.newNode"
-        :gridSize="gridSize"
+        :gridSize="grid.size"
         @startDrag="startDrag"
       >
       </nodeComponent>
@@ -53,9 +53,14 @@ export default {
     nodes: Array,
     apiUrl: String,
     apiValidity: Boolean,
-    gridSize: {
-      default: 1,
-      type: Number
+    grid: {
+      default() {
+        return {
+          size: 1,
+          opacity: 0
+        };
+      },
+      type: Object
     }
   },
   data: function() {
@@ -108,13 +113,15 @@ export default {
       };
     },
     gridStyle: function() {
+      // todo: move color processing functionality to vuex store
+      var processedColor = `hsla(${this.colors["theme_light"][0]}, ${this.colors["theme_light"][1]}%, ${this.colors["theme_light"][2]}%, ${this.grid.opacity})`;
       return {
         height: "110%",
         width: "110%",
         position: "absolute",
-        top: `-${this.gridSize - ((this.height / 2) % this.gridSize)}px`,
-        left: `-${this.gridSize - ((this.width / 2) % this.gridSize)}px`,
-        backgroundImage: `repeating-linear-gradient(rgba(255, 255, 255, 0), ${this.colorsProcessed["theme_light"]} 1px, rgba(255, 255, 255, 0) 1px, rgba(255, 255, 255, 0) ${this.gridSize}px), repeating-linear-gradient(90deg, rgba(255, 255, 255, 0), ${this.colorsProcessed["theme_light"]} 1px, rgba(255, 255, 255, 0) 1px, rgba(255, 255, 255, 0) ${this.gridSize}px)`
+        top: `-${this.grid.size - ((this.height / 2) % this.grid.size)}px`,
+        left: `-${this.grid.size - ((this.width / 2) % this.grid.size)}px`,
+        backgroundImage: `repeating-linear-gradient(rgba(255, 255, 255, 0), ${processedColor} 1px, rgba(255, 255, 255, 0) 1px, rgba(255, 255, 255, 0) ${this.grid.size}px), repeating-linear-gradient(90deg, rgba(255, 255, 255, 0), ${processedColor} 1px, rgba(255, 255, 255, 0) 1px, rgba(255, 255, 255, 0) ${this.grid.size}px)`
       };
     }
   },
