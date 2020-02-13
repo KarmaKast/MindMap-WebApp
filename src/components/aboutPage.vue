@@ -13,7 +13,11 @@
           :style="{ height: '100%', width: '100%', borderRadius: 'inherit' }"
         />
       </button>
+
       <p :style="pStyle">
+        <span :style="{ fontSize: '20px' }">MapTheeMind - {{ version }}</span>
+        <br />
+        <br />
         A Mindmap web app that uses
         <a
           href="https://github.com/KarmaKast/nodeLib/tree/develop"
@@ -31,8 +35,6 @@
           Github Repo
         </a>
         <br />
-        App Version : {{ version }}
-        <br />
         Depends on nodeAPI-0.1.0 (run nodeVizAPI.py)
       </p>
     </div>
@@ -47,7 +49,7 @@ export default {
   data: function() {
     return {
       isHovered: false,
-      version: "0.3.0"
+      version: "v0.3.0"
     };
   },
   computed: {
@@ -70,7 +72,7 @@ export default {
         padding: "15px",
         height: "fit-content",
         maxWidth: "400px",
-        minWidth: "200px",
+        minWidth: "280px",
         width: "20%",
         border: "1px dashed hsl(358, 96%, 67%)",
         boxSizing: "border-box",
