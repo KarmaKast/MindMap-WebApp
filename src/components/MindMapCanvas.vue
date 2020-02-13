@@ -8,7 +8,7 @@
     @mousedown.middle="setCanvasDragging"
     @mouseup.middle="setCanvasDragging"
   >
-    <div id="grid" :style="gridStyle"></div>
+    <div v-if="grid.opacity > 0" id="grid" :style="gridStyle"></div>
     <div id="nodes">
       <nodeComponent
         v-for="(value, key_) in processedNodes"
@@ -53,6 +53,12 @@ export default {
     colors: Object,
     colorsProcessed: Object,
     nodes: Array,
+    nodeLimit: {
+      // context: setting this to 10. With some optimizations should be increased to 100
+      // or extra nodes could be loaded with minimum memory usage.
+      default: 10,
+      type: Number
+    },
     apiUrl: String,
     apiValidity: Boolean,
     grid: {
@@ -88,16 +94,18 @@ export default {
   computed: {
     processedNodes: function() {
       var nodes_ = {};
-      for (var node of this.nodes) {
-        nodes_[node.ID] = {
-          dragging:
-            node.ID === this.nodeDragging.nodeID
-              ? this.nodeDragging.state
-              : false,
-          canvasMousePos: this.canvasMousePos,
-          newNode: node.newNode
-        };
-      }
+      this.nodes.forEach((key, index) => {
+        if (index < this.nodeLimit) {
+          nodes_[this.nodes[index].ID] = {
+            dragging:
+              this.nodes[index].ID === this.nodeDragging.nodeID
+                ? this.nodeDragging.state
+                : false,
+            canvasMousePos: this.canvasMousePos,
+            newNode: this.nodes[index].newNode
+          };
+        }
+      });
       return nodes_;
     },
     height: function() {
@@ -214,7 +222,7 @@ export default {
         box = this.$refs.canvasContainer.getBoundingClientRect();
         this.$store.commit("update_canvas_height", box.height);
         this.$store.commit("update_canvas_width", box.width);
-        // todo: WIP
+        // todo: WIP ?
       }
     });
   },
