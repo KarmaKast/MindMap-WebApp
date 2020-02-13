@@ -195,11 +195,14 @@ export default {
         // doing: start drag
         this.canvasDragging.state = true;
         this.canvasDragging.event = event;
+        // context: since canvas bounding box x,y is taken once at the start of the drag, if for some reason canvas container position changes relative to the window top-left it will make the drag to malfunction
+        this.canvasContainerBoxLoc.x = this.$refs.canvasContainer.getBoundingClientRect().x;
+        this.canvasContainerBoxLoc.y = this.$refs.canvasContainer.getBoundingClientRect().y;
         // todo: set dragging deltas
         this.canvasDragging.deltas.x =
-          event.clientX - this.width / 2 - this.canvasLocation.x;
+          event.clientX - this.width / 2 - this.canvasLocation.x - this.canvasContainerBoxLoc.x ;
         this.canvasDragging.deltas.y =
-          event.clientY - this.height / 2 - this.canvasLocation.y;
+          event.clientY - this.height / 2 - this.canvasLocation.y - this.canvasContainerBoxLoc.y ;
       }
     }
   },
