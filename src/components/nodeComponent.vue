@@ -89,6 +89,7 @@ export default {
   },
   computed: {
     canvasCenter: function() {
+      // context: whats nodeSizeFinal about?
       return {
         x: this.canvasSize["width"] / 2 - this.nodeSizFinal.width / 2,
         y: this.canvasSize["height"] / 2 - this.nodeSizFinal.height / 2
@@ -120,7 +121,7 @@ export default {
             : "rgba(0, 0, 0, 0.15) 0px 0px 3px 1px"
         }, inset 0px 0px 0 4px hsla(${this.node_data.viz_props.color[0]}, 
         ${this.node_data.viz_props.color[1]}%, 
-        ${this.node_data.viz_props.color[2]}%, 0.4)`,
+        ${this.node_data.viz_props.color[2]}%, 0.2)`,
         boxSizing: "border-box",
         display: "grid",
         gridTemplateColumns: "100%",
@@ -162,14 +163,16 @@ export default {
       var boundingBox = this.$refs.nodeContainer.getBoundingClientRect();
       //console.log(boundingBox);
       // context: draggingDeltas are ---
-      this.draggingDeltas["x"] = event.clientX - boundingBox.x;
-      this.draggingDeltas["y"] = event.clientY - boundingBox.y;
+      this.draggingDeltas["x"] =
+        event.clientX - boundingBox.x + this.canvasLocation.x;
+      this.draggingDeltas["y"] =
+        event.clientY - boundingBox.y + this.canvasLocation.y;
 
-      this.$emit("startDrag", event, this.ID);
+      this.$emit("startNodeDrag", event, this.ID);
       //console.log(`x:${this.draggingDeltas.x}, y:${this.draggingDeltas.y}`);
     },
     getNodeData() {
-      // todo: get node data from api
+      // doing: get node data from api
       // todo: check api url validity
       this.$axios
         .get(this.apiUrl + `/node/get-data/${this.ID}`)
@@ -187,7 +190,7 @@ export default {
         }
       });
       if (this.autoSave) {
-        // doing: save state to file
+        // todo: save state to file
       }
     }
   },

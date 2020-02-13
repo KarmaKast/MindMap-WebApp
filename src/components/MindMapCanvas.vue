@@ -4,7 +4,9 @@
     ref="canvasContainer"
     :style="canvasContainerStyle"
     @mousemove="getMousePos"
-    @mouseup.left="stopDrag"
+    @mouseup.left="stopNodeDrag"
+    @mousedown.middle="setCanvasDragging"
+    @mouseup.middle="setCanvasDragging"
   >
     <div id="grid" :style="gridStyle"></div>
     <div id="nodes">
@@ -20,7 +22,7 @@
         :dragging="value.dragging"
         :newNode="value.newNode"
         :gridSize="grid.size"
-        @startDrag="startDrag"
+        @startNodeDrag="startNodeDrag"
       >
       </nodeComponent>
     </div>
@@ -74,6 +76,12 @@ export default {
       nodeDragging: {
         nodeID: undefined,
         state: undefined
+      },
+
+      canvasDragging: {
+        state: false,
+        event: undefined,
+        deltas: { x: 0, y: 0 }
       }
     };
   },
@@ -131,7 +139,7 @@ export default {
     }
   },
   methods: {
-    startDrag(event, ID) {
+    startNodeDrag(event, ID) {
       //console.log("drag started at canvas");
       if (this.nodeDragging.nodeID === undefined) {
         this.nodeDragging.nodeID = ID;
@@ -145,19 +153,54 @@ export default {
         this.canvasMousePos.y = event.clientY - this.canvasContainerBoxLoc.y;
       }
     },
-    stopDrag() {
+    stopNodeDrag() {
       //console.log("drag stopped at canvas");
       this.nodeDragging.nodeID = undefined;
       this.nodeDragging.state = false;
     },
     getMousePos(event) {
       if (this.nodeDragging.state === true) {
-        this.canvasMousePos.x = event.clientX - this.canvasContainerBoxLoc.x;
-        this.canvasMousePos.y = event.clientY - this.canvasContainerBoxLoc.y;
+        // todo: if dragging pass canvasMousePos to nodes else pass undefined
+      }
+      this.canvasMousePos.x = event.clientX - this.canvasContainerBoxLoc.x;
+      this.canvasMousePos.y = event.clientY - this.canvasContainerBoxLoc.y;
+
+      if (this.canvasDragging.state) {
+        this.canvasLocation.x =
+          this.canvasMousePos.x - this.width / 2 - this.canvasDragging.deltas.x;
+        this.canvasLocation.y =
+          this.canvasMousePos.y -
+          this.height / 2 -
+          this.canvasDragging.deltas.y;
+      }
+    },
+    setCanvasDragging(event) {
+      console.log("from event func");
+      console.log(event);
+      if (this.canvasDragging.state) {
+        // doing: stop drag
+        this.canvasDragging.state = false;
+        this.canvasDragging.event = undefined;
+        // todo: reset dragging deltas (not necessary)
+        this.canvasDragging.deltas = { x: 0, y: 0 };
+      } else {
+        // doing: start drag
+        this.canvasDragging.state = true;
+        this.canvasDragging.event = event;
+        // todo: set dragging deltas
+        this.canvasDragging.deltas.x =
+          event.clientX - this.width / 2 - this.canvasLocation.x;
+        this.canvasDragging.deltas.y =
+          event.clientY - this.height / 2 - this.canvasLocation.y;
       }
     }
   },
-  watch: {},
+  watch: {
+    "canvasDragging.state"() {
+      console.log("from watch func");
+      console.log(this.canvasDragging.event);
+    }
+  },
   created: function() {},
   mounted: function() {
     var box = this.$refs.canvasContainer.getBoundingClientRect();

@@ -251,6 +251,10 @@ export default {
     }
   },
   methods: {
+    loadAppSettings() {
+      // todo: WIP
+      // load app settings from app_settings.json either during mounted or created
+    },
     loadDatabase() {
       var url_ = this.apiUrl;
       this.$axios.get(url_ + "/load");
