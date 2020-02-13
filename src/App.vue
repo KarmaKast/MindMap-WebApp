@@ -8,7 +8,7 @@
       }"
     ></div>
     <div id="mindMapContainer" :style="mindMapContainerStyle">
-      <MindMapModule :colors="this.MindMapColors" />
+      <MindMapModule :colors="MindMapColors" />
     </div>
   </div>
 </template>
@@ -30,17 +30,15 @@ export default {
         marginLeft: "0px",
         boxSizing: "border-box",
         padding: "20px"
+      },
+      MindMapColors: {
+        background: [0, 0, 100, 0.5],
+        theme: [358, 97, 67, 1],
+        theme_light: [0, 100, 84, 1]
       }
     };
   },
   computed: {
-    MindMapColors: function() {
-      return {
-        background: [0, 0, 100, 0.5],
-        theme: [358, 97, 67, 1],
-        theme_light: [0, 100, 84, 1]
-      };
-    },
     appStyle: function() {
       return {
         height: `${this.$store.state.window_height}px`,

@@ -1,24 +1,21 @@
 <template>
-  <div ref="nodeContainer" :style="nodeStyle" @mousedown.left="startdrag">
-    <div
-      id="inner"
-      :style="{
-        borderRadius: 'inherit',
-        border: '1.2px dashed rgba(255, 255, 255, 0.28)',
-        backdropFilter: 'blur(2px)',
-        pointerEvents: 'none',
-        display: 'grid',
-        placeItems: 'center'
-      }"
-    >
+  <div
+    ref="nodeContainer"
+    :style="nodeContainerStyle"
+    @mousedown.left="startdrag"
+  >
+    <div id="node" :style="nodeStyle">
       <p
         :style="{
-          pointerEvents: 'none'
+          pointerEvents: 'none',
+          margin: '0px',
+          maxWidth: '100px'
         }"
       >
-        {{ nodeLabel }}
+        {{ newNode ? "" : nodeLabel }}
       </p>
     </div>
+    <div id="nodeUI" :style="{ position: 'absolute' }"></div>
   </div>
   <!--<v-group
     ref="nodeGroup"
@@ -55,6 +52,7 @@ export default {
   name: "nodeComponent",
   props: {
     ID: String,
+    newNode: Boolean,
     apiUrl: String,
     canvasSize: Object,
     canvasLocation: Object,
@@ -63,46 +61,80 @@ export default {
       default: false,
       type: Boolean
     },
-    defaultColors: Object
+    autoSave: {
+      default: true,
+      type: Boolean
+    },
+    gridSize: Number,
+    defaultColors: Object,
+    selected: {
+      default: false,
+      type: Boolean
+    }
   },
   data: function() {
     return {
-      minHeight: 40,
-      minWidth: 40,
+      minHeight: 60,
+      minWidth: 120,
       nodeLocation: { x: 0, y: 0 },
       nodeLabel: "__null__",
-      konvaNode: null,
+      node_data: {
+        label: "",
+        viz_props: { location: [0, 0, 0], color: [166, 89, 45, 1] }
+      },
       nodeSize: { height: 60, width: 160 },
+      nodeSizFinal: { height: 0, width: 0 },
       draggingDeltas: { x: 0, y: 0 }
     };
   },
   computed: {
     canvasCenter: function() {
       return {
-        x: this.canvasSize["width"] / 2 - this.nodeSize.width / 2,
-        y: this.canvasSize["height"] / 2 - this.nodeSize.height / 2
+        x: this.canvasSize["width"] / 2 - this.nodeSizFinal.width / 2,
+        y: this.canvasSize["height"] / 2 - this.nodeSizFinal.height / 2
       };
     },
-    nodeStyle: function() {
+    nodeContainerStyle: function() {
       return {
         position: "absolute",
         top: `${this.canvasCenter["y"] + this.nodeLocation_["y"]}px`,
         left: `${this.canvasCenter["x"] + this.nodeLocation_["x"]}px`,
-        width: `${this.nodeSize["width"]}px`,
-        height: `${this.nodeSize["height"]}px`,
+        minWidth: `${this.newNode ? this.minWidth : 0}px`,
+        minHeight: `${this.newNode ? this.minHeight : 0}px`,
         cursor: this.dragging ? "grabbing" : "grab",
         zIndex: this.dragging ? "5000" : "unset",
 
-        backgroundColor: "rgba(255,255,255,0.2)",
-        border: `0.5px dashed rgb(255, 164, 164)`,
+        backgroundColor: "hsla(0,0%,0%,0.01)",
+        border: `1px dotted rgba(0, 0, 0, 0.2)`,
         borderRadius:
           this.nodeSize["height"] > this.nodeSize["width"]
             ? `${this.nodeSize["height"]}px`
             : `${this.nodeSize["width"]}px`,
-        boxShadow: `0px 0px 4px 1px hsla(0, 0%, 0%, 0.1)`,
+        boxShadow: `${
+          this.dragging
+            ? "rgba(0, 0, 0, 0.2) 0px 0px 13px 4px"
+            : "rgba(0, 0, 0, 0.15) 0px 0px 3px 1px"
+        }, inset 0px 0px 0 4px hsla(${this.node_data.viz_props.color[0]}, 
+        ${this.node_data.viz_props.color[1]}%, 
+        ${this.node_data.viz_props.color[2]}%, 0.4)`,
+        boxSizing: "border-box",
         display: "grid",
         gridTemplateColumns: "100%",
-        padding: "8px"
+        padding: "4px",
+        outline: "none"
+      };
+    },
+    nodeStyle: function() {
+      return {
+        position: "relative",
+        borderRadius: "inherit",
+        border: `1px solid hsla(${this.node_data.viz_props.color[0]},${this.node_data.viz_props.color[1]}%, ${this.node_data.viz_props.color[2]}%, ${this.node_data.viz_props.color[3]})`,
+        backdropFilter: "blur(2px)",
+        pointerEvents: "none",
+        display: "grid",
+        placeItems: "center",
+        boxSizing: "border-box",
+        padding: "10px 15px 10px 15px"
       };
     },
     nodeLocation_: function() {
@@ -110,8 +142,10 @@ export default {
       if (this.dragging) {
         nodeLoc.x =
           this.canvasMousePos.x - this.draggingDeltas.x - this.canvasCenter.x;
+        nodeLoc.x -= nodeLoc.x % this.gridSize;
         nodeLoc.y =
           this.canvasMousePos.y - this.draggingDeltas.y - this.canvasCenter.y;
+        nodeLoc.y -= nodeLoc.y % this.gridSize;
       }
       //console.log(nodeLoc);
       return nodeLoc;
@@ -129,6 +163,28 @@ export default {
 
       this.$emit("startDrag", event, this.ID);
       //console.log(`x:${this.draggingDeltas.x}, y:${this.draggingDeltas.y}`);
+    },
+    getNodeData() {
+      // todo: get node data from api
+      // todo: check api url validity
+      this.$axios
+        .get(this.apiUrl + `/node/get-data/${this.ID}`)
+        .then(response => {
+          console.log(response["data"]);
+          this.node_data = response["data"]["node_viz_data"];
+        });
+    },
+    updatePropToAPI(propName, data) {
+      this.$axios({
+        method: "post",
+        url: this.apiUrl + `/updateProps/${this.ID}`,
+        params: {
+          [propName]: data
+        }
+      });
+      if (this.autoSave) {
+        // doing: save state to file
+      }
     }
   },
   watch: {
@@ -136,6 +192,37 @@ export default {
       if (!this.dragging) {
         this.nodeLocation = this.nodeLocation_;
       }
+    },
+    nodeLocation_() {
+      // todo: save node location to database on drag end
+      if (!this.dragging) {
+        if (!this.newNode) {
+          var msg = `updated location from {x:${this.node_data.viz_props.location[0]},y: ${this.node_data.viz_props.location[1]}} to 
+            {x:${this.nodeLocation_.x},y:${this.nodeLocation_.y}}`;
+          console.log(msg);
+          // todo: WIP
+          console.log([this.nodeLocation_.x, this.nodeLocation_.y, 0]);
+          this.updatePropToAPI(
+            "location",
+            `(${this.nodeLocation_.x},${this.nodeLocation_.y}, 0)`
+          );
+        }
+      }
+    },
+    node_data() {
+      this.nodeLocation = {
+        x: this.node_data.viz_props.location[0],
+        y: this.node_data.viz_props.location[1]
+      };
+      this.nodeLabel = this.node_data.label;
+    },
+    nodeLabel() {
+      // update nodeSizeFinal
+      var boundingBox = this.$refs.nodeContainer.getBoundingClientRect();
+      this.nodeSizFinal = {
+        width: boundingBox.width,
+        height: boundingBox.height
+      };
     }
   },
   created: function() {
@@ -149,6 +236,14 @@ export default {
       console.log(`@ mounted ${this.ID}`);
       // todo: get node_label, relation_claims, data from the API using the nodeID
     }
+    if (!this.newNode) {
+      this.getNodeData();
+    }
+    var boundingBox = this.$refs.nodeContainer.getBoundingClientRect();
+    this.nodeSizFinal = {
+      width: boundingBox.width,
+      height: boundingBox.height
+    };
   },
   updated() {}
 };

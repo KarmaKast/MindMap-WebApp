@@ -1,6 +1,13 @@
 <template>
   <div class="MindMapModule" :style="this.containerStyle">
-    <mind-map-canvas :colors="this.colors" :apiUrl="this.apiUrl" :nodes="nodes">
+    <mind-map-canvas
+      :colors="this.colors"
+      :colorsProcessed="colorsProcessed"
+      :apiUrl="this.apiUrl"
+      :nodes="nodes"
+      :apiValidity="apiValidity"
+      :grid="grid"
+    >
     </mind-map-canvas>
 
     <div
@@ -39,13 +46,14 @@
             height: '38px',
             width: '48px',
             background: 'rgba(255, 255, 255, 0.5)',
-            border: '0.5px dashed rgb(255, 164, 164)',
+            border: '1px solid rgb(255, 164, 164)',
             backdropFilter: 'blur(4px)',
             borderRadius: '12px',
             padding: '0px',
             boxShadow: this.showMenu
               ? 'hsla(0, 0%, 0%, 0.16) 0px 0px 19px 1px'
-              : 'hsla(0, 0%, 0%, 0.2) 0px 0px 1px 1px',
+              : 'unset',
+            boxSizing: 'border-box',
             cursor: 'pointer',
             outline: 'none',
             pointerEvents: 'initial'
@@ -74,7 +82,8 @@
         </div>
       </div>
       <status-bar
-        :colors="colorsProcessed"
+        :colors="colors"
+        :colorsProcessed="colorsProcessed"
         :apiUrl="apiUrl"
         :apiValidity="apiValidity"
       >
@@ -116,8 +125,15 @@ export default {
       showMenu: false,
       apiUrl: "",
       apiValidity: false,
-      nodes: ["__test_ID__", "__test_ID__1"],
-      showAboutPage: false
+      nodes: [
+        { ID: "__test_ID__", newNode: true },
+        { ID: "__test_ID__1", newNode: true }
+      ],
+      showAboutPage: false,
+      grid: {
+        size: 20,
+        opacity: 0.3
+      }
     };
   },
   computed: {
@@ -170,7 +186,6 @@ export default {
     colorsProcessed: function() {
       var colors_ = {};
       for (var key in this.colors) {
-        //var color = `hsla($(this.colors[]))`;
         var color_ = this.colors[key];
         colors_[
           key
@@ -188,10 +203,10 @@ export default {
       };
       if (this.colors !== undefined) {
         if ("background" in this.colors) {
-          style["backgroundColor"] = `${this.colorsProcessed["theme"]}`;
+          style["backgroundColor"] = `${this.colorsProcessed["background"]}`;
           style[
             "boxShadow"
-          ] = `0px 0px 0 2px ${this.colorsProcessed["theme_light"]}`;
+          ] = `0px 0px 0 2px ${this.colorsProcessed["theme_light"]}, inset 0px 0px 5px 3px hsla(0, 0%, 0%, 0.1`;
         }
       }
       return style;
@@ -241,8 +256,10 @@ export default {
       // todo: get a list of nodeIDs and create a list of nodes in the canvas
       console.log(`getting list of nodes\n${url_}`);
       this.$axios.get(url_ + "/get/nodeIDs").then(response => {
-        console.log(response);
-        this.nodes = response["data"]["IDs"];
+        //console.log(response);
+        this.nodes = response["data"]["IDs"].map(function(ID) {
+          return { ID: ID, newNode: false };
+        });
       });
     },
     clearDatabase() {

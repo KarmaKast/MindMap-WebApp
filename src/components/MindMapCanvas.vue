@@ -2,10 +2,11 @@
   <div
     id="canvasContainer"
     ref="canvasContainer"
-    style="height:100%; width:100%; position:relative; overflow: hidden;"
+    :style="canvasContainerStyle"
     @mousemove="getMousePos"
     @mouseup.left="stopDrag"
   >
+    <div id="grid" :style="gridStyle"></div>
     <div id="nodes">
       <nodeComponent
         v-for="(value, key_) in processedNodes"
@@ -17,6 +18,8 @@
         :canvasMousePos="value.canvasMousePos"
         :defaultColors="colors"
         :dragging="value.dragging"
+        :newNode="value.newNode"
+        :gridSize="grid.size"
         @startDrag="startDrag"
       >
       </nodeComponent>
@@ -46,8 +49,19 @@ export default {
   },
   props: {
     colors: Object,
+    colorsProcessed: Object,
     nodes: Array,
-    apiUrl: String
+    apiUrl: String,
+    apiValidity: Boolean,
+    grid: {
+      default() {
+        return {
+          size: 1,
+          opacity: 0
+        };
+      },
+      type: Object
+    }
   },
   data: function() {
     return {
@@ -65,18 +79,20 @@ export default {
   computed: {
     processedNodes: function() {
       var nodes_ = {};
-      for (var nodeID of this.nodes) {
-        nodes_[nodeID] = {
+      for (var node of this.nodes) {
+        nodes_[node.ID] = {
           dragging:
-            nodeID === this.nodeDragging.nodeID
+            node.ID === this.nodeDragging.nodeID
               ? this.nodeDragging.state
               : false,
-          canvasMousePos: this.canvasMousePos
+          canvasMousePos: this.canvasMousePos,
+          newNode: node.newNode
         };
       }
       return nodes_;
     },
     height: function() {
+      // todo: redo this with store.subscribe
       return this.$store.state.canvas_height;
     },
     width: function() {
@@ -87,6 +103,26 @@ export default {
         height: this.height,
         width: this.width
       };
+    },
+    canvasContainerStyle: function() {
+      return {
+        height: "100%",
+        width: "100%",
+        position: "relative",
+        overflow: "hidden"
+      };
+    },
+    gridStyle: function() {
+      // todo: move color processing functionality to vuex store
+      var processedColor = `hsla(${this.colors["theme_light"][0]}, ${this.colors["theme_light"][1]}%, ${this.colors["theme_light"][2]}%, ${this.grid.opacity})`;
+      return {
+        height: "110%",
+        width: "110%",
+        position: "absolute",
+        top: `-${this.grid.size - ((this.height / 2) % this.grid.size)}px`,
+        left: `-${this.grid.size - ((this.width / 2) % this.grid.size)}px`,
+        backgroundImage: `repeating-linear-gradient(rgba(255, 255, 255, 0), ${processedColor} 1px, rgba(255, 255, 255, 0) 1px, rgba(255, 255, 255, 0) ${this.grid.size}px), repeating-linear-gradient(90deg, rgba(255, 255, 255, 0), ${processedColor} 1px, rgba(255, 255, 255, 0) 1px, rgba(255, 255, 255, 0) ${this.grid.size}px)`
+      };
     }
   },
   methods: {
@@ -96,7 +132,6 @@ export default {
         this.nodeDragging.nodeID = ID;
         this.nodeDragging.state = true;
 
-        // todo: canvasMousePos currently is relative to window top-left. It should be relative to canvas container bounding box top-left
         // context: since canvas bounding box x,y is taken once at the start of the drag, if for some reason canvas container position changes relative to the window top-left it will make the drag to malfunction
         this.canvasContainerBoxLoc.x = this.$refs.canvasContainer.getBoundingClientRect().x;
         this.canvasContainerBoxLoc.y = this.$refs.canvasContainer.getBoundingClientRect().y;

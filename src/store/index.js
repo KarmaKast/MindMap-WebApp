@@ -35,7 +35,7 @@ export default new Vuex.Store({
   getters: {},
   actions: {
     update_apiUrl(context, url) {
-      console.log("doing action");
+      //console.log("doing action");
       context.commit("update_apiUrl", url);
 
       var isValid = url === "" ? false : true;
