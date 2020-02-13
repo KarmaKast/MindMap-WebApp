@@ -117,7 +117,11 @@ export default {
   },
   props: {
     // locationHor: {'left':value} or {'right':value}
-    colors: Object
+    colors: Object,
+    nodeLimit: {
+      default: 10,
+      type: Number
+    }
   },
   data: function() {
     return {

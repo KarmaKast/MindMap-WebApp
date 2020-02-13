@@ -8,7 +8,7 @@
       }"
     ></div>
     <div id="mindMapContainer" :style="mindMapContainerStyle">
-      <MindMapModule :colors="MindMapColors" />
+      <MindMapModule :colors="MindMapColors" :nodeLimit="20" />
     </div>
   </div>
 </template>
