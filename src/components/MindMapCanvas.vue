@@ -2,10 +2,11 @@
   <div
     id="canvasContainer"
     ref="canvasContainer"
-    style="height:100%; width:100%; position:relative; overflow: hidden;"
+    :style="canvasContainerStyle"
     @mousemove="getMousePos"
     @mouseup.left="stopDrag"
   >
+    <div id="grid" :style="gridStyle"></div>
     <div id="nodes">
       <nodeComponent
         v-for="(value, key_) in processedNodes"
@@ -48,10 +49,10 @@ export default {
   },
   props: {
     colors: Object,
+    colorsProcessed: Object,
     nodes: Array,
     apiUrl: String,
     apiValidity: Boolean,
-    canvasSize: Object,
     gridSize: {
       default: 1,
       type: Number
@@ -86,6 +87,7 @@ export default {
       return nodes_;
     },
     height: function() {
+      // todo: redo this with store.subscribe
       return this.$store.state.canvas_height;
     },
     width: function() {
@@ -96,6 +98,24 @@ export default {
         height: this.height,
         width: this.width
       };
+    },
+    canvasContainerStyle: function() {
+      return {
+        height: "100%",
+        width: "100%",
+        position: "relative",
+        overflow: "hidden"
+      };
+    },
+    gridStyle: function() {
+      return {
+        height: "110%",
+        width: "110%",
+        position: "absolute",
+        top: `-${this.gridSize - ((this.height / 2) % this.gridSize)}px`,
+        left: `-${this.gridSize - ((this.width / 2) % this.gridSize)}px`,
+        backgroundImage: `repeating-linear-gradient(rgba(255, 255, 255, 0), ${this.colorsProcessed["theme_light"]} 1px, rgba(255, 255, 255, 0) 1px, rgba(255, 255, 255, 0) ${this.gridSize}px), repeating-linear-gradient(90deg, rgba(255, 255, 255, 0), ${this.colorsProcessed["theme_light"]} 1px, rgba(255, 255, 255, 0) 1px, rgba(255, 255, 255, 0) ${this.gridSize}px)`
+      };
     }
   },
   methods: {
@@ -105,7 +125,6 @@ export default {
         this.nodeDragging.nodeID = ID;
         this.nodeDragging.state = true;
 
-        // todo: canvasMousePos currently is relative to window top-left. It should be relative to canvas container bounding box top-left
         // context: since canvas bounding box x,y is taken once at the start of the drag, if for some reason canvas container position changes relative to the window top-left it will make the drag to malfunction
         this.canvasContainerBoxLoc.x = this.$refs.canvasContainer.getBoundingClientRect().x;
         this.canvasContainerBoxLoc.y = this.$refs.canvasContainer.getBoundingClientRect().y;

@@ -2,6 +2,7 @@
   <div class="MindMapModule" :style="this.containerStyle">
     <mind-map-canvas
       :colors="this.colors"
+      :colorsProcessed="colorsProcessed"
       :apiUrl="this.apiUrl"
       :nodes="nodes"
       :apiValidity="apiValidity"
@@ -51,7 +52,7 @@
             padding: '0px',
             boxShadow: this.showMenu
               ? 'hsla(0, 0%, 0%, 0.16) 0px 0px 19px 1px'
-              : 'hsla(0, 0%, 0%, 0.2) 0px 0px 1px 1px',
+              : 'unset',
             boxSizing: 'border-box',
             cursor: 'pointer',
             outline: 'none',
@@ -81,7 +82,8 @@
         </div>
       </div>
       <status-bar
-        :colors="colorsProcessed"
+        :colors="colors"
+        :colorsProcessed="colorsProcessed"
         :apiUrl="apiUrl"
         :apiValidity="apiValidity"
       >
@@ -128,7 +130,7 @@ export default {
         { ID: "__test_ID__1", newNode: true }
       ],
       showAboutPage: false,
-      gridSize: 1
+      gridSize: 20
     };
   },
   computed: {

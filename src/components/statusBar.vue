@@ -1,5 +1,6 @@
 <template>
   <div id="statusBar" :style="statusBarStyle">
+    <div id="grid" :style="gridTest"></div>
     <div></div>
     <div id="apiStatusContainer" :style="apiStatusContainerStyle">
       <div
@@ -28,6 +29,7 @@ export default {
   name: "statusBar",
   props: {
     colors: Object,
+    colorsProcessed: Object,
     apiUrl: String,
     apiValidity: Boolean
   },
@@ -56,7 +58,7 @@ export default {
         gridTemplateColumns: `auto min-content`,
         columnGap: "5px",
 
-        backgroundColor: `${this.colors["background"]}`,
+        backgroundColor: `${this.colorsProcessed["background"]}`,
         backdropFilter: "blur(3px)"
       };
     },
@@ -83,6 +85,18 @@ export default {
         border: "1.2px dotted white",
         boxShadow: "0px 0px 3px 1px hsla(0, 0%, 0%, 0.32)",
         boxSizing: "border-box"
+      };
+    },
+    gridTest: function() {
+      // doing: WIP
+      //var color_ = "rgba(255, 255, 255, .05)";
+      return {
+        position: "absolute",
+        top: "0xp",
+        left: "0px",
+        width: "100%",
+        height: "100%",
+        backgroundImage: `repeating-linear-gradient(45deg,rgba(255, 255, 255, 0), rgba(255, 173, 173, 0.49) 1px, rgba(255, 255, 255, 0) 1px, rgba(255, 255, 255, 0) 6px), repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0), rgba(255, 173, 173, 0.51) 1px, rgba(255, 255, 255, 0) 1px, rgba(255, 255, 255, 0) 6px)`
       };
     }
   }

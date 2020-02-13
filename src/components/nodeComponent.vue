@@ -15,6 +15,7 @@
         {{ newNode ? "" : nodeLabel }}
       </p>
     </div>
+    <div id="nodeUI" :style="{ position: 'absolute' }"></div>
   </div>
   <!--<v-group
     ref="nodeGroup"
@@ -65,7 +66,11 @@ export default {
       type: Boolean
     },
     gridSize: Number,
-    defaultColors: Object
+    defaultColors: Object,
+    selected: {
+      default: false,
+      type: Boolean
+    }
   },
   data: function() {
     return {
@@ -96,8 +101,6 @@ export default {
         left: `${this.canvasCenter["x"] + this.nodeLocation_["x"]}px`,
         minWidth: `${this.newNode ? this.minWidth : 0}px`,
         minHeight: `${this.newNode ? this.minHeight : 0}px`,
-        //width: `${this.nodeSize["width"]}px`,
-        //height: `${this.nodeSize["height"]}px`,
         cursor: this.dragging ? "grabbing" : "grab",
         zIndex: this.dragging ? "5000" : "unset",
 
@@ -111,17 +114,19 @@ export default {
           this.dragging
             ? "rgba(0, 0, 0, 0.2) 0px 0px 13px 4px"
             : "rgba(0, 0, 0, 0.15) 0px 0px 3px 1px"
-        }, inset 0px 0px 0 7px hsla(${this.node_data.viz_props.color[0]}, 
+        }, inset 0px 0px 0 4px hsla(${this.node_data.viz_props.color[0]}, 
         ${this.node_data.viz_props.color[1]}%, 
-        ${this.node_data.viz_props.color[2]}%, 0.12)`,
+        ${this.node_data.viz_props.color[2]}%, 0.4)`,
+        boxSizing: "border-box",
         display: "grid",
         gridTemplateColumns: "100%",
-        padding: "8px",
-        boxSizing: "border-box"
+        padding: "4px",
+        outline: "none"
       };
     },
     nodeStyle: function() {
       return {
+        position: "relative",
         borderRadius: "inherit",
         border: `1px solid hsla(${this.node_data.viz_props.color[0]},${this.node_data.viz_props.color[1]}%, ${this.node_data.viz_props.color[2]}%, ${this.node_data.viz_props.color[3]})`,
         backdropFilter: "blur(2px)",
@@ -151,7 +156,7 @@ export default {
       //console.log("drag started at node");
 
       var boundingBox = this.$refs.nodeContainer.getBoundingClientRect();
-      console.log(boundingBox);
+      //console.log(boundingBox);
       // context: draggingDeltas are ---
       this.draggingDeltas["x"] = event.clientX - boundingBox.x;
       this.draggingDeltas["y"] = event.clientY - boundingBox.y;
