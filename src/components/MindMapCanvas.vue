@@ -57,7 +57,8 @@ export default {
       default() {
         return {
           size: 1,
-          opacity: 0
+          opacity: 0,
+          width: 0
         };
       },
       type: Object
@@ -119,9 +120,13 @@ export default {
         height: "110%",
         width: "110%",
         position: "absolute",
-        top: `-${this.grid.size - ((this.height / 2) % this.grid.size)}px`,
-        left: `-${this.grid.size - ((this.width / 2) % this.grid.size)}px`,
-        backgroundImage: `repeating-linear-gradient(rgba(255, 255, 255, 0), ${processedColor} 1px, rgba(255, 255, 255, 0) 1px, rgba(255, 255, 255, 0) ${this.grid.size}px), repeating-linear-gradient(90deg, rgba(255, 255, 255, 0), ${processedColor} 1px, rgba(255, 255, 255, 0) 1px, rgba(255, 255, 255, 0) ${this.grid.size}px)`
+        top: `${((this.height / 2 + this.canvasLocation["y"]) %
+          this.grid.size) -
+          this.grid.size}px`,
+        left: `${((this.width / 2 + this.canvasLocation["x"]) %
+          this.grid.size) -
+          this.grid.size}px`,
+        backgroundImage: `repeating-linear-gradient(rgba(255, 255, 255, 0), ${processedColor} ${this.grid.width}px, rgba(255, 255, 255, 0) ${this.grid.width}px, rgba(255, 255, 255, 0) ${this.grid.size}px), repeating-linear-gradient(90deg, rgba(255, 255, 255, 0), ${processedColor} ${this.grid.width}px, rgba(255, 255, 255, 0) ${this.grid.width}px, rgba(255, 255, 255, 0) ${this.grid.size}px)`
       };
     }
   },

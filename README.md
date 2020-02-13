@@ -1,4 +1,4 @@
-# mindmapwebapp
+# MapTheeMInd
 
 ## Project setup
 ```

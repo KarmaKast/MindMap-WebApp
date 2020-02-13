@@ -97,8 +97,12 @@ export default {
     nodeContainerStyle: function() {
       return {
         position: "absolute",
-        top: `${this.canvasCenter["y"] + this.nodeLocation_["y"]}px`,
-        left: `${this.canvasCenter["x"] + this.nodeLocation_["x"]}px`,
+        top: `${this.canvasLocation["y"] +
+          this.canvasCenter["y"] +
+          this.nodeLocation_["y"]}px`,
+        left: `${this.canvasLocation["x"] +
+          this.canvasCenter["x"] +
+          this.nodeLocation_["x"]}px`,
         minWidth: `${this.newNode ? this.minWidth : 0}px`,
         minHeight: `${this.newNode ? this.minHeight : 0}px`,
         cursor: this.dragging ? "grabbing" : "grab",
