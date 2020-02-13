@@ -1,4 +1,4 @@
-# MapTheeMInd
+# MapThyMInd
 
 ## Project setup
 ```
