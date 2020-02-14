@@ -52,7 +52,7 @@ export default {
   name: "nodeComponent",
   props: {
     ID: String,
-    newNode: Boolean,
+    newNodeDef: Boolean,
     apiUrl: String,
     canvasSize: Object,
     canvasLocation: Object,
@@ -78,6 +78,7 @@ export default {
       minWidth: 120,
       nodeLocation: { x: 0, y: 0 },
       nodeLabel: "__null__",
+      newNode: this.newNodeDef,
       node_data: {
         label: "",
         viz_props: { location: [0, 0, 0], color: [166, 89, 45, 1] }

@@ -9,6 +9,7 @@
     @mouseup.middle="setCanvasDragging"
   >
     <div v-if="grid.opacity > 0" id="grid" :style="gridStyle"></div>
+    <div v-if="grid.opacity > 0" id="grid" :style="gridCenterStyle"></div>
     <div id="nodes">
       <nodeComponent
         v-for="(value, key_) in processedNodes"
@@ -20,7 +21,7 @@
         :canvasMousePos="value.canvasMousePos"
         :defaultColors="colors"
         :dragging="value.dragging"
-        :newNode="value.newNode"
+        :newNodeDef="value.newNode"
         :gridSize="grid.size"
         @startNodeDrag="startNodeDrag"
       >
@@ -88,7 +89,9 @@ export default {
         state: false,
         event: undefined,
         deltas: { x: 0, y: 0 }
-      }
+      },
+      height: 0,
+      width: 0
     };
   },
   computed: {
@@ -108,13 +111,6 @@ export default {
       });
       return nodes_;
     },
-    height: function() {
-      // todo: redo this with store.subscribe
-      return this.$store.state.canvas_height;
-    },
-    width: function() {
-      return this.$store.state.canvas_width;
-    },
     canvasConfig: function() {
       return {
         height: this.height,
@@ -125,40 +121,64 @@ export default {
       return {
         height: "100%",
         width: "100%",
-        position: "relative",
+        position: "absolute",
+        top: "0px",
+        left: "0px",
         overflow: "hidden"
       };
     },
     gridStyle: function() {
       // todo: move color processing functionality to vuex store
       var processedColor = `hsla(${this.colors["theme_light"][0]}, ${this.colors["theme_light"][1]}%, ${this.colors["theme_light"][2]}%, ${this.grid.opacity})`;
+      var size_ = this.grid.size * 2;
       return {
-        height: "110%",
-        width: "110%",
+        height: "200%",
+        width: "200%",
         position: "absolute",
-        top: `${((this.height / 2 + this.canvasLocation["y"]) %
-          this.grid.size) -
-          this.grid.size}px`,
-        left: `${((this.width / 2 + this.canvasLocation["x"]) %
-          this.grid.size) -
-          this.grid.size}px`,
-        backgroundImage: `repeating-linear-gradient(rgba(255, 255, 255, 0), ${processedColor} ${this.grid.width}px, rgba(255, 255, 255, 0) ${this.grid.width}px, rgba(255, 255, 255, 0) ${this.grid.size}px), repeating-linear-gradient(90deg, rgba(255, 255, 255, 0), ${processedColor} ${this.grid.width}px, rgba(255, 255, 255, 0) ${this.grid.width}px, rgba(255, 255, 255, 0) ${this.grid.size}px)`
+        top: `${((this.height / 2 + this.canvasLocation["y"]) % size_) -
+          size_}px`,
+        left: `${((this.width / 2 + this.canvasLocation["x"]) % size_) -
+          size_}px`,
+        backgroundImage: `repeating-linear-gradient(rgba(255, 255, 255, 0), ${processedColor} ${this.grid.width}px, rgba(255, 255, 255, 0) ${this.grid.width}px, rgba(255, 255, 255, 0) ${size_}px), repeating-linear-gradient(90deg, rgba(255, 255, 255, 0), ${processedColor} ${this.grid.width}px, rgba(255, 255, 255, 0) ${this.grid.width}px, rgba(255, 255, 255, 0) ${size_}px)`
+      };
+    },
+    gridCenterStyle: function() {
+      // todo: move color processing functionality to vuex store
+      //var processedColor = `hsla(${this.colors["theme_light"][0]}, ${this.colors["theme_light"][1]}%, ${this.colors["theme_light"][2]}%, ${this.grid.opacity*2})`;
+      var size_x = this.width * 1.5;
+      var size_y = this.height * 1.5;
+      //var size_ = this.grid.size * 2;
+      return {
+        height: "400%",
+        width: "400%",
+        position: "absolute",
+        top: `${((this.height / 2 + this.canvasLocation["y"]) % size_y) -
+          size_y}px`,
+        left: `${((this.width / 2 + this.canvasLocation["x"]) % size_x) -
+          size_x}px`,
+        backgroundImage: `repeating-linear-gradient(rgba(255, 255, 255, 0), hsla(222, 100%, 50%, ${this
+          .grid.opacity * 2}) ${this.grid.width}px, rgba(255, 255, 255, 0) ${
+          this.grid.width
+        }px, rgba(255, 255, 255, 0) ${size_y}px), repeating-linear-gradient(90deg, rgba(255, 255, 255, 0), hsla(177, 73%, 47%, ${this
+          .grid.opacity * 2}) ${this.grid.width}px, rgba(255, 255, 255, 0) ${
+          this.grid.width
+        }px, rgba(255, 255, 255, 0) ${size_x}px)`
       };
     }
   },
   methods: {
+    updateContainerBoxLoc() {
+      // context: since canvas bounding box x,y is taken once at the start of the drag, if for some reason canvas container position changes relative to the window top-left it will make the drag to malfunction
+      this.canvasContainerBoxLoc.x = this.$refs.canvasContainer.getBoundingClientRect().x;
+      this.canvasContainerBoxLoc.y = this.$refs.canvasContainer.getBoundingClientRect().y;
+    },
     startNodeDrag(event, ID) {
       //console.log("drag started at canvas");
       if (this.nodeDragging.nodeID === undefined) {
         this.nodeDragging.nodeID = ID;
         this.nodeDragging.state = true;
 
-        // context: since canvas bounding box x,y is taken once at the start of the drag, if for some reason canvas container position changes relative to the window top-left it will make the drag to malfunction
-        this.canvasContainerBoxLoc.x = this.$refs.canvasContainer.getBoundingClientRect().x;
-        this.canvasContainerBoxLoc.y = this.$refs.canvasContainer.getBoundingClientRect().y;
-
-        this.canvasMousePos.x = event.clientX - this.canvasContainerBoxLoc.x;
-        this.canvasMousePos.y = event.clientY - this.canvasContainerBoxLoc.y;
+        this.updateContainerBoxLoc();
       }
     },
     stopNodeDrag() {
@@ -185,6 +205,7 @@ export default {
     setCanvasDragging(event) {
       console.log("from event func");
       console.log(event);
+      // todo: this toggling mechanism causes problems if mouse moves out of canvas container
       if (this.canvasDragging.state) {
         // doing: stop drag
         this.canvasDragging.state = false;
@@ -195,14 +216,18 @@ export default {
         // doing: start drag
         this.canvasDragging.state = true;
         this.canvasDragging.event = event;
-        // context: since canvas bounding box x,y is taken once at the start of the drag, if for some reason canvas container position changes relative to the window top-left it will make the drag to malfunction
-        this.canvasContainerBoxLoc.x = this.$refs.canvasContainer.getBoundingClientRect().x;
-        this.canvasContainerBoxLoc.y = this.$refs.canvasContainer.getBoundingClientRect().y;
+        this.updateContainerBoxLoc();
         // todo: set dragging deltas
         this.canvasDragging.deltas.x =
-          event.clientX - this.width / 2 - this.canvasLocation.x - this.canvasContainerBoxLoc.x ;
+          event.clientX -
+          this.width / 2 -
+          this.canvasLocation.x -
+          this.canvasContainerBoxLoc.x;
         this.canvasDragging.deltas.y =
-          event.clientY - this.height / 2 - this.canvasLocation.y - this.canvasContainerBoxLoc.y ;
+          event.clientY -
+          this.height / 2 -
+          this.canvasLocation.y -
+          this.canvasContainerBoxLoc.y;
       }
     }
   },
@@ -212,24 +237,34 @@ export default {
       console.log(this.canvasDragging.event);
     }
   },
-  created: function() {},
-  mounted: function() {
-    var box = this.$refs.canvasContainer.getBoundingClientRect();
-    this.$store.commit("update_canvas_height", box.height);
-    this.$store.commit("update_canvas_width", box.width);
-
-    this.$store.subscribe(mutation => {
-      if (
-        ["update_window_height", "update_window_width"].includes(mutation.type)
-      ) {
-        box = this.$refs.canvasContainer.getBoundingClientRect();
-        this.$store.commit("update_canvas_height", box.height);
-        this.$store.commit("update_canvas_width", box.width);
-        // todo: WIP ?
+  created: function() {
+    this.$store.subscribeAction({
+      after: action => {
+        if ("update_window_size" === action.type) {
+          var box = this.$refs.canvasContainer.getBoundingClientRect();
+          this.height = box.height;
+          this.width = box.width;
+        }
       }
     });
   },
-  updated: function() {}
+  mounted: function() {
+    var box = this.$refs.canvasContainer.getBoundingClientRect();
+    console.log(box);
+    this.height = box.height;
+    this.width = box.width;
+  },
+  beforeUpdate: function() {
+    console.log("before update called");
+    var box = this.$refs.canvasContainer.getBoundingClientRect();
+    this.height = box.height;
+    this.width = box.width;
+  },
+  updated: function() {
+    /*var box = this.$refs.canvasContainer.getBoundingClientRect();
+    this.height = box.height;
+    this.width = box.width;*/
+  }
 };
 </script>
 <style lang="sass" scoped></style>
