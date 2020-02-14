@@ -3,6 +3,7 @@
     ref="nodeContainer"
     :style="nodeContainerStyle"
     @mousedown.left="startdrag"
+    @click.left="setActive"
   >
     <div id="node" :style="nodeStyle">
       <p
@@ -15,7 +16,7 @@
         {{ newNode ? "" : nodeLabel }}
       </p>
     </div>
-    <div id="nodeUI" :style="{ position: 'absolute' }"></div>
+    <div v-if="active" id="nodeUI" :style="{ position: 'absolute' }"></div>
   </div>
   <!--<v-group
     ref="nodeGroup"
@@ -84,16 +85,17 @@ export default {
         viz_props: { location: [0, 0, 0], color: [166, 89, 45, 1] }
       },
       nodeSize: { height: 60, width: 160 },
-      nodeSizFinal: { height: 0, width: 0 },
-      draggingDeltas: { x: 0, y: 0 }
+      nodeBoundingBoxSize: { height: 0, width: 0 },
+      draggingDeltas: { x: 0, y: 0 },
+      active: false
     };
   },
   computed: {
     canvasCenter: function() {
       // context: whats nodeSizeFinal about?
       return {
-        x: this.canvasSize["width"] / 2 - this.nodeSizFinal.width / 2,
-        y: this.canvasSize["height"] / 2 - this.nodeSizFinal.height / 2
+        x: this.canvasSize["width"] / 2 - this.nodeBoundingBoxSize.width / 2,
+        y: this.canvasSize["height"] / 2 - this.nodeBoundingBoxSize.height / 2
       };
     },
     nodeContainerStyle: function() {
@@ -120,8 +122,8 @@ export default {
           this.dragging
             ? "rgba(0, 0, 0, 0.2) 0px 0px 13px 4px"
             : "rgba(0, 0, 0, 0.15) 0px 0px 3px 1px"
-        }, inset 0px 0px 0 4px hsla(${this.node_data.viz_props.color[0]}, 
-        ${this.node_data.viz_props.color[1]}%, 
+        }, inset 0px 0px 0 4px hsla(${this.node_data.viz_props.color[0]},
+        ${this.node_data.viz_props.color[1]}%,
         ${this.node_data.viz_props.color[2]}%, 0.2)`,
         boxSizing: "border-box",
         display: "grid",
@@ -158,12 +160,16 @@ export default {
     }
   },
   methods: {
+    setActive() {
+      this.active = this.active ? false : true;
+    },
     startdrag(event) {
       //console.log("drag started at node");
 
+      // doing: calculating draggingDeltas
       var boundingBox = this.$refs.nodeContainer.getBoundingClientRect();
       //console.log(boundingBox);
-      // context: draggingDeltas are ---
+
       this.draggingDeltas["x"] =
         event.clientX - boundingBox.x + this.canvasLocation.x;
       this.draggingDeltas["y"] =
@@ -193,6 +199,16 @@ export default {
       if (this.autoSave) {
         // todo: save state to file
       }
+    },
+    updateNodeBBox(time = 100) {
+      // doing: updating node's bounding box width and height
+      setTimeout(() => {
+        var boundingBox = this.$refs.nodeContainer.getBoundingClientRect();
+        this.nodeBoundingBoxSize = {
+          width: boundingBox.width,
+          height: boundingBox.height
+        };
+      }, time);
     }
   },
   watch: {
@@ -205,7 +221,7 @@ export default {
       // todo: save node location to database on drag end
       if (!this.dragging) {
         if (!this.newNode) {
-          var msg = `updated location from {x:${this.node_data.viz_props.location[0]},y: ${this.node_data.viz_props.location[1]}} to 
+          var msg = `updated location from {x:${this.node_data.viz_props.location[0]},y: ${this.node_data.viz_props.location[1]}} to
             {x:${this.nodeLocation_.x},y:${this.nodeLocation_.y}}`;
           console.log(msg);
           // todo: WIP
@@ -224,13 +240,15 @@ export default {
       };
       this.nodeLabel = this.node_data.label;
     },
+    newNode() {
+      // doing: updating node's bounding box width and height
+      this.updateNodeBBox();
+    },
     nodeLabel() {
-      // update nodeSizeFinal
-      var boundingBox = this.$refs.nodeContainer.getBoundingClientRect();
-      this.nodeSizFinal = {
-        width: boundingBox.width,
-        height: boundingBox.height
-      };
+      if (!this.newNode) {
+        // doing: updating node's bounding box width and height
+        this.updateNodeBBox();
+      }
     }
   },
   created: function() {
@@ -247,12 +265,9 @@ export default {
     if (!this.newNode) {
       this.getNodeData();
     }
-    var boundingBox = this.$refs.nodeContainer.getBoundingClientRect();
-    this.nodeSizFinal = {
-      width: boundingBox.width,
-      height: boundingBox.height
-    };
+    this.updateNodeBBox(0);
   },
+  beforeUpdate() {},
   updated() {}
 };
 </script>
