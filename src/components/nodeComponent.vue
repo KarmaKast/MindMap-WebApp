@@ -1,22 +1,46 @@
 <template>
-  <div
-    ref="nodeContainer"
-    :style="nodeContainerStyle"
-    @mousedown.left="startdrag"
-    @click.left="setActive"
-  >
-    <div id="node" :style="nodeStyle">
-      <p
-        :style="{
-          pointerEvents: 'none',
-          margin: '0px',
-          maxWidth: '100px'
-        }"
-      >
-        {{ newNode ? "" : nodeLabel }}
+  <div ref="nodeContainer" :style="nodeContainerStyle">
+    <div
+      id="node"
+      :style="nodeStyle"
+      @mousedown.left="startdrag"
+      @click.left="setActive"
+    >
+      <!--<input type="text" :style="nodeTextStyle" :value="nodeLabel" />-->
+      <p :style="nodeTextStyle">
+        {{ nodeLabel }}
       </p>
     </div>
-    <div v-if="active" id="nodeUI" :style="{ position: 'absolute' }"></div>
+    <div
+      v-if="nodeSelected"
+      id="nodeUI"
+      :style="{
+        position: 'absolute',
+        top: '-15px',
+        display: 'grid'
+      }"
+    >
+      <div
+        id="editLabelBttn"
+        :style="{
+          height: '15px',
+          width: '15px',
+          backgroundColor: 'red',
+          borderRadius: '10px'
+        }"
+        @click.left.self="editNodeLabel"
+      >
+        <input
+          v-if="editingLabel"
+          ref="labelInput"
+          type="text"
+          :style="inputTextStyle"
+          :value="nodeLabel"
+          @input="nodeLabel = $event.target.value"
+          @keyup.enter="editNodeLabel"
+        />
+      </div>
+    </div>
   </div>
   <!--<v-group
     ref="nodeGroup"
@@ -78,7 +102,7 @@ export default {
       minHeight: 60,
       minWidth: 120,
       nodeLocation: { x: 0, y: 0 },
-      nodeLabel: "__null__",
+      nodeLabel: "",
       newNode: this.newNodeDef,
       node_data: {
         label: "",
@@ -87,7 +111,8 @@ export default {
       nodeSize: { height: 60, width: 160 },
       nodeBoundingBoxSize: { height: 0, width: 0 },
       draggingDeltas: { x: 0, y: 0 },
-      active: false
+      nodeSelected: false,
+      editingLabel: false
     };
   },
   computed: {
@@ -112,7 +137,7 @@ export default {
         cursor: this.dragging ? "grabbing" : "grab",
         zIndex: this.dragging ? "5000" : "unset",
 
-        backgroundColor: "hsla(0,0%,0%,0.01)",
+        backgroundColor: this.editingLabel ? "white" : "hsla(0,0%,0%,0.01)",
         border: `1px dotted rgba(0, 0, 0, 0.2)`,
         borderRadius:
           this.nodeSize["height"] > this.nodeSize["width"]
@@ -138,11 +163,28 @@ export default {
         borderRadius: "inherit",
         border: `1px solid hsla(${this.node_data.viz_props.color[0]},${this.node_data.viz_props.color[1]}%, ${this.node_data.viz_props.color[2]}%, ${this.node_data.viz_props.color[3]})`,
         backdropFilter: "blur(2px)",
-        pointerEvents: "none",
+        pointerEvents: "all",
         display: "grid",
         placeItems: "center",
         boxSizing: "border-box",
         padding: "10px 15px 10px 15px"
+      };
+    },
+    nodeTextStyle: function() {
+      return {
+        pointerEvents: "none",
+        margin: "0px",
+        maxWidth: "100px",
+        color: `hsla(${this.node_data.viz_props.color[0]},${this.node_data.viz_props.color[1]}%, ${this.node_data.viz_props.color[2]}%, ${this.node_data.viz_props.color[3]})`,
+        background: "none",
+        border: "none"
+      };
+    },
+    inputTextStyle: function() {
+      return {
+        position: "absolute",
+        bottom: "20px",
+        left: "20px"
       };
     },
     nodeLocation_: function() {
@@ -161,7 +203,7 @@ export default {
   },
   methods: {
     setActive() {
-      this.active = this.active ? false : true;
+      this.nodeSelected = this.nodeSelected ? false : true;
     },
     startdrag(event) {
       //console.log("drag started at node");
@@ -209,6 +251,14 @@ export default {
           height: boundingBox.height
         };
       }, time);
+    },
+    editNodeLabel(event) {
+      console.log(event);
+      if (this.newNode) {
+        this.newNode = false;
+      }
+      this.editingLabel = this.editingLabel ? false : true;
+      this.$refs.labelInput.focus();
     }
   },
   watch: {
