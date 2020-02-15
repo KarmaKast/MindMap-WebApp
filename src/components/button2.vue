@@ -58,7 +58,7 @@ export default {
     backgroundStyle: function() {
       return {
         background: this.mainButtonIsHovered
-          ? "rgba(255, 255, 255, 0.9)"
+          ? "hsla(3, 100%, 87%, 0.16)"
           : "rgba(255, 255, 255, 0.3)",
         position: "absolute",
         top: "0px",

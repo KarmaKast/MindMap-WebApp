@@ -8,8 +8,16 @@
     @mousedown.middle="setCanvasDragging"
     @mouseup.middle="setCanvasDragging"
   >
-    <div v-if="grid.opacity > 0" id="grid" :style="gridStyle"></div>
-    <div v-if="grid.opacity > 0" id="grid" :style="gridCenterStyle"></div>
+    <div
+      v-if="grid.opacity > 0 && grid.size > 1 && grid.width > 0"
+      id="grid"
+      :style="gridStyle"
+    ></div>
+    <div
+      v-if="grid.opacity > 0 && grid.size > 1 && grid.width > 0"
+      id="grid"
+      :style="gridCenterStyle"
+    ></div>
     <div id="nodes">
       <nodeComponent
         v-for="(value, key_) in processedNodes"
@@ -64,6 +72,11 @@ export default {
     apiValidity: Boolean,
     grid: {
       default() {
+        /*
+        size : [1,infinite*)
+        opacity : [0,1],
+        width : [0,5]
+        */
         return {
           size: 1,
           opacity: 0,
@@ -71,6 +84,11 @@ export default {
         };
       },
       type: Object
+    },
+    popupLock: {
+      // context: if true disables this canvas from using popup feature * WIP *
+      default: true,
+      type: Boolean
     }
   },
   data: function() {
@@ -124,7 +142,8 @@ export default {
         position: "absolute",
         top: "0px",
         left: "0px",
-        overflow: "hidden"
+        overflow: "hidden",
+        backgroundColor: "inherit"
       };
     },
     gridStyle: function() {
@@ -143,8 +162,6 @@ export default {
       };
     },
     gridCenterStyle: function() {
-      // todo: move color processing functionality to vuex store
-      //var processedColor = `hsla(${this.colors["theme_light"][0]}, ${this.colors["theme_light"][1]}%, ${this.colors["theme_light"][2]}%, ${this.grid.opacity*2})`;
       var size_x = this.width * 1.5;
       var size_y = this.height * 1.5;
       //var size_ = this.grid.size * 2;
@@ -163,6 +180,7 @@ export default {
           .grid.opacity * 2}) ${this.grid.width}px, rgba(255, 255, 255, 0) ${
           this.grid.width
         }px, rgba(255, 255, 255, 0) ${size_x}px)`
+        /*backgroundImage: `linear-gradient(90deg, #FFFFFF 49.9%, rgba(0, 0, 0, 0.520833) 50%, rgba(255, 255, 255, 0) 51.1%)`*/
       };
     }
   },

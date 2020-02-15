@@ -3,8 +3,8 @@
     <div
       id="node"
       :style="nodeStyle"
-      @mousedown.left="startdrag"
-      @click.left="setActive"
+      @mousedown.left.self="startdrag"
+      @click.left.self="setActive"
     >
       <!--<input type="text" :style="nodeTextStyle" :value="nodeLabel" />-->
       <p :style="nodeTextStyle">
@@ -40,6 +40,7 @@
           @keyup.enter="editNodeLabel"
         />
       </div>
+      <color-picker> </color-picker>
     </div>
   </div>
   <!--<v-group
@@ -73,8 +74,13 @@
 </template>
 
 <script>
+import ColorPicker from "./general/ColorPicker.vue";
+
 export default {
   name: "nodeComponent",
+  components: {
+    ColorPicker
+  },
   props: {
     ID: String,
     newNodeDef: Boolean,
@@ -87,7 +93,7 @@ export default {
       type: Boolean
     },
     autoSave: {
-      default: true,
+      default: false,
       type: Boolean
     },
     gridSize: Number,
@@ -103,6 +109,7 @@ export default {
       minWidth: 120,
       nodeLocation: { x: 0, y: 0 },
       nodeLabel: "",
+      nodeColor: [0, 0, 0, 1],
       newNode: this.newNodeDef,
       node_data: {
         label: "",
@@ -116,22 +123,17 @@ export default {
     };
   },
   computed: {
-    canvasCenter: function() {
-      // context: whats nodeSizeFinal about?
-      return {
-        x: this.canvasSize["width"] / 2 - this.nodeBoundingBoxSize.width / 2,
-        y: this.canvasSize["height"] / 2 - this.nodeBoundingBoxSize.height / 2
-      };
-    },
     nodeContainerStyle: function() {
       return {
         position: "absolute",
         top: `${this.canvasLocation["y"] +
-          this.canvasCenter["y"] +
-          this.nodeLocation_["y"]}px`,
+          this.canvasSize.height / 2 +
+          this.nodeLocation_["y"] -
+          this.nodeBoundingBoxSize.height / 2}px`,
         left: `${this.canvasLocation["x"] +
-          this.canvasCenter["x"] +
-          this.nodeLocation_["x"]}px`,
+          this.canvasSize.width / 2 +
+          this.nodeLocation_["x"] -
+          this.nodeBoundingBoxSize.width / 2}px`,
         minWidth: `${this.newNode ? this.minWidth : 0}px`,
         minHeight: `${this.newNode ? this.minHeight : 0}px`,
         cursor: this.dragging ? "grabbing" : "grab",
@@ -147,9 +149,9 @@ export default {
           this.dragging
             ? "rgba(0, 0, 0, 0.2) 0px 0px 13px 4px"
             : "rgba(0, 0, 0, 0.15) 0px 0px 3px 1px"
-        }, inset 0px 0px 0 4px hsla(${this.node_data.viz_props.color[0]},
-        ${this.node_data.viz_props.color[1]}%,
-        ${this.node_data.viz_props.color[2]}%, 0.2)`,
+        }, inset 0px 0px 0 4px hsla(${this.nodeColor[0]},
+        ${this.nodeColor[1]}%,
+        ${this.nodeColor[2]}%, 0.2)`,
         boxSizing: "border-box",
         display: "grid",
         gridTemplateColumns: "100%",
@@ -161,7 +163,7 @@ export default {
       return {
         position: "relative",
         borderRadius: "inherit",
-        border: `1px solid hsla(${this.node_data.viz_props.color[0]},${this.node_data.viz_props.color[1]}%, ${this.node_data.viz_props.color[2]}%, ${this.node_data.viz_props.color[3]})`,
+        border: `1px solid hsla(${this.nodeColor[0]},${this.nodeColor[1]}%, ${this.nodeColor[2]}%, ${this.nodeColor[3]})`,
         backdropFilter: "blur(2px)",
         pointerEvents: "all",
         display: "grid",
@@ -174,8 +176,9 @@ export default {
       return {
         pointerEvents: "none",
         margin: "0px",
-        maxWidth: "100px",
-        color: `hsla(${this.node_data.viz_props.color[0]},${this.node_data.viz_props.color[1]}%, ${this.node_data.viz_props.color[2]}%, ${this.node_data.viz_props.color[3]})`,
+        /*maxWidth: "100px",
+        overflowWrap: 'break-word',*/
+        color: `hsla(${this.nodeColor[0]},${this.nodeColor[1]}%, ${this.nodeColor[2]}%, ${this.nodeColor[3]})`,
         background: "none",
         border: "none"
       };
@@ -190,12 +193,24 @@ export default {
     nodeLocation_: function() {
       var nodeLoc = this.nodeLocation;
       if (this.dragging) {
+        // todo: this is working as intended. Just need to detect drag differently from simply clicking in.
         nodeLoc.x =
-          this.canvasMousePos.x - this.draggingDeltas.x - this.canvasCenter.x;
-        nodeLoc.x -= nodeLoc.x % this.gridSize;
+          this.canvasMousePos.x -
+          this.canvasSize.width / 2 -
+          this.canvasLocation.x;
+
+        nodeLoc.x =
+          (Math.floor((nodeLoc.x - this.gridSize / 2) / this.gridSize) + 1) *
+          this.gridSize;
+
         nodeLoc.y =
-          this.canvasMousePos.y - this.draggingDeltas.y - this.canvasCenter.y;
-        nodeLoc.y -= nodeLoc.y % this.gridSize;
+          this.canvasMousePos.y -
+          this.canvasSize.height / 2 -
+          this.canvasLocation.y;
+
+        nodeLoc.y =
+          (Math.floor((nodeLoc.y - this.gridSize / 2) / this.gridSize) + 1) *
+          this.gridSize;
       }
       //console.log(nodeLoc);
       return nodeLoc;
@@ -230,7 +245,7 @@ export default {
           this.node_data = response["data"]["node_viz_data"];
         });
     },
-    updatePropToAPI(propName, data) {
+    savePropToAPI(propName, data) {
       this.$axios({
         method: "post",
         url: this.apiUrl + `/updateProps/${this.ID}`,
@@ -239,7 +254,8 @@ export default {
         }
       });
       if (this.autoSave) {
-        // todo: save state to file
+        // doing: ask server save state to file
+        this.$axios.post(this.apiUrl + "/save");
       }
     },
     updateNodeBBox(time = 100) {
@@ -258,7 +274,10 @@ export default {
         this.newNode = false;
       }
       this.editingLabel = this.editingLabel ? false : true;
-      this.$refs.labelInput.focus();
+      //setInterval
+      if (this.editingLabel) {
+        this.$refs.labelInput.focus();
+      }
     }
   },
   watch: {
@@ -276,7 +295,7 @@ export default {
           console.log(msg);
           // todo: WIP
           console.log([this.nodeLocation_.x, this.nodeLocation_.y, 0]);
-          this.updatePropToAPI(
+          this.savePropToAPI(
             "location",
             `(${this.nodeLocation_.x},${this.nodeLocation_.y}, 0)`
           );
@@ -289,6 +308,7 @@ export default {
         y: this.node_data.viz_props.location[1]
       };
       this.nodeLabel = this.node_data.label;
+      this.nodeColor = this.node_data.viz_props.color;
     },
     newNode() {
       // doing: updating node's bounding box width and height
@@ -298,6 +318,30 @@ export default {
       if (!this.newNode) {
         // doing: updating node's bounding box width and height
         this.updateNodeBBox();
+      }
+      // todo: save node Label to API
+      this.$axios({
+        method: "post",
+        url: this.apiUrl + `/updateSource/${this.ID}`,
+        params: {
+          label: this.nodeLabel
+        }
+      });
+      if (this.autoSave) {
+        // doing: ask server save state to file
+        this.$axios.post(this.apiUrl + "/save");
+      }
+    },
+    nodeColor() {
+      this.savePropToAPI(
+        "color",
+        `(${this.nodeColor[0]},${this.nodeColor[1]},${this.nodeColor[2]}, ${
+          this.nodeColor[3] !== undefined ? this.nodeColor[3] : 1
+        })`
+      );
+      if (this.autoSave) {
+        // doing: ask server save state to file
+        this.$axios.post(this.apiUrl + "/save");
       }
     }
   },

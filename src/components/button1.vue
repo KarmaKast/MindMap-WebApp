@@ -1,12 +1,12 @@
 <template>
-  <div id="container" :style="this.containerStyle">
-    <div id="background" :style="this.backgroundStyle"></div>
-    <p :style="this.buttonTextStyle">
-      {{ this.buttonText }}
+  <div id="container" :style="containerStyle">
+    <div id="background" :style="backgroundStyle"></div>
+    <p :style="buttonTextStyle">
+      {{ buttonText }}
     </p>
     <button
       id="primary-button"
-      :style="this.buttonStyle"
+      :style="buttonStyle"
       @click.left="setActive"
       @mouseover="setButtonHovered('main')"
       @mouseout="unsetButtonHovered('main')"
@@ -16,13 +16,13 @@
       id="input-field"
       ref="inputField"
       placeholder="Connect to API"
-      :style="this.inputFieldStyle"
+      :style="inputFieldStyle"
       @keyup.enter="testAPI"
       @keyup.esc="setNotActive"
     />
     <button
       id="secondary-button"
-      :style="this.testButtonStyle"
+      :style="testButtonStyle"
       @click.left="testAPI"
       @mouseover="setButtonHovered('test')"
       @mouseout="unsetButtonHovered('test')"
@@ -80,7 +80,7 @@ export default {
     backgroundStyle: function() {
       return {
         background: this.mainButtonIsHovered
-          ? "rgba(255, 255, 255, 0.9)"
+          ? "hsla(3, 100%, 87%, 0.16)"
           : "rgba(255, 255, 255, 0.3)",
         position: "absolute",
         top: "0px",
