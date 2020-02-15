@@ -280,7 +280,9 @@ export default {
       this.editingLabel = this.editingLabel ? false : true;
       //setInterval
       if (this.editingLabel) {
-        this.$refs.labelInput.focus();
+        setTimeout(() => {
+          this.$refs.labelInput.focus();
+        }, 100);
       }
     }
   },
