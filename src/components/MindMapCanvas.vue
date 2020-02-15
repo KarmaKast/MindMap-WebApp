@@ -4,7 +4,9 @@
     ref="canvasContainer"
     :style="canvasContainerStyle"
     @mousemove="getMousePos"
+    v-touch:moving="getMousePos"
     @mouseup.left="stopNodeDrag"
+    v-touch:end="stopNodeDrag"
     @mousedown.middle="setCanvasDragging"
     @mouseup.middle="setCanvasDragging"
   >
@@ -210,8 +212,16 @@ export default {
       if (this.nodeDragging.state === true) {
         // todo: if dragging pass canvasMousePos to nodes else pass undefined
       }
-      this.canvasMousePos.x = event.clientX - this.canvasContainerBoxLoc.x;
-      this.canvasMousePos.y = event.clientY - this.canvasContainerBoxLoc.y;
+      if (event.type === "mousemove") {
+        this.canvasMousePos.x = event.clientX - this.canvasContainerBoxLoc.x;
+        this.canvasMousePos.y = event.clientY - this.canvasContainerBoxLoc.y;
+      } else if (event.type === "touchmove") {
+        //console.log(event);
+        this.canvasMousePos.x =
+          event.touches[0].clientX - this.canvasContainerBoxLoc.x;
+        this.canvasMousePos.y =
+          event.touches[0].clientY - this.canvasContainerBoxLoc.y;
+      }
 
       if (this.canvasDragging.state) {
         this.canvasLocation.x =

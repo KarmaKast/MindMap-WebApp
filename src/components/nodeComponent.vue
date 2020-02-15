@@ -4,6 +4,7 @@
       id="node"
       :style="nodeStyle"
       @mousedown.left.self="startdrag"
+      v-touch:start="startdrag"
       @click.left.self="setActive"
     >
       <!--<input type="text" :style="nodeTextStyle" :value="nodeLabel" />-->
@@ -140,7 +141,7 @@ export default {
         zIndex: this.dragging ? "5000" : "unset",
 
         backgroundColor: this.editingLabel ? "white" : "hsla(0,0%,0%,0.01)",
-        border: `1px dotted rgba(0, 0, 0, 0.2)`,
+        border: `1px dotted hsla(${this.nodeColor[0]},${this.nodeColor[1]}%,${this.nodeColor[2]}%, 0.2)`,
         borderRadius:
           this.nodeSize["height"] > this.nodeSize["width"]
             ? `${this.nodeSize["height"]}px`
@@ -148,7 +149,7 @@ export default {
         boxShadow: `${
           this.dragging
             ? "rgba(0, 0, 0, 0.2) 0px 0px 13px 4px"
-            : "rgba(0, 0, 0, 0.15) 0px 0px 3px 1px"
+            : "rgba(0, 0, 0, 0.15) 0px 0px 3px 2px"
         }, inset 0px 0px 0 4px hsla(${this.nodeColor[0]},
         ${this.nodeColor[1]}%,
         ${this.nodeColor[2]}%, 0.2)`,
@@ -176,8 +177,8 @@ export default {
       return {
         pointerEvents: "none",
         margin: "0px",
-        /*maxWidth: "100px",
-        overflowWrap: 'break-word',*/
+        maxWidth: "100px",
+        overflowWrap: "break-word",
         color: `hsla(${this.nodeColor[0]},${this.nodeColor[1]}%, ${this.nodeColor[2]}%, ${this.nodeColor[3]})`,
         background: "none",
         border: "none"
@@ -226,11 +227,12 @@ export default {
     },
     startdrag(event) {
       //console.log("drag started at node");
-
+      console.log(event);
       // doing: calculating draggingDeltas
       var boundingBox = this.$refs.nodeContainer.getBoundingClientRect();
       //console.log(boundingBox);
 
+      //if (event.type)
       this.draggingDeltas["x"] =
         event.clientX - boundingBox.x + this.canvasLocation.x;
       this.draggingDeltas["y"] =

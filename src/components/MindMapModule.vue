@@ -73,7 +73,7 @@
           ></button-one>
           <button-two
             v-for="(button, index) in menuButtons"
-            :key="index+1"
+            :key="index + 1"
             :colors="colors"
             :buttonText="button['text']"
             @takeAction="button['action'](...button['args'])"
