@@ -137,7 +137,9 @@ export default {
       grid: {
         size: 24,
         opacity: 0.3,
-        width: 2
+        width: 2,
+        show: true,
+        snap: true
       }
     };
   },

@@ -96,7 +96,7 @@ export default {
       default: false,
       type: Boolean
     },
-    gridSize: Number,
+    grid: Object,
     defaultColors: Object,
     selected: {
       default: false,
@@ -199,18 +199,22 @@ export default {
           this.canvasSize.width / 2 -
           this.canvasLocation.x;
 
-        nodeLoc.x =
-          (Math.floor((nodeLoc.x - this.gridSize / 2) / this.gridSize) + 1) *
-          this.gridSize;
-
         nodeLoc.y =
           this.canvasMousePos.y -
           this.canvasSize.height / 2 -
           this.canvasLocation.y;
 
-        nodeLoc.y =
-          (Math.floor((nodeLoc.y - this.gridSize / 2) / this.gridSize) + 1) *
-          this.gridSize;
+        if (this.grid.snap) {
+          nodeLoc.x =
+            (Math.floor((nodeLoc.x - this.grid.size / 2) / this.grid.size) +
+              1) *
+            this.grid.size;
+
+          nodeLoc.y =
+            (Math.floor((nodeLoc.y - this.grid.size / 2) / this.grid.size) +
+              1) *
+            this.grid.size;
+        }
       }
       //console.log(nodeLoc);
       return nodeLoc;

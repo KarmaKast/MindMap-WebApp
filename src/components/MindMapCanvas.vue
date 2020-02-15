@@ -9,12 +9,12 @@
     @mouseup.middle="setCanvasDragging"
   >
     <div
-      v-if="grid.opacity > 0 && grid.size > 1 && grid.width > 0"
+      v-if="grid.show && grid.opacity > 0 && grid.size > 1 && grid.width > 0"
       id="grid"
       :style="gridStyle"
     ></div>
     <div
-      v-if="grid.opacity > 0 && grid.size > 1 && grid.width > 0"
+      v-if="grid.show && grid.opacity > 0 && grid.size > 1 && grid.width > 0"
       id="grid"
       :style="gridCenterStyle"
     ></div>
@@ -30,7 +30,7 @@
         :defaultColors="colors"
         :dragging="value.dragging"
         :newNodeDef="value.newNode"
-        :gridSize="grid.size"
+        :grid="grid"
         @startNodeDrag="startNodeDrag"
       >
       </nodeComponent>
@@ -80,7 +80,9 @@ export default {
         return {
           size: 1,
           opacity: 0,
-          width: 0
+          width: 0,
+          show: true,
+          snap: true
         };
       },
       type: Object
