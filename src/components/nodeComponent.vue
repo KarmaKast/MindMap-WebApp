@@ -3,8 +3,8 @@
     <div
       id="node"
       :style="nodeStyle"
-      @mousedown.left.self="startdrag"
       v-touch:start="startdrag"
+      @mousedown.left.self="startdrag"
       @click.left.self="setActive"
     >
       <!--<input type="text" :style="nodeTextStyle" :value="nodeLabel" />-->
@@ -90,8 +90,12 @@ export default {
     canvasLocation: Object,
     canvasMousePos: Object,
     dragging: {
-      default: false,
-      type: Boolean
+      default() {
+        return {
+          state: false
+        };
+      },
+      type: Object
     },
     autoSave: {
       default: false,
@@ -137,8 +141,8 @@ export default {
           this.nodeBoundingBoxSize.width / 2}px`,
         minWidth: `${this.newNode ? this.minWidth : 0}px`,
         minHeight: `${this.newNode ? this.minHeight : 0}px`,
-        cursor: this.dragging ? "grabbing" : "grab",
-        zIndex: this.dragging ? "5000" : "unset",
+        cursor: this.dragging.state ? "grabbing" : "grab",
+        zIndex: this.dragging.state ? "5000" : "unset",
 
         backgroundColor: this.editingLabel ? "white" : "hsla(0,0%,0%,0.01)",
         border: `1px dotted hsla(${this.nodeColor[0]},${this.nodeColor[1]}%,${this.nodeColor[2]}%, 0.2)`,
@@ -147,7 +151,7 @@ export default {
             ? `${this.nodeSize["height"]}px`
             : `${this.nodeSize["width"]}px`,
         boxShadow: `${
-          this.dragging
+          this.dragging.state
             ? "rgba(0, 0, 0, 0.2) 0px 0px 13px 4px"
             : "rgba(0, 0, 0, 0.15) 0px 0px 3px 2px"
         }, inset 0px 0px 0 4px hsla(${this.nodeColor[0]},
@@ -193,7 +197,7 @@ export default {
     },
     nodeLocation_: function() {
       var nodeLoc = this.nodeLocation;
-      if (this.dragging) {
+      if (this.dragging.state) {
         // todo: this is working as intended. Just need to detect drag differently from simply clicking in.
         nodeLoc.x =
           this.canvasMousePos.x -
@@ -218,6 +222,13 @@ export default {
         }
       }
       //console.log(nodeLoc);
+      /*
+      doing: debugging: on touch start nodelocation goes wrong
+      Note: if I touch somewhere on the canvas and then touch the node the node goes to that location
+      Analysis: while using mouse this.canvasMousePos already is on the node but with mouse it is not.
+      Solution: before emitting event set canvasMousePos.x using the same calculation in nodeContainerStyle.left
+      */
+
       return nodeLoc;
     }
   },
@@ -225,21 +236,51 @@ export default {
     setActive() {
       this.nodeSelected = this.nodeSelected ? false : true;
     },
+    defaultCanvasMousePos() {
+      var r = {
+        x:
+          this.canvasLocation["x"] +
+          this.canvasSize.width / 2 +
+          this.nodeLocation_[
+            "x"
+          ] /*-
+          this.nodeBoundingBoxSize.width / 2*/,
+
+        y:
+          this.canvasLocation["y"] +
+          this.canvasSize.height / 2 +
+          this.nodeLocation_[
+            "y"
+          ] /*-
+          this.nodeBoundingBoxSize.height / 2*/
+      };
+      /**
+       * call at updated hook and in this.nodeLocation_ watch
+       */
+      this.$emit("setStartingCanvasMousePos", r);
+    },
     startdrag(event) {
+      this.defaultCanvasMousePos();
       //console.log("drag started at node");
-      console.log(event);
       // doing: calculating draggingDeltas
-      var boundingBox = this.$refs.nodeContainer.getBoundingClientRect();
-      //console.log(boundingBox);
+      if (!this.dragging.state) {
+        var boundingBox = this.$refs.nodeContainer.getBoundingClientRect();
+        //console.log(boundingBox);
 
-      //if (event.type)
-      this.draggingDeltas["x"] =
-        event.clientX - boundingBox.x + this.canvasLocation.x;
-      this.draggingDeltas["y"] =
-        event.clientY - boundingBox.y + this.canvasLocation.y;
+        if (event.type === "mousedown") {
+          this.draggingDeltas["x"] =
+            event.clientX - boundingBox.x + this.canvasLocation.x;
+          this.draggingDeltas["y"] =
+            event.clientY - boundingBox.y + this.canvasLocation.y;
+        } else if (event.type == "touchstart") {
+          this.draggingDeltas["x"] =
+            event.touches[0].clientX - boundingBox.x + this.canvasLocation.x;
+          this.draggingDeltas["y"] =
+            event.touches[0].clientY - boundingBox.y + this.canvasLocation.y;
+        }
 
-      this.$emit("startNodeDrag", event, this.ID);
-      //console.log(`x:${this.draggingDeltas.x}, y:${this.draggingDeltas.y}`);
+        this.$emit("startNodeDrag", event, this.ID);
+      }
     },
     getNodeData() {
       // doing: get node data from api
@@ -289,14 +330,15 @@ export default {
     }
   },
   watch: {
-    dragging() {
-      if (!this.dragging) {
+    "dragging.state"() {
+      if (!this.dragging.state) {
         this.nodeLocation = this.nodeLocation_;
       }
     },
+
     nodeLocation_() {
       // todo: save node location to database on drag end
-      if (!this.dragging) {
+      if (!this.dragging.state) {
         if (!this.newNode) {
           var msg = `updated location from {x:${this.node_data.viz_props.location[0]},y: ${this.node_data.viz_props.location[1]}} to
             {x:${this.nodeLocation_.x},y:${this.nodeLocation_.y}}`;
@@ -309,6 +351,7 @@ export default {
           );
         }
       }
+      //this.defaultCanvasMousePos()
     },
     node_data() {
       this.nodeLocation = {
@@ -369,7 +412,9 @@ export default {
     }
     this.updateNodeBBox(0);
   },
-  beforeUpdate() {},
+  beforeUpdate() {
+    //this.defaultCanvasMousePos();
+  },
   updated() {}
 };
 </script>

@@ -29,6 +29,7 @@
         :canvasSize="{ height: height, width: width }"
         :canvasLocation="canvasLocation"
         :canvasMousePos="value.canvasMousePos"
+        @setStartingCanvasMousePos="setStartingCanvasMousePos"
         :defaultColors="colors"
         :dragging="value.dragging"
         :newNodeDef="value.newNode"
@@ -122,10 +123,12 @@ export default {
       this.nodes.forEach((key, index) => {
         if (index < this.nodeLimit) {
           nodes_[this.nodes[index].ID] = {
-            dragging:
-              this.nodes[index].ID === this.nodeDragging.nodeID
-                ? this.nodeDragging.state
-                : false,
+            dragging: {
+              state:
+                this.nodes[index].ID === this.nodeDragging.nodeID
+                  ? this.nodeDragging.state
+                  : false
+            },
             canvasMousePos: this.canvasMousePos,
             newNode: this.nodes[index].newNode
           };
@@ -189,7 +192,7 @@ export default {
     }
   },
   methods: {
-    updateContainerBoxLoc() {
+    updateCanvasContainerBoxLoc() {
       // context: since canvas bounding box x,y is taken once at the start of the drag, if for some reason canvas container position changes relative to the window top-left it will make the drag to malfunction
       this.canvasContainerBoxLoc.x = this.$refs.canvasContainer.getBoundingClientRect().x;
       this.canvasContainerBoxLoc.y = this.$refs.canvasContainer.getBoundingClientRect().y;
@@ -197,22 +200,29 @@ export default {
     startNodeDrag(event, ID) {
       //console.log("drag started at canvas");
       if (this.nodeDragging.nodeID === undefined) {
-        this.nodeDragging.nodeID = ID;
-        this.nodeDragging.state = true;
+        if (!this.nodeDragging.state) {
+          console.log(event);
+          this.nodeDragging.nodeID = ID;
+          this.nodeDragging.state = true;
 
-        this.updateContainerBoxLoc();
+          this.updateCanvasContainerBoxLoc();
+        }
       }
     },
-    stopNodeDrag() {
+    stopNodeDrag(event) {
       //console.log("drag stopped at canvas");
-      this.nodeDragging.nodeID = undefined;
-      this.nodeDragging.state = false;
+      if (this.nodeDragging.state) {
+        console.log(event);
+        this.nodeDragging.nodeID = undefined;
+        this.nodeDragging.state = false;
+      }
     },
     getMousePos(event) {
       if (this.nodeDragging.state === true) {
         // todo: if dragging pass canvasMousePos to nodes else pass undefined
       }
       if (event.type === "mousemove") {
+        //console.log(event);
         this.canvasMousePos.x = event.clientX - this.canvasContainerBoxLoc.x;
         this.canvasMousePos.y = event.clientY - this.canvasContainerBoxLoc.y;
       } else if (event.type === "touchmove") {
@@ -246,7 +256,7 @@ export default {
         // doing: start drag
         this.canvasDragging.state = true;
         this.canvasDragging.event = event;
-        this.updateContainerBoxLoc();
+        this.updateCanvasContainerBoxLoc();
         // todo: set dragging deltas
         this.canvasDragging.deltas.x =
           event.clientX -
@@ -259,6 +269,9 @@ export default {
           this.canvasLocation.y -
           this.canvasContainerBoxLoc.y;
       }
+    },
+    setStartingCanvasMousePos(r) {
+      this.canvasMousePos = r;
     }
   },
   watch: {
@@ -280,12 +293,12 @@ export default {
   },
   mounted: function() {
     var box = this.$refs.canvasContainer.getBoundingClientRect();
-    console.log(box);
+    //console.log(box);
     this.height = box.height;
     this.width = box.width;
   },
   beforeUpdate: function() {
-    console.log("before update called");
+    //console.log("before update called");
     var box = this.$refs.canvasContainer.getBoundingClientRect();
     this.height = box.height;
     this.width = box.width;

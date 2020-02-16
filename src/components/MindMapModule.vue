@@ -130,8 +130,8 @@ export default {
       apiUrl: "",
       apiValidity: false,
       nodes: [
-        { ID: "__test_ID__", newNode: true },
-        { ID: "__test_ID__1", newNode: true }
+        { ID: "__test_ID__", newNode: true }
+        //{ ID: "__test_ID__1", newNode: true }
       ],
       showAboutPage: false,
       grid: {
@@ -206,7 +206,8 @@ export default {
         width: "100%",
         overflow: "hidden",
         borderRadius: "15px 15px 10px 10px",
-        position: "relative"
+        position: "relative",
+        touchAction: "none"
       };
       if (this.colors !== undefined) {
         if ("background" in this.colors) {
