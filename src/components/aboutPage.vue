@@ -15,7 +15,7 @@
       </button>
 
       <p :style="pStyle">
-        <span :style="{ fontSize: '20px' }">MapTheeMind - {{ version }}</span>
+        <span :style="{ fontSize: '20px' }">MapThyMind - {{ version }}</span>
         <br />
         <br />
         A Mindmap web app that uses
@@ -49,7 +49,7 @@ export default {
   data: function() {
     return {
       isHovered: false,
-      version: "v0.3.0"
+      version: "v0.4.0"
     };
   },
   computed: {

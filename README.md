@@ -1,4 +1,4 @@
-# mindmapwebapp
+# MapThyMInd
 
 ## Project setup
 ```

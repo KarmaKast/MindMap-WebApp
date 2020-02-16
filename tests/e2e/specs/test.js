@@ -1,7 +1,7 @@
 /// <reference types="Cypress" />
 // https://docs.cypress.io/api/introduction/api.html
 
-describe("Main Tests", () => {
+describe("Basic Tests", () => {
   it("Visits the app root url", () => {
     cy.visit("/");
   });

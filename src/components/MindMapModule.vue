@@ -73,7 +73,7 @@
           ></button-one>
           <button-two
             v-for="(button, index) in menuButtons"
-            :key="index"
+            :key="index + 1"
             :colors="colors"
             :buttonText="button['text']"
             @takeAction="button['action'](...button['args'])"
@@ -117,7 +117,11 @@ export default {
   },
   props: {
     // locationHor: {'left':value} or {'right':value}
-    colors: Object
+    colors: Object,
+    nodeLimit: {
+      default: 10,
+      type: Number
+    }
   },
   data: function() {
     return {
@@ -126,13 +130,16 @@ export default {
       apiUrl: "",
       apiValidity: false,
       nodes: [
-        { ID: "__test_ID__", newNode: true },
-        { ID: "__test_ID__1", newNode: true }
+        { ID: "__test_ID__", newNode: true }
+        //{ ID: "__test_ID__1", newNode: true }
       ],
       showAboutPage: false,
       grid: {
-        size: 20,
-        opacity: 0.3
+        size: 25,
+        opacity: 0.3,
+        width: 2,
+        show: true,
+        snap: true
       }
     };
   },
@@ -199,7 +206,8 @@ export default {
         width: "100%",
         overflow: "hidden",
         borderRadius: "15px 15px 10px 10px",
-        position: "relative"
+        position: "relative",
+        touchAction: "none"
       };
       if (this.colors !== undefined) {
         if ("background" in this.colors) {
@@ -250,6 +258,10 @@ export default {
     }
   },
   methods: {
+    loadAppSettings() {
+      // todo: WIP
+      // load app settings from app_settings.json either during mounted or created
+    },
     loadDatabase() {
       var url_ = this.apiUrl;
       this.$axios.get(url_ + "/load");
