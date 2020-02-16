@@ -1,15 +1,27 @@
 {
   "name": "map-thy-mind",
-  "version": "0.4.0",
+  "productName": "MapThyMind",
+  "version": "v0.4.0",
   "private": true,
+  "author": {
+    "name": "Sree Chandan",
+    "email": "sreechandan98@gmail.com"
+  },
+  "license": "Apache-2.0",
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "test:e2e": "vue-cli-service test:e2e",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "electron:build": "vue-cli-service electron:build",
+    "electron:serve": "vue-cli-service electron:serve",
+    "postinstall": "electron-builder install-app-deps",
+    "postuninstall": "electron-builder install-app-deps"
   },
+  "main": "background.js",
   "dependencies": {
     "axios": "^0.19.2",
+    "color-convert": "^2.0.1",
     "core-js": "^3.4.4",
     "konva": "^4.1.4",
     "vue": "^2.6.10",
@@ -25,13 +37,15 @@
     "@vue/cli-service": "^4.2.2",
     "@vue/eslint-config-prettier": "^5.0.0",
     "babel-eslint": "^10.0.3",
-    "cypress": "^4.0.1",
+    "cypress": "^4.0.2",
+    "electron": "^6.1.7",
     "eslint": "^5.16.0",
     "eslint-plugin-prettier": "^3.1.1",
     "eslint-plugin-vue": "^5.0.0",
     "node-sass": "^4.12.0",
     "prettier": "^1.19.1",
     "sass-loader": "^8.0.0",
+    "vue-cli-plugin-electron-builder": "^1.4.5",
     "vue-template-compiler": "^2.6.10"
   },
   "eslintConfig": {
