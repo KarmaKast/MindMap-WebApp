@@ -201,7 +201,7 @@ export default {
       //console.log("drag started at canvas");
       if (this.nodeDragging.nodeID === undefined) {
         if (!this.nodeDragging.state) {
-          console.log(event);
+          //console.log(event);
           this.nodeDragging.nodeID = ID;
           this.nodeDragging.state = true;
 
@@ -209,10 +209,10 @@ export default {
         }
       }
     },
-    stopNodeDrag(event) {
+    stopNodeDrag() {
       //console.log("drag stopped at canvas");
       if (this.nodeDragging.state) {
-        console.log(event);
+        //console.log(event);
         this.nodeDragging.nodeID = undefined;
         this.nodeDragging.state = false;
       }
@@ -270,8 +270,20 @@ export default {
           this.canvasContainerBoxLoc.y;
       }
     },
-    setStartingCanvasMousePos(r) {
-      this.canvasMousePos = r;
+    setStartingCanvasMousePos(event) {
+      this.updateCanvasContainerBoxLoc();
+      console.log(event);
+      if (event.type === "touchstart") {
+        //console.log(event.clientX - this.canvasContainerBoxLoc.x);
+        this.canvasMousePos.x =
+          event.touches[0].clientX - this.canvasContainerBoxLoc.x;
+        this.canvasMousePos.y =
+          event.touches[0].clientY - this.canvasContainerBoxLoc.y;
+      } else {
+        this.canvasMousePos.x = event.clientX - this.canvasContainerBoxLoc.x;
+        this.canvasMousePos.y = event.clientY - this.canvasContainerBoxLoc.y;
+      }
+      console.log([this.canvasMousePos.x, this.canvasMousePos.y]);
     }
   },
   watch: {

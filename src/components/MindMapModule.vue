@@ -135,7 +135,7 @@ export default {
       ],
       showAboutPage: false,
       grid: {
-        size: 24,
+        size: 25,
         opacity: 0.3,
         width: 2,
         show: true,

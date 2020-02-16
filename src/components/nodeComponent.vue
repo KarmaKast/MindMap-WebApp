@@ -199,6 +199,7 @@ export default {
       var nodeLoc = this.nodeLocation;
       if (this.dragging.state) {
         // todo: this is working as intended. Just need to detect drag differently from simply clicking in.
+
         nodeLoc.x =
           this.canvasMousePos.x -
           this.canvasSize.width / 2 -
@@ -219,6 +220,10 @@ export default {
             (Math.floor((nodeLoc.y - this.grid.size / 2) / this.grid.size) +
               1) *
             this.grid.size;
+        } else {
+          var boundingBox = this.$refs.nodeContainer.getBoundingClientRect();
+          nodeLoc.x += boundingBox.width / 2 - this.draggingDeltas.x;
+          nodeLoc.y += boundingBox.height / 2 - this.draggingDeltas.y;
         }
       }
       //console.log(nodeLoc);
@@ -236,31 +241,7 @@ export default {
     setActive() {
       this.nodeSelected = this.nodeSelected ? false : true;
     },
-    defaultCanvasMousePos() {
-      var r = {
-        x:
-          this.canvasLocation["x"] +
-          this.canvasSize.width / 2 +
-          this.nodeLocation_[
-            "x"
-          ] /*-
-          this.nodeBoundingBoxSize.width / 2*/,
-
-        y:
-          this.canvasLocation["y"] +
-          this.canvasSize.height / 2 +
-          this.nodeLocation_[
-            "y"
-          ] /*-
-          this.nodeBoundingBoxSize.height / 2*/
-      };
-      /**
-       * call at updated hook and in this.nodeLocation_ watch
-       */
-      this.$emit("setStartingCanvasMousePos", r);
-    },
     startdrag(event) {
-      this.defaultCanvasMousePos();
       //console.log("drag started at node");
       // doing: calculating draggingDeltas
       if (!this.dragging.state) {
@@ -278,7 +259,7 @@ export default {
           this.draggingDeltas["y"] =
             event.touches[0].clientY - boundingBox.y + this.canvasLocation.y;
         }
-
+        this.$emit("setStartingCanvasMousePos", event);
         this.$emit("startNodeDrag", event, this.ID);
       }
     },
@@ -351,7 +332,6 @@ export default {
           );
         }
       }
-      //this.defaultCanvasMousePos()
     },
     node_data() {
       this.nodeLocation = {
@@ -412,9 +392,7 @@ export default {
     }
     this.updateNodeBBox(0);
   },
-  beforeUpdate() {
-    //this.defaultCanvasMousePos();
-  },
+  beforeUpdate() {},
   updated() {}
 };
 </script>
