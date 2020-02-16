@@ -260,7 +260,7 @@ export default {
             event.touches[0].clientY - boundingBox.y + this.canvasLocation.y;
         }
         this.$emit("setStartingCanvasMousePos", event);
-        this.$emit("startNodeDrag", event, this.ID);
+        this.$emit("nodeActivated", event, this.ID);
       }
     },
     getNodeData() {
@@ -276,7 +276,8 @@ export default {
     savePropToAPI(propName, data) {
       this.$axios({
         method: "post",
-        url: this.apiUrl + `/updateProps/${this.ID}`,
+        baseURL: this.apiUrl,
+        url: `/updateProps/${this.ID}`,
         params: {
           [propName]: data
         }
