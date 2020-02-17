@@ -6,8 +6,8 @@
     @mousemove="getMousePos"
     v-touch:moving="getMousePos"
     v-touch:end.prevent="deactivateAllNodes"
-    @mousedown.middle="setCanvasDragging"
-    @mouseup.middle="setCanvasDragging"
+    v-touch:start.self="setCanvasDragging"
+    v-touch:end.self="setCanvasDragging"
   >
     <div
       v-if="grid.show && grid.opacity > 0 && grid.size > 1 && grid.width > 0"
@@ -178,7 +178,8 @@ export default {
           size_}px`,
         left: `${((this.width / 2 + this.canvasLocation["x"]) % size_) -
           size_}px`,
-        backgroundImage: `repeating-linear-gradient(rgba(255, 255, 255, 0), ${processedColor} ${this.grid.width}px, rgba(255, 255, 255, 0) ${this.grid.width}px, rgba(255, 255, 255, 0) ${size_}px), repeating-linear-gradient(90deg, rgba(255, 255, 255, 0), ${processedColor} ${this.grid.width}px, rgba(255, 255, 255, 0) ${this.grid.width}px, rgba(255, 255, 255, 0) ${size_}px)`
+        backgroundImage: `repeating-linear-gradient(rgba(255, 255, 255, 0), ${processedColor} ${this.grid.width}px, rgba(255, 255, 255, 0) ${this.grid.width}px, rgba(255, 255, 255, 0) ${size_}px), repeating-linear-gradient(90deg, rgba(255, 255, 255, 0), ${processedColor} ${this.grid.width}px, rgba(255, 255, 255, 0) ${this.grid.width}px, rgba(255, 255, 255, 0) ${size_}px)`,
+        pointerEvents: "none"
       };
     },
     gridCenterStyle: function() {
@@ -199,7 +200,8 @@ export default {
         }px, rgba(255, 255, 255, 0) ${size_y}px), repeating-linear-gradient(90deg, rgba(255, 255, 255, 0), hsla(177, 73%, 47%, ${this
           .grid.opacity * 2}) ${this.grid.width}px, rgba(255, 255, 255, 0) ${
           this.grid.width
-        }px, rgba(255, 255, 255, 0) ${size_x}px)`
+        }px, rgba(255, 255, 255, 0) ${size_x}px)`,
+        pointerEvents: "none"
         /*backgroundImage: `linear-gradient(90deg, #FFFFFF 49.9%, rgba(0, 0, 0, 0.520833) 50%, rgba(255, 255, 255, 0) 51.1%)`*/
       };
     }
@@ -246,7 +248,6 @@ export default {
     },
     deactivateAllNodes(event) {
       if ([1].includes(event.which) || event.type === "touchend") {
-        console.log("node unpressed");
         console.log(event);
         if (this.activeNode.pressed.state === false) {
           // context: this is on the canvas
@@ -254,6 +255,7 @@ export default {
           this.activeNode.nodeID = undefined;
         } else {
           // context: this is for the node
+          console.log("node unpressed");
           this.activeNode.pressed.state = false;
           if (this.activeNode.dragging.state) {
             //console.log(event);
@@ -292,31 +294,52 @@ export default {
       }
     },
     setCanvasDragging(event) {
-      console.log("from event func");
-      console.log(event);
-      // todo: this toggling mechanism causes problems if mouse moves out of canvas container
-      if (this.canvasDragging.state) {
-        // doing: stop drag
-        this.canvasDragging.state = false;
-        this.canvasDragging.event = undefined;
-        // todo: reset dragging deltas (not necessary)
-        this.canvasDragging.deltas = { x: 0, y: 0 };
-      } else {
-        // doing: start drag
-        this.canvasDragging.state = true;
-        this.canvasDragging.event = event;
-        this.updateCanvasContainerBoxLoc();
-        // todo: set dragging deltas
-        this.canvasDragging.deltas.x =
-          event.clientX -
-          this.width / 2 -
-          this.canvasLocation.x -
-          this.canvasContainerBoxLoc.x;
-        this.canvasDragging.deltas.y =
-          event.clientY -
-          this.height / 2 -
-          this.canvasLocation.y -
-          this.canvasContainerBoxLoc.y;
+      if (
+        event.which === 2 ||
+        ["touchend", "touchstart"].includes(event.type)
+      ) {
+        console.log("from setCanvasDragging func");
+        console.log(event);
+        // todo: this toggling mechanism causes problems if mouse moves out of canvas container
+        if (this.canvasDragging.state) {
+          // doing: stop drag
+          this.canvasDragging.state = false;
+          this.canvasDragging.event = undefined;
+          // todo: reset dragging deltas (not necessary)
+          this.canvasDragging.deltas = { x: 0, y: 0 };
+        } else {
+          // doing: start drag
+          this.canvasDragging.state = true;
+          this.canvasDragging.event = event;
+          this.updateCanvasContainerBoxLoc();
+
+          // todo: set dragging deltas
+          if (event.type === "mousedown") {
+            this.canvasDragging.deltas.x =
+              event.clientX -
+              this.width / 2 -
+              this.canvasLocation.x -
+              this.canvasContainerBoxLoc.x;
+            this.canvasDragging.deltas.y =
+              event.clientY -
+              this.height / 2 -
+              this.canvasLocation.y -
+              this.canvasContainerBoxLoc.y;
+          } else if (event.type === "touchstart") {
+            console.log(event.target.id === "canvasContainer");
+
+            this.canvasDragging.deltas.x =
+              event.touches[0].clientX -
+              this.width / 2 -
+              this.canvasLocation.x -
+              this.canvasContainerBoxLoc.x;
+            this.canvasDragging.deltas.y =
+              event.touches[0].clientY -
+              this.height / 2 -
+              this.canvasLocation.y -
+              this.canvasContainerBoxLoc.y;
+          }
+        }
       }
     },
     setStartingCanvasMousePos(event) {
