@@ -210,37 +210,38 @@ export default {
        * If it does within 100ms consider it as a mouse press else drag.
        */
       //console.log("drag started at canvas");
-      if (this.activeNode.nodeID === undefined) {
-        this.activeNode.nodeID = ID;
-        console.log("node pressed");
-        this.activeNode.pressed.state = true;
-        //var dragging=false;
-        setTimeout(() => {
-          if (this.activeNode.pressed.state) {
-            console.log("started dragging");
-            /**
-             * also check for mouse position change to detect drag. eg: if delta is more than 5px
-             */
-            this.activeNode.dragging.state = true;
 
-            this.updateCanvasContainerBoxLoc();
-          } else {
-            this.activeNode.selected = true;
-            this.activeNode.nodeID = ID;
-          }
-        }, 100);
-        //console.log(event);
-      }
+      this.activeNode.nodeID = ID;
+      console.log("node pressed");
+      this.activeNode.pressed.state = true;
+
+      setTimeout(() => {
+        if (this.activeNode.pressed.state) {
+          console.log("started dragging");
+          /**
+           * also check for mouse position change to detect drag. eg: if delta is more than 5px
+           */
+          this.activeNode.dragging.state = true;
+          this.activeNode.selected = false;
+
+          this.updateCanvasContainerBoxLoc();
+        } else {
+          this.activeNode.selected = true;
+          this.activeNode.nodeID = ID;
+        }
+      }, 100);
     },
-    deactivateAllNodes() {
+    deactivateAllNodes(event) {
       //console.log("drag stopped at canvas");
-      console.log("node unpressed");
-      this.activeNode.pressed.state = false;
-      this.activeNode.selected = false;
-      this.activeNode.nodeID = undefined;
-      if (this.activeNode.dragging.state) {
-        //console.log(event);
-        this.activeNode.dragging.state = false;
+      if ([1].includes(event.which) || event.type === "touchend") {
+        console.log("node unpressed");
+        this.activeNode.pressed.state = false;
+        this.activeNode.selected = false;
+        this.activeNode.nodeID = undefined;
+        if (this.activeNode.dragging.state) {
+          //console.log(event);
+          this.activeNode.dragging.state = false;
+        }
       }
     },
     getMousePos(event) {
