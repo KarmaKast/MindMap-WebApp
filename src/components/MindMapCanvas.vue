@@ -6,7 +6,7 @@
     @mousemove="getMousePos"
     v-touch:moving="getMousePos"
     @mouseup.left="deactivateAllNodes"
-    v-touch:end="deactivateAllNodes"
+    v-touch:end.prevent="deactivateAllNodes"
     @mousedown.middle="setCanvasDragging"
     @mouseup.middle="setCanvasDragging"
   >
@@ -32,6 +32,7 @@
         @setStartingCanvasMousePos="setStartingCanvasMousePos"
         :defaultColors="colors"
         :dragging="value.dragging"
+        :nodeSelected="value.nodeSelected"
         :newNodeDef="value.newNode"
         :grid="grid"
         @nodeActivated="nodeActivated"
@@ -130,6 +131,10 @@ export default {
                   ? this.activeNode.dragging.state
                   : false
             },
+            nodeSelected:
+              this.nodes[index].ID === this.activeNode.nodeID
+                ? this.activeNode.pressed.state
+                : false,
             canvasMousePos: this.canvasMousePos,
             newNode: this.nodes[index].newNode
           };
@@ -218,6 +223,9 @@ export default {
             this.activeNode.dragging.state = true;
 
             this.updateCanvasContainerBoxLoc();
+          } else {
+            this.activeNode.pressed.state = true;
+            this.activeNode.nodeID = ID;
           }
         }, 100);
         //console.log(event);

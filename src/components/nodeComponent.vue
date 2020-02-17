@@ -3,9 +3,8 @@
     <div
       id="node"
       :style="nodeStyle"
-      v-touch:start="startdrag"
+      v-touch:start.self="startdrag"
       @mousedown.left.self="startdrag"
-      @click.left.self="setActive"
     >
       <!--<input type="text" :style="nodeTextStyle" :value="nodeLabel" />-->
       <p :style="nodeTextStyle">
@@ -103,7 +102,7 @@ export default {
     },
     grid: Object,
     defaultColors: Object,
-    selected: {
+    nodeSelected: {
       default: false,
       type: Boolean
     }
@@ -123,7 +122,6 @@ export default {
       nodeSize: { height: 60, width: 160 },
       nodeBoundingBoxSize: { height: 0, width: 0 },
       draggingDeltas: { x: 0, y: 0 },
-      nodeSelected: false,
       editingLabel: false
     };
   },
@@ -238,9 +236,6 @@ export default {
     }
   },
   methods: {
-    setActive() {
-      this.nodeSelected = this.nodeSelected ? false : true;
-    },
     startdrag(event) {
       //console.log("drag started at node");
       // doing: calculating draggingDeltas
