@@ -107,7 +107,8 @@ export default {
       activeNode: {
         nodeID: undefined,
         dragging: { state: false },
-        pressed: { state: false }
+        pressed: { state: false },
+        selected: false
       },
 
       canvasDragging: {
@@ -133,7 +134,7 @@ export default {
             },
             nodeSelected:
               this.nodes[index].ID === this.activeNode.nodeID
-                ? this.activeNode.pressed.state
+                ? this.activeNode.selected
                 : false,
             canvasMousePos: this.canvasMousePos,
             newNode: this.nodes[index].newNode
@@ -224,7 +225,7 @@ export default {
 
             this.updateCanvasContainerBoxLoc();
           } else {
-            this.activeNode.pressed.state = true;
+            this.activeNode.selected = true;
             this.activeNode.nodeID = ID;
           }
         }, 100);
@@ -235,6 +236,7 @@ export default {
       //console.log("drag stopped at canvas");
       console.log("node unpressed");
       this.activeNode.pressed.state = false;
+      this.activeNode.selected = false;
       this.activeNode.nodeID = undefined;
       if (this.activeNode.dragging.state) {
         //console.log(event);
