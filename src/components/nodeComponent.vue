@@ -1,11 +1,6 @@
 <template>
   <div ref="nodeContainer" :style="nodeContainerStyle">
-    <div
-      id="node"
-      :style="nodeStyle"
-      v-touch:start.self="startdrag"
-      @mousedown.left.self="startdrag"
-    >
+    <div id="node" :style="nodeStyle" v-touch:start.self="startdrag">
       <!--<input type="text" :style="nodeTextStyle" :value="nodeLabel" />-->
       <p :style="nodeTextStyle">
         {{ nodeLabel }}
@@ -88,6 +83,13 @@ export default {
     canvasSize: Object,
     canvasLocation: Object,
     canvasMousePos: Object,
+    autoSave: {
+      default: false,
+      type: Boolean
+    },
+    grid: Object,
+    defaultColors: Object,
+
     dragging: {
       default() {
         return {
@@ -96,12 +98,14 @@ export default {
       },
       type: Object
     },
-    autoSave: {
-      default: false,
-      type: Boolean
+    pressed: {
+      default() {
+        return {
+          state: false
+        };
+      },
+      type: Object
     },
-    grid: Object,
-    defaultColors: Object,
     nodeSelected: {
       default: false,
       type: Boolean
@@ -239,23 +243,25 @@ export default {
     startdrag(event) {
       //console.log("drag started at node");
       // doing: calculating draggingDeltas
-      if (!this.dragging.state) {
-        var boundingBox = this.$refs.nodeContainer.getBoundingClientRect();
-        //console.log(boundingBox);
+      if ([1].includes(event.which) || event.type === "touchstart") {
+        if (!this.pressed.state) {
+          var boundingBox = this.$refs.nodeContainer.getBoundingClientRect();
+          //console.log(boundingBox);
 
-        if (event.type === "mousedown") {
-          this.draggingDeltas["x"] =
-            event.clientX - boundingBox.x + this.canvasLocation.x;
-          this.draggingDeltas["y"] =
-            event.clientY - boundingBox.y + this.canvasLocation.y;
-        } else if (event.type == "touchstart") {
-          this.draggingDeltas["x"] =
-            event.touches[0].clientX - boundingBox.x + this.canvasLocation.x;
-          this.draggingDeltas["y"] =
-            event.touches[0].clientY - boundingBox.y + this.canvasLocation.y;
+          if (event.type === "mousedown") {
+            this.draggingDeltas["x"] =
+              event.clientX - boundingBox.x + this.canvasLocation.x;
+            this.draggingDeltas["y"] =
+              event.clientY - boundingBox.y + this.canvasLocation.y;
+          } else if (event.type == "touchstart") {
+            this.draggingDeltas["x"] =
+              event.touches[0].clientX - boundingBox.x + this.canvasLocation.x;
+            this.draggingDeltas["y"] =
+              event.touches[0].clientY - boundingBox.y + this.canvasLocation.y;
+          }
+          this.$emit("setStartingCanvasMousePos", event);
+          this.$emit("nodeActivated", event, this.ID);
         }
-        this.$emit("setStartingCanvasMousePos", event);
-        this.$emit("nodeActivated", event, this.ID);
       }
     },
     getNodeData() {

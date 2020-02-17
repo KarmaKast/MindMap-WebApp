@@ -5,7 +5,6 @@
     :style="canvasContainerStyle"
     @mousemove="getMousePos"
     v-touch:moving="getMousePos"
-    @mouseup.left="deactivateAllNodes"
     v-touch:end.prevent="deactivateAllNodes"
     @mousedown.middle="setCanvasDragging"
     @mouseup.middle="setCanvasDragging"
@@ -32,6 +31,7 @@
         @setStartingCanvasMousePos="setStartingCanvasMousePos"
         :defaultColors="colors"
         :dragging="value.dragging"
+        :pressed="value.pressed"
         :nodeSelected="value.nodeSelected"
         :newNodeDef="value.newNode"
         :grid="grid"
@@ -132,6 +132,12 @@ export default {
                   ? this.activeNode.dragging.state
                   : false
             },
+            pressed: {
+              state:
+                this.nodes[index].ID === this.activeNode.nodeID
+                  ? this.activeNode.pressed.state
+                  : undefined
+            },
             nodeSelected:
               this.nodes[index].ID === this.activeNode.nodeID
                 ? this.activeNode.selected
@@ -211,6 +217,7 @@ export default {
        */
       //console.log("drag started at canvas");
 
+      var diffNode = this.activeNode.nodeID !== ID;
       this.activeNode.nodeID = ID;
       console.log("node pressed");
       this.activeNode.pressed.state = true;
@@ -226,21 +233,32 @@ export default {
 
           this.updateCanvasContainerBoxLoc();
         } else {
-          this.activeNode.selected = true;
-          this.activeNode.nodeID = ID;
+          if (ID === this.activeNode.nodeID) {
+            this.activeNode.selected = diffNode
+              ? true
+              : this.activeNode.selected
+              ? false
+              : true;
+            console.log(this.activeNode.selected);
+          }
         }
       }, 100);
     },
     deactivateAllNodes(event) {
-      //console.log("drag stopped at canvas");
       if ([1].includes(event.which) || event.type === "touchend") {
         console.log("node unpressed");
-        this.activeNode.pressed.state = false;
-        this.activeNode.selected = false;
-        this.activeNode.nodeID = undefined;
-        if (this.activeNode.dragging.state) {
-          //console.log(event);
-          this.activeNode.dragging.state = false;
+        console.log(event);
+        if (this.activeNode.pressed.state === false) {
+          // context: this is on the canvas
+          this.activeNode.selected = false;
+          this.activeNode.nodeID = undefined;
+        } else {
+          // context: this is for the node
+          this.activeNode.pressed.state = false;
+          if (this.activeNode.dragging.state) {
+            //console.log(event);
+            this.activeNode.dragging.state = false;
+          }
         }
       }
     },
