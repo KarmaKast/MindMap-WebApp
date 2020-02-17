@@ -200,7 +200,7 @@ export default {
     },
     nodeActivated(event, ID) {
       /**
-       * wait for 100ms to see if canvas has no mouseup Event.
+       * context: wait for 100ms to see if canvas has no mouseup Event.
        * If it does within 100ms consider it as a mouse press else drag.
        */
       //console.log("drag started at canvas");
@@ -212,7 +212,9 @@ export default {
         setTimeout(() => {
           if (this.activeNode.pressed.state) {
             console.log("started dragging");
-
+            /**
+             * also check for mouse position change to detect drag. eg: if delta is more than 5px
+             */
             this.activeNode.dragging.state = true;
 
             this.updateCanvasContainerBoxLoc();
@@ -304,12 +306,7 @@ export default {
       console.log([this.canvasMousePos.x, this.canvasMousePos.y]);
     }
   },
-  watch: {
-    "canvasDragging.state"() {
-      console.log("from watch func");
-      console.log(this.canvasDragging.event);
-    }
-  },
+  watch: {},
   created: function() {
     this.$store.subscribeAction({
       after: action => {

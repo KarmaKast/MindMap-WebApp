@@ -35,7 +35,14 @@
           Github Repo
         </a>
         <br />
-        Depends on nodeAPI-0.1.0 (run nodeVizAPI.py)
+        Depends on
+        <a
+          href="https://github.com/KarmaKast/nodeAPI/"
+          :style="{ pointerEvents: 'initial' }"
+          target="_blank"
+          >nodeAPI-0.1.0</a
+        >
+        (run nodeVizAPI.py)
       </p>
     </div>
   </div>
