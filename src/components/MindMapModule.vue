@@ -130,8 +130,10 @@ export default {
       apiUrl: "",
       apiValidity: false,
       nodes: [
-        { ID: "__test_ID__", newNode: true }
-        //{ ID: "__test_ID__1", newNode: true }
+        { ID: "__test_ID__", newNode: true },
+        { ID: "__test_ID__1", newNode: true },
+        { ID: "__test_ID__2", newNode: true },
+        { ID: "__test_ID__3", newNode: true },
       ],
       showAboutPage: false,
       grid: {

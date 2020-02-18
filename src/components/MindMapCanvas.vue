@@ -5,9 +5,9 @@
     :style="canvasContainerStyle"
     @mousemove="getMousePos"
     v-touch:moving="getMousePos"
-    v-touch:end.self="deactivateAllNodes"
+    v-touch:end.prevent="deactivateAllNodes"
     v-touch:start.self="setCanvasDragging"
-    v-touch:end.prevent="setCanvasDragging"
+    v-touch:end.self="setCanvasDragging"
   >
     <div
       v-if="grid.show && grid.opacity > 0 && grid.size > 1 && grid.width > 0"
