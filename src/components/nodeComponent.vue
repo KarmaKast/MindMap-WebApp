@@ -23,7 +23,7 @@
           backgroundColor: 'red',
           borderRadius: '10px'
         }"
-        @click.left.self="editNodeLabel"
+        v-touch:tap.self="editNodeLabel"
       >
         <input
           v-if="editingLabel"

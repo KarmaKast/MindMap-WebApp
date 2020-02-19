@@ -251,8 +251,10 @@ export default {
         console.log(event);
         if (this.activeNode.pressed.state === false) {
           // context: this is on the canvas
-          this.activeNode.selected = false;
-          this.activeNode.nodeID = undefined;
+          if (this.$refs.canvasContainer === event.target) {
+            this.activeNode.selected = false;
+            this.activeNode.nodeID = undefined;
+          }
         } else {
           // context: this is for the node
           console.log("node unpressed");
