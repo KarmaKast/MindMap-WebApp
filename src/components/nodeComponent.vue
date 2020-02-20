@@ -11,17 +11,18 @@
       id="nodeUI"
       :style="{
         position: 'absolute',
-        top: '-15px',
+        top: '-25px',
         display: 'grid'
       }"
     >
       <div
         id="editLabelBttn"
         :style="{
-          height: '15px',
-          width: '15px',
+          height: '25px',
+          width: '25px',
           backgroundColor: 'red',
-          borderRadius: '10px'
+          borderRadius: '50%',
+          pointerEvents: 'all'
         }"
         v-touch:tap.self="editNodeLabel"
       >
@@ -187,7 +188,8 @@ export default {
         overflowWrap: "break-word",
         color: `hsla(${this.nodeColor[0]},${this.nodeColor[1]}%, ${this.nodeColor[2]}%, ${this.nodeColor[3]})`,
         background: "none",
-        border: "none"
+        border: "none",
+        userSelect: 'none'
       };
     },
     inputTextStyle: function() {

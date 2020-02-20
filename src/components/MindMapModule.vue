@@ -62,7 +62,7 @@
         >
           <img
             src="../assets/ic_more_vert_18px.svg"
-            style="color: rgb(255, 164, 164);"
+            :style="{ color: 'rgb(255, 164, 164)', userSelect: 'none' }"
           />
         </button>
         <div id="menuItems" :style="this.mainItemsStyle">
