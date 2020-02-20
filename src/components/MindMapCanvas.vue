@@ -8,6 +8,7 @@
     v-touch:end.prevent="deactivateAllNodes"
     v-touch:start.self="setCanvasDragging"
     v-touch:end.self="setCanvasDragging"
+    v-touch:tap.self="handleCanvasTap"
   >
     <div
       v-if="grid.show && grid.opacity > 0 && grid.size > 1 && grid.width > 0"
@@ -362,15 +363,32 @@ export default {
         }
       }
     },
+    handleCanvasTap(event) {
+      event.preventDefault();
+      console.log(event);
+      this.canvas.taps.count += 1;
+      var tapMaxInterval = 250;
+      if (this.canvas.taps.timer === undefined) {
+        this.canvas.taps.timer = setTimeout(() => {
+          if (this.canvas.taps.count > 1) {
+            this.canvas.taps.count = 0;
+            console.log("this is double tap i guess?");
+          } else {
+            console.log("this is single tap i guess?");
+          }
+          this.canvas.taps.timer = undefined;
+        }, tapMaxInterval);
+      }
+    },
     setStartingCanvasMousePos(event) {
       this.updateCanvasContainerBoxLoc();
       console.log(event);
       if (event.type === "touchstart") {
         //console.log(event.clientX - this.canvasContainerBoxLoc.x);
         this.canvasMousePos.x =
-          event.touches[0].clientX - this.canvasContainerBoxLoc.x;
+          event.changedTouches[0].clientX - this.canvasContainerBoxLoc.x;
         this.canvasMousePos.y =
-          event.touches[0].clientY - this.canvasContainerBoxLoc.y;
+          event.changedTouches[0].clientY - this.canvasContainerBoxLoc.y;
       } else {
         this.canvasMousePos.x = event.clientX - this.canvasContainerBoxLoc.x;
         this.canvasMousePos.y = event.clientY - this.canvasContainerBoxLoc.y;
