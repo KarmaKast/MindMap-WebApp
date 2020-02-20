@@ -111,10 +111,16 @@ export default {
         selected: false
       },
 
-      canvasDragging: {
-        state: false,
-        event: undefined,
-        deltas: { x: 0, y: 0 }
+      canvas: {
+        taps: {
+          timer: undefined,
+          count: 0
+        },
+        dragging: {
+          state: false,
+          event: undefined,
+          deltas: { x: 0, y: 0 }
+        }
       },
       height: 0,
       width: 0
@@ -207,6 +213,13 @@ export default {
     }
   },
   methods: {
+    handleTouchEnd(event) {
+      event.preventDefault();
+
+      if (event.target) this.setcanvas.dragging();
+
+      this.deactivateAllNodes(event);
+    },
     updateCanvasContainerBoxLoc() {
       // context: since canvas bounding box x,y is taken once at the start of the drag, if for some reason canvas container position changes relative to the window top-left it will make the drag to malfunction
       this.canvasContainerBoxLoc.x = this.$refs.canvasContainer.getBoundingClientRect().x;
@@ -241,7 +254,7 @@ export default {
               : this.activeNode.selected
               ? false
               : true;
-            console.log(this.activeNode.selected);
+            //console.log(this.activeNode.selected);
           }
         }
       }, 100);
@@ -270,7 +283,7 @@ export default {
       if (this.activeNode.dragging.state === true) {
         // todo: if dragging pass canvasMousePos to nodes else pass undefined
       }
-      if (this.activeNode.dragging.state || this.canvasDragging.state) {
+      if (this.activeNode.dragging.state || this.canvas.dragging.state) {
         if (event.type === "mousemove") {
           //console.log(event);
           this.canvasMousePos.x = event.clientX - this.canvasContainerBoxLoc.x;
@@ -283,15 +296,15 @@ export default {
             event.touches[0].clientY - this.canvasContainerBoxLoc.y;
         }
 
-        if (this.canvasDragging.state) {
+        if (this.canvas.dragging.state) {
           this.canvasLocation.x =
             this.canvasMousePos.x -
             this.width / 2 -
-            this.canvasDragging.deltas.x;
+            this.canvas.dragging.deltas.x;
           this.canvasLocation.y =
             this.canvasMousePos.y -
             this.height / 2 -
-            this.canvasDragging.deltas.y;
+            this.canvas.dragging.deltas.y;
         }
       }
     },
@@ -300,43 +313,48 @@ export default {
         event.which === 2 ||
         ["touchend", "touchstart"].includes(event.type)
       ) {
-        console.log("from setCanvasDragging func");
+        console.log("from setcanvas.dragging func");
         console.log(event);
+        //event.preventDefault();
         // todo: this toggling mechanism causes problems if mouse moves out of canvas container
-        if (this.canvasDragging.state) {
+        if (this.canvas.dragging.state) {
           // doing: stop drag
-          this.canvasDragging.state = false;
-          this.canvasDragging.event = undefined;
+          this.canvas.dragging.state = false;
+          this.canvas.dragging.deltas = { x: 0, y: 0 };
+          this.canvas.dragging.event = undefined;
           // todo: reset dragging deltas (not necessary)
-          this.canvasDragging.deltas = { x: 0, y: 0 };
+          this.canvas.dragging.deltas = { x: 0, y: 0 };
         } else {
           // doing: start drag
-          this.canvasDragging.state = true;
-          this.canvasDragging.event = event;
+
           this.updateCanvasContainerBoxLoc();
 
-          // todo: set dragging deltas
+          var clientPos = { x: 0, y: 0 };
           if (event.type === "mousedown") {
-            this.canvasDragging.deltas.x =
-              event.clientX -
-              this.width / 2 -
-              this.canvasLocation.x -
-              this.canvasContainerBoxLoc.x;
-            this.canvasDragging.deltas.y =
-              event.clientY -
-              this.height / 2 -
-              this.canvasLocation.y -
-              this.canvasContainerBoxLoc.y;
-          } else if (event.type === "touchstart") {
-            console.log(event.target.id === "canvasContainer");
+            this.canvas.dragging.state = true;
+            this.canvas.dragging.event = event;
 
-            this.canvasDragging.deltas.x =
-              event.touches[0].clientX -
+            clientPos.x = event.clientX;
+            clientPos.y = event.clientY;
+          } else {
+            // todo: check for double tap
+
+            this.canvas.dragging.state = true;
+            this.canvas.dragging.event = event;
+            //console.log(event);
+            clientPos.x = event.changedTouches[0].clientX;
+            clientPos.y = event.changedTouches[0].clientY;
+          }
+
+          // todo: set dragging deltas
+          if (this.canvas.dragging.state) {
+            this.canvas.dragging.deltas.x =
+              clientPos.x -
               this.width / 2 -
               this.canvasLocation.x -
               this.canvasContainerBoxLoc.x;
-            this.canvasDragging.deltas.y =
-              event.touches[0].clientY -
+            this.canvas.dragging.deltas.y =
+              clientPos.y -
               this.height / 2 -
               this.canvasLocation.y -
               this.canvasContainerBoxLoc.y;
@@ -357,7 +375,7 @@ export default {
         this.canvasMousePos.x = event.clientX - this.canvasContainerBoxLoc.x;
         this.canvasMousePos.y = event.clientY - this.canvasContainerBoxLoc.y;
       }
-      console.log([this.canvasMousePos.x, this.canvasMousePos.y]);
+      //console.log([this.canvasMousePos.x, this.canvasMousePos.y]);
     }
   },
   watch: {},
