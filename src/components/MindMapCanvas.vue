@@ -26,6 +26,8 @@
         :key="key_"
         :ID="key_"
         :apiUrl="apiUrl"
+        :autoSave="false"
+        :apiValidity="apiValidity"
         :canvasSize="{ height: height, width: width }"
         :canvasLocation="canvasLocation"
         :canvasMousePos="value.canvasMousePos"
@@ -235,12 +237,12 @@ export default {
 
       var diffNode = this.activeNode.nodeID !== ID;
       this.activeNode.nodeID = ID;
-      console.log("node pressed");
+      //console.log("node pressed");
       this.activeNode.pressed.state = true;
 
       setTimeout(() => {
         if (this.activeNode.pressed.state) {
-          console.log("started dragging");
+          //console.log("started dragging");
           /**
            * also check for mouse position change to detect drag. eg: if delta is more than 5px
            */
@@ -262,7 +264,7 @@ export default {
     },
     deactivateAllNodes(event) {
       if ([1].includes(event.which) || event.type === "touchend") {
-        console.log(event);
+        //console.log(event);
         if (this.activeNode.pressed.state === false) {
           // context: this is on the canvas
           if (this.$refs.canvasContainer === event.target) {
@@ -271,7 +273,7 @@ export default {
           }
         } else {
           // context: this is for the node
-          console.log("node unpressed");
+          //console.log("node unpressed");
           this.activeNode.pressed.state = false;
           if (this.activeNode.dragging.state) {
             //console.log(event);
@@ -314,8 +316,8 @@ export default {
         event.which === 2 ||
         ["touchend", "touchstart"].includes(event.type)
       ) {
-        console.log("from setcanvas.dragging func");
-        console.log(event);
+        //console.log("from setcanvas.dragging func");
+        //console.log(event);
         //event.preventDefault();
         // todo: this toggling mechanism causes problems if mouse moves out of canvas container
         if (this.canvas.dragging.state) {
@@ -373,7 +375,10 @@ export default {
           if (this.canvas.taps.count > 1) {
             this.canvas.taps.count = 0;
             console.log("this is double tap i guess?");
+
+            this.$emit("create-new-node");
           } else {
+            this.canvas.taps.count = 0;
             console.log("this is single tap i guess?");
           }
           this.canvas.taps.timer = undefined;
@@ -382,7 +387,7 @@ export default {
     },
     setStartingCanvasMousePos(event) {
       this.updateCanvasContainerBoxLoc();
-      console.log(event);
+      //console.log(event);
       if (event.type === "touchstart") {
         //console.log(event.clientX - this.canvasContainerBoxLoc.x);
         this.canvasMousePos.x =

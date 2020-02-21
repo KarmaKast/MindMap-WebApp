@@ -81,6 +81,7 @@ export default {
     ID: String,
     newNodeDef: Boolean,
     apiUrl: String,
+    apiValidity: Boolean,
     canvasSize: Object,
     canvasLocation: Object,
     canvasMousePos: Object,
@@ -118,6 +119,7 @@ export default {
       minWidth: 120,
       nodeLocation: { x: 0, y: 0 },
       nodeLabel: "",
+      node_ID: this.ID,
       nodeColor: [0, 0, 0, 1],
       newNode: this.newNodeDef,
       node_data: {
@@ -142,8 +144,8 @@ export default {
           this.canvasSize.width / 2 +
           this.nodeLocation_["x"] -
           this.nodeBoundingBoxSize.width / 2}px`,
-        minWidth: `${this.newNode ? this.minWidth : 0}px`,
-        minHeight: `${this.newNode ? this.minHeight : 0}px`,
+        minWidth: `${this.nodeLabel === "" ? this.minWidth : 0}px`,
+        minHeight: `${this.nodeLabel === "" ? this.minHeight : 0}px`,
         cursor: this.dragging.state ? "grabbing" : "grab",
         zIndex: this.dragging.state ? "5000" : "unset",
 
@@ -189,7 +191,7 @@ export default {
         color: `hsla(${this.nodeColor[0]},${this.nodeColor[1]}%, ${this.nodeColor[2]}%, ${this.nodeColor[3]})`,
         background: "none",
         border: "none",
-        userSelect: 'none'
+        userSelect: "none"
       };
     },
     inputTextStyle: function() {
@@ -270,7 +272,7 @@ export default {
       // doing: get node data from api
       // todo: check api url validity
       this.$axios
-        .get(this.apiUrl + `/node/get-data/${this.ID}`)
+        .get(this.apiUrl + `/node/get-data/${this.node_ID}`)
         .then(response => {
           console.log(response["data"]);
           this.node_data = response["data"]["node_viz_data"];
@@ -280,7 +282,7 @@ export default {
       this.$axios({
         method: "post",
         baseURL: this.apiUrl,
-        url: `/updateProps/${this.ID}`,
+        url: `/updateProps/${this.node_ID}`,
         params: {
           [propName]: data
         }
@@ -300,11 +302,23 @@ export default {
         };
       }, time);
     },
+    createNodeInDatabase() {
+      console.log(`from createNodeInDatabase: /node/create/${this.nodeLabel}`);
+      this.$axios({
+        method: "post",
+        baseURL: this.apiUrl,
+        url: `/node/create/${this.nodeLabel}`
+      }).then(response => {
+        console.log("getting response");
+        console.log(response);
+        this.node_ID = response.data.ID;
+      });
+    },
     editNodeLabel(event) {
       console.log(event);
-      if (this.newNode) {
+      /*if (this.newNode) {
         this.newNode = false;
-      }
+      }*/
       this.editingLabel = this.editingLabel ? false : true;
       //setInterval
       if (this.editingLabel) {
@@ -320,20 +334,27 @@ export default {
         this.nodeLocation = this.nodeLocation_;
       }
     },
+    apiValidity() {},
 
     nodeLocation_() {
       // todo: save node location to database on drag end
       if (!this.dragging.state) {
-        if (!this.newNode) {
-          var msg = `updated location from {x:${this.node_data.viz_props.location[0]},y: ${this.node_data.viz_props.location[1]}} to
-            {x:${this.nodeLocation_.x},y:${this.nodeLocation_.y}}`;
-          console.log(msg);
+        if (this.apiValidity) {
+          //var msg = `updated location from {x:${this.node_data.viz_props.location[0]},y: ${this.node_data.viz_props.location[1]}} to
+          //  {x:${this.nodeLocation_.x},y:${this.nodeLocation_.y}}`;
+          //console.log(msg);
           // todo: WIP
-          console.log([this.nodeLocation_.x, this.nodeLocation_.y, 0]);
-          this.savePropToAPI(
-            "location",
-            `(${this.nodeLocation_.x},${this.nodeLocation_.y}, 0)`
-          );
+          //console.log([this.nodeLocation_.x, this.nodeLocation_.y, 0]);
+          /*if (this.newNode) {
+            this.newNode = false;
+            this.createNodeInDatabase();
+          }*/
+          if (!this.newNode) {
+            this.savePropToAPI(
+              "location",
+              `(${this.nodeLocation_.x},${this.nodeLocation_.y}, 0)`
+            );
+          }
         }
       }
     },
@@ -355,16 +376,24 @@ export default {
         this.updateNodeBBox();
       }
       // todo: save node Label to API
-      this.$axios({
-        method: "post",
-        url: this.apiUrl + `/updateSource/${this.ID}`,
-        params: {
-          label: this.nodeLabel
+      if (this.apiValidity) {
+        if (this.newNode) {
+          this.newNode = false;
+          this.createNodeInDatabase();
+        } else {
+          // todo: also set it to true when api disconnects
+          this.$axios({
+            method: "post",
+            url: this.apiUrl + `/updateSource/${this.node_ID}`,
+            params: {
+              label: this.nodeLabel
+            }
+          });
+          if (this.autoSave) {
+            // doing: ask server save state to file
+            this.$axios.post(this.apiUrl + "/save");
+          }
         }
-      });
-      if (this.autoSave) {
-        // doing: ask server save state to file
-        this.$axios.post(this.apiUrl + "/save");
       }
     },
     nodeColor() {
@@ -381,14 +410,14 @@ export default {
     }
   },
   created: function() {
-    if (this.ID === undefined) {
+    if (this.node_ID === undefined) {
       // create new node using the nodeAPI and take its ID
-      console.log(this.ID);
+      console.log(this.node_ID);
     }
   },
   mounted: function() {
-    if (this.ID !== undefined) {
-      console.log(`@ mounted ${this.ID}`);
+    if (this.node_ID !== undefined) {
+      console.log(`@ mounted ${this.node_ID}`);
       // todo: get node_label, relation_claims, data from the API using the nodeID
     }
     if (!this.newNode) {

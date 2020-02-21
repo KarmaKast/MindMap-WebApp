@@ -42,7 +42,7 @@ export default {
       return {
         display: "grid",
         position: "absolute",
-        bottom: "20px",
+        bottom: "40px",
         gridGap: "2px"
       };
     }

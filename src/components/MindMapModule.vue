@@ -7,6 +7,7 @@
       :nodes="nodes"
       :apiValidity="apiValidity"
       :grid="grid"
+      @create-new-node="createNewNode"
     >
     </mind-map-canvas>
 
@@ -105,6 +106,8 @@ import aboutPage from "./aboutPage.vue";
 import buttonOne from "./button1.vue";
 import buttonTwo from "./button2.vue";
 
+//import {uuidv1} from 'uuid/v1';
+
 export default {
   name: "MindMapModule",
   components: {
@@ -133,7 +136,7 @@ export default {
         { ID: "__test_ID__", newNode: true },
         { ID: "__test_ID__1", newNode: true },
         { ID: "__test_ID__2", newNode: true },
-        { ID: "__test_ID__3", newNode: true },
+        { ID: "__test_ID__3", newNode: true }
       ],
       showAboutPage: false,
       grid: {
@@ -294,6 +297,10 @@ export default {
       } else {
         this.showMenu = true;
       }
+    },
+    createNewNode() {
+      const uuidv1 = require("uuid/v1");
+      this.nodes.push({ ID: `__test_ID__${uuidv1()}`, newNode: true });
     },
     aboutPageDisplay(showOrHide) {
       //var win = window.open('https://github.com/KarmaKast/MindMap-WebApp/tree/develop', '_blank');
