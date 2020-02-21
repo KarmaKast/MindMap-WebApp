@@ -56,7 +56,7 @@ export default {
   data: function() {
     return {
       isHovered: false,
-      version: "v0.4.2"
+      version: "v0.4.3"
     };
   },
   computed: {

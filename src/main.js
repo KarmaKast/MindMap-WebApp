@@ -9,7 +9,7 @@ import store from "./store";
 Vue.config.productionTip = false;
 Vue.prototype.$axios = axios;
 Vue.use(VueKonva);
-Vue.use(Vue2TouchEvents);
+Vue.use(Vue2TouchEvents, {});
 
 new Vue({
   store,

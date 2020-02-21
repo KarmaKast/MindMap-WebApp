@@ -8,6 +8,7 @@
     v-touch:end.prevent="deactivateAllNodes"
     v-touch:start.self="setCanvasDragging"
     v-touch:end.self="setCanvasDragging"
+    v-touch:tap.self="handleCanvasTap"
   >
     <div
       v-if="grid.show && grid.opacity > 0 && grid.size > 1 && grid.width > 0"
@@ -25,6 +26,8 @@
         :key="key_"
         :ID="key_"
         :apiUrl="apiUrl"
+        :autoSave="false"
+        :apiValidity="apiValidity"
         :canvasSize="{ height: height, width: width }"
         :canvasLocation="canvasLocation"
         :canvasMousePos="value.canvasMousePos"
@@ -111,10 +114,16 @@ export default {
         selected: false
       },
 
-      canvasDragging: {
-        state: false,
-        event: undefined,
-        deltas: { x: 0, y: 0 }
+      canvas: {
+        taps: {
+          timer: undefined,
+          count: 0
+        },
+        dragging: {
+          state: false,
+          event: undefined,
+          deltas: { x: 0, y: 0 }
+        }
       },
       height: 0,
       width: 0
@@ -207,6 +216,13 @@ export default {
     }
   },
   methods: {
+    handleTouchEnd(event) {
+      event.preventDefault();
+
+      if (event.target) this.setcanvas.dragging();
+
+      this.deactivateAllNodes(event);
+    },
     updateCanvasContainerBoxLoc() {
       // context: since canvas bounding box x,y is taken once at the start of the drag, if for some reason canvas container position changes relative to the window top-left it will make the drag to malfunction
       this.canvasContainerBoxLoc.x = this.$refs.canvasContainer.getBoundingClientRect().x;
@@ -221,12 +237,12 @@ export default {
 
       var diffNode = this.activeNode.nodeID !== ID;
       this.activeNode.nodeID = ID;
-      console.log("node pressed");
+      //console.log("node pressed");
       this.activeNode.pressed.state = true;
 
       setTimeout(() => {
         if (this.activeNode.pressed.state) {
-          console.log("started dragging");
+          //console.log("started dragging");
           /**
            * also check for mouse position change to detect drag. eg: if delta is more than 5px
            */
@@ -241,21 +257,23 @@ export default {
               : this.activeNode.selected
               ? false
               : true;
-            console.log(this.activeNode.selected);
+            //console.log(this.activeNode.selected);
           }
         }
       }, 100);
     },
     deactivateAllNodes(event) {
       if ([1].includes(event.which) || event.type === "touchend") {
-        console.log(event);
+        //console.log(event);
         if (this.activeNode.pressed.state === false) {
           // context: this is on the canvas
-          this.activeNode.selected = false;
-          this.activeNode.nodeID = undefined;
+          if (this.$refs.canvasContainer === event.target) {
+            this.activeNode.selected = false;
+            this.activeNode.nodeID = undefined;
+          }
         } else {
           // context: this is for the node
-          console.log("node unpressed");
+          //console.log("node unpressed");
           this.activeNode.pressed.state = false;
           if (this.activeNode.dragging.state) {
             //console.log(event);
@@ -268,7 +286,7 @@ export default {
       if (this.activeNode.dragging.state === true) {
         // todo: if dragging pass canvasMousePos to nodes else pass undefined
       }
-      if (this.activeNode.dragging.state || this.canvasDragging.state) {
+      if (this.activeNode.dragging.state || this.canvas.dragging.state) {
         if (event.type === "mousemove") {
           //console.log(event);
           this.canvasMousePos.x = event.clientX - this.canvasContainerBoxLoc.x;
@@ -281,15 +299,15 @@ export default {
             event.touches[0].clientY - this.canvasContainerBoxLoc.y;
         }
 
-        if (this.canvasDragging.state) {
+        if (this.canvas.dragging.state) {
           this.canvasLocation.x =
             this.canvasMousePos.x -
             this.width / 2 -
-            this.canvasDragging.deltas.x;
+            this.canvas.dragging.deltas.x;
           this.canvasLocation.y =
             this.canvasMousePos.y -
             this.height / 2 -
-            this.canvasDragging.deltas.y;
+            this.canvas.dragging.deltas.y;
         }
       }
     },
@@ -298,43 +316,48 @@ export default {
         event.which === 2 ||
         ["touchend", "touchstart"].includes(event.type)
       ) {
-        console.log("from setCanvasDragging func");
-        console.log(event);
+        //console.log("from setcanvas.dragging func");
+        //console.log(event);
+        //event.preventDefault();
         // todo: this toggling mechanism causes problems if mouse moves out of canvas container
-        if (this.canvasDragging.state) {
+        if (this.canvas.dragging.state) {
           // doing: stop drag
-          this.canvasDragging.state = false;
-          this.canvasDragging.event = undefined;
+          this.canvas.dragging.state = false;
+          this.canvas.dragging.deltas = { x: 0, y: 0 };
+          this.canvas.dragging.event = undefined;
           // todo: reset dragging deltas (not necessary)
-          this.canvasDragging.deltas = { x: 0, y: 0 };
+          this.canvas.dragging.deltas = { x: 0, y: 0 };
         } else {
           // doing: start drag
-          this.canvasDragging.state = true;
-          this.canvasDragging.event = event;
+
           this.updateCanvasContainerBoxLoc();
 
-          // todo: set dragging deltas
+          var clientPos = { x: 0, y: 0 };
           if (event.type === "mousedown") {
-            this.canvasDragging.deltas.x =
-              event.clientX -
-              this.width / 2 -
-              this.canvasLocation.x -
-              this.canvasContainerBoxLoc.x;
-            this.canvasDragging.deltas.y =
-              event.clientY -
-              this.height / 2 -
-              this.canvasLocation.y -
-              this.canvasContainerBoxLoc.y;
-          } else if (event.type === "touchstart") {
-            console.log(event.target.id === "canvasContainer");
+            this.canvas.dragging.state = true;
+            this.canvas.dragging.event = event;
 
-            this.canvasDragging.deltas.x =
-              event.touches[0].clientX -
+            clientPos.x = event.clientX;
+            clientPos.y = event.clientY;
+          } else {
+            // todo: check for double tap
+
+            this.canvas.dragging.state = true;
+            this.canvas.dragging.event = event;
+            //console.log(event);
+            clientPos.x = event.changedTouches[0].clientX;
+            clientPos.y = event.changedTouches[0].clientY;
+          }
+
+          // todo: set dragging deltas
+          if (this.canvas.dragging.state) {
+            this.canvas.dragging.deltas.x =
+              clientPos.x -
               this.width / 2 -
               this.canvasLocation.x -
               this.canvasContainerBoxLoc.x;
-            this.canvasDragging.deltas.y =
-              event.touches[0].clientY -
+            this.canvas.dragging.deltas.y =
+              clientPos.y -
               this.height / 2 -
               this.canvasLocation.y -
               this.canvasContainerBoxLoc.y;
@@ -342,20 +365,40 @@ export default {
         }
       }
     },
+    handleCanvasTap(event) {
+      event.preventDefault();
+      console.log(event);
+      this.canvas.taps.count += 1;
+      var tapMaxInterval = 250;
+      if (this.canvas.taps.timer === undefined) {
+        this.canvas.taps.timer = setTimeout(() => {
+          if (this.canvas.taps.count > 1) {
+            this.canvas.taps.count = 0;
+            console.log("this is double tap i guess?");
+
+            this.$emit("create-new-node");
+          } else {
+            this.canvas.taps.count = 0;
+            console.log("this is single tap i guess?");
+          }
+          this.canvas.taps.timer = undefined;
+        }, tapMaxInterval);
+      }
+    },
     setStartingCanvasMousePos(event) {
       this.updateCanvasContainerBoxLoc();
-      console.log(event);
+      //console.log(event);
       if (event.type === "touchstart") {
         //console.log(event.clientX - this.canvasContainerBoxLoc.x);
         this.canvasMousePos.x =
-          event.touches[0].clientX - this.canvasContainerBoxLoc.x;
+          event.changedTouches[0].clientX - this.canvasContainerBoxLoc.x;
         this.canvasMousePos.y =
-          event.touches[0].clientY - this.canvasContainerBoxLoc.y;
+          event.changedTouches[0].clientY - this.canvasContainerBoxLoc.y;
       } else {
         this.canvasMousePos.x = event.clientX - this.canvasContainerBoxLoc.x;
         this.canvasMousePos.y = event.clientY - this.canvasContainerBoxLoc.y;
       }
-      console.log([this.canvasMousePos.x, this.canvasMousePos.y]);
+      //console.log([this.canvasMousePos.x, this.canvasMousePos.y]);
     }
   },
   watch: {},
