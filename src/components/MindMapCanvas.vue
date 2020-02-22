@@ -36,6 +36,7 @@
         :dragging="value.dragging"
         :pressed="value.pressed"
         :nodeSelected="value.nodeSelected"
+        :nodeLocationDef="value.nodeLocationDef"
         :newNodeDef="value.newNode"
         :grid="grid"
         @nodeActivated="nodeActivated"
@@ -152,7 +153,11 @@ export default {
                 ? this.activeNode.selected
                 : false,
             canvasMousePos: this.canvasMousePos,
-            newNode: this.nodes[index].newNode
+            newNode: this.nodes[index].newNode,
+            nodeLocationDef:
+              this.nodes[index]["nodeLocationDef"] === undefined
+                ? { x: 0, y: 0 }
+                : this.nodes[index]["nodeLocationDef"]
           };
         }
       });
@@ -376,7 +381,21 @@ export default {
             this.canvas.taps.count = 0;
             console.log("this is double tap i guess?");
 
-            this.$emit("create-new-node");
+            var nodeLocationDef_ = { x: 0, y: 0 };
+            if (event.type.startsWith("mouse")) {
+              nodeLocationDef_ = { x: event.clientX, y: event.clientY };
+            } else {
+              nodeLocationDef_ = {
+                x: event.changedTouches[0].clientX,
+                y: event.changedTouches[0].clientY
+              };
+            }
+            nodeLocationDef_.x =
+              nodeLocationDef_.x - this.width / 2 - this.canvasLocation.x;
+            nodeLocationDef_.y =
+              nodeLocationDef_.y - this.height / 2 - this.canvasLocation.y;
+
+            this.$emit("create-new-node", nodeLocationDef_);
           } else {
             this.canvas.taps.count = 0;
             console.log("this is single tap i guess?");

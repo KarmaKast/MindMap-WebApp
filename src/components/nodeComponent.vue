@@ -111,13 +111,19 @@ export default {
     nodeSelected: {
       default: false,
       type: Boolean
+    },
+    nodeLocationDef: {
+      default() {
+        return { x: 0, y: 0 };
+      },
+      type: Object
     }
   },
   data: function() {
     return {
       minHeight: 60,
       minWidth: 120,
-      nodeLocation: { x: 0, y: 0 },
+      nodeLocation: this.nodeLocationDef,
       nodeLabel: "",
       node_ID: this.ID,
       nodeColor: [0, 0, 0, 1],
@@ -303,14 +309,14 @@ export default {
       }, time);
     },
     createNodeInDatabase() {
-      console.log(`from createNodeInDatabase: /node/create/${this.nodeLabel}`);
+      //console.log(`from createNodeInDatabase: /node/create/${this.nodeLabel}`);
       this.$axios({
         method: "post",
         baseURL: this.apiUrl,
         url: `/node/create/${this.nodeLabel}`
       }).then(response => {
-        console.log("getting response");
-        console.log(response);
+        //console.log("getting response");
+        //console.log(response);
         this.node_ID = response.data.ID;
       });
     },

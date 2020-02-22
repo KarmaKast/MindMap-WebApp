@@ -5,6 +5,7 @@
       :colorsProcessed="colorsProcessed"
       :apiUrl="this.apiUrl"
       :nodes="nodes"
+      :nodeLimit="nodeLimit"
       :apiValidity="apiValidity"
       :grid="grid"
       @create-new-node="createNewNode"
@@ -298,9 +299,13 @@ export default {
         this.showMenu = true;
       }
     },
-    createNewNode() {
+    createNewNode(nodeLocationDef_) {
       const uuidv1 = require("uuid/v1");
-      this.nodes.push({ ID: `__test_ID__${uuidv1()}`, newNode: true });
+      this.nodes.push({
+        ID: `__test_ID__${uuidv1()}`,
+        newNode: true,
+        nodeLocationDef: nodeLocationDef_
+      });
     },
     aboutPageDisplay(showOrHide) {
       //var win = window.open('https://github.com/KarmaKast/MindMap-WebApp/tree/develop', '_blank');
