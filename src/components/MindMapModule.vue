@@ -108,6 +108,9 @@ import buttonOne from "./button1.vue";
 import buttonTwo from "./button2.vue";
 
 //import {uuidv1} from 'uuid/v1';
+import axios from "axios";
+import qs from "querystring";
+//import * as morphCore from "@karmakast/morph-dbms-core";
 
 export default {
   name: "MindMapModule",
@@ -133,6 +136,7 @@ export default {
       showMenu: false,
       apiUrl: "",
       apiValidity: false,
+      collection: null,
       nodes: [
         { ID: "__test_ID__", newNode: true },
         { ID: "__test_ID__1", newNode: true },
@@ -154,7 +158,7 @@ export default {
       var list = [
         {
           text: "Load Database",
-          action: this.loadDatabase,
+          action: this.loadCollection,
           args: [],
           if: this.apiValidity
         },
@@ -268,15 +272,23 @@ export default {
       // todo: WIP
       // load app settings from app_settings.json either during mounted or created
     },
-    loadDatabase() {
+    loadCollection() {
       var url_ = this.apiUrl;
-      this.$axios.get(url_ + "/load");
-      // todo: get a list of nodeIDs and create a list of nodes in the canvas
-      console.log(`getting list of nodes\n${url_}`);
-      this.$axios.get(url_ + "/get/nodeIDs").then(response => {
-        //console.log(response);
-        this.nodes = response["data"]["IDs"].map(function(ID) {
-          return { ID: ID, newNode: false };
+      // todo: directly using testCollection for now. Later a collection explorer feature need to be added.
+      axios({
+        method: "POST",
+        url: url_ + "/collection/load",
+        data: qs.stringify({ Label: "testCollection" }),
+        headers: { "Content-Type": "application/x-www-form-urlencoded" }
+      }).then(() => {
+        // todo: get a list of nodeIDs and create a list of nodes in the canvas
+        console.log(`getting list of nodes\n${url_}`);
+        axios.get(url_ + "/collection/get").then(response => {
+          //console.log(response);
+          this.collection = response["data"];
+          this.nodes = response.data.Entities.map(function(ID) {
+            return { ID: ID, newNode: false };
+          });
         });
       });
     },
@@ -286,7 +298,7 @@ export default {
     },
     saveDatabase() {
       var url_ = this.apiUrl;
-      this.$axios.post(url_ + "/save");
+      this.$axios.post(url_ + "/collection/save");
     },
     archiveDatabase() {
       var url_ = this.apiUrl;

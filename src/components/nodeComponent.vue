@@ -72,6 +72,11 @@
 <script>
 import ColorPicker from "./general/ColorPicker.vue";
 
+//import {uuidv1} from 'uuid/v1';
+import axios from "axios";
+import qs from "querystring";
+//import * as morphCore from "@karmakast/morph-dbms-core";
+
 export default {
   name: "nodeComponent",
   components: {
@@ -114,7 +119,7 @@ export default {
     },
     nodeLocationDef: {
       default() {
-        return { x: 0, y: 0 };
+        return { x: 0, y: 0, z: 0 };
       },
       type: Object
     }
@@ -126,11 +131,14 @@ export default {
       nodeLocation: this.nodeLocationDef,
       nodeLabel: "",
       node_ID: this.ID,
-      nodeColor: [0, 0, 0, 1],
+      nodeColor: { h: 0, s: 0, l: 0, a: 1 },
       newNode: this.newNodeDef,
       node_data: {
-        label: "",
-        viz_props: { location: [0, 0, 0], color: [166, 89, 45, 1] }
+        source: { Label: "" },
+        viz_props: {
+          location: { x: 0, y: 0, z: 0 },
+          color: { h: 166, s: 89, l: 45, a: 1 }
+        }
       },
       nodeSize: { height: 60, width: 160 },
       nodeBoundingBoxSize: { height: 0, width: 0 },
@@ -144,11 +152,11 @@ export default {
         position: "absolute",
         top: `${this.canvasLocation["y"] +
           this.canvasSize.height / 2 +
-          this.nodeLocation_["y"] -
+          this.nodeLocation_.y -
           this.nodeBoundingBoxSize.height / 2}px`,
         left: `${this.canvasLocation["x"] +
           this.canvasSize.width / 2 +
-          this.nodeLocation_["x"] -
+          this.nodeLocation_.x -
           this.nodeBoundingBoxSize.width / 2}px`,
         minWidth: `${this.nodeLabel === "" ? this.minWidth : 0}px`,
         minHeight: `${this.nodeLabel === "" ? this.minHeight : 0}px`,
@@ -156,7 +164,7 @@ export default {
         zIndex: this.dragging.state ? "5000" : "unset",
 
         backgroundColor: this.editingLabel ? "white" : "hsla(0,0%,0%,0.01)",
-        border: `1px dotted hsla(${this.nodeColor[0]},${this.nodeColor[1]}%,${this.nodeColor[2]}%, 0.2)`,
+        border: `1px dotted hsla(${this.nodeColor.h},${this.nodeColor.s}%,${this.nodeColor.l}%, 0.2)`,
         borderRadius:
           this.nodeSize["height"] > this.nodeSize["width"]
             ? `${this.nodeSize["height"]}px`
@@ -165,9 +173,9 @@ export default {
           this.dragging.state
             ? "rgba(0, 0, 0, 0.2) 0px 0px 13px 4px"
             : "rgba(0, 0, 0, 0.15) 0px 0px 3px 2px"
-        }, inset 0px 0px 0 4px hsla(${this.nodeColor[0]},
-        ${this.nodeColor[1]}%,
-        ${this.nodeColor[2]}%, 0.2)`,
+        }, inset 0px 0px 0 4px hsla(${this.nodeColor.h},
+        ${this.nodeColor.s}%,
+        ${this.nodeColor.l}%, 0.2)`,
         boxSizing: "border-box",
         display: "grid",
         gridTemplateColumns: "100%",
@@ -179,7 +187,7 @@ export default {
       return {
         position: "relative",
         borderRadius: "inherit",
-        border: `1px solid hsla(${this.nodeColor[0]},${this.nodeColor[1]}%, ${this.nodeColor[2]}%, ${this.nodeColor[3]})`,
+        border: `1px solid hsla(${this.nodeColor.h},${this.nodeColor.s}%, ${this.nodeColor.l}%, ${this.nodeColor.a})`,
         backdropFilter: "blur(2px)",
         pointerEvents: "all",
         display: "grid",
@@ -194,7 +202,7 @@ export default {
         margin: "0px",
         maxWidth: "100px",
         overflowWrap: "break-word",
-        color: `hsla(${this.nodeColor[0]},${this.nodeColor[1]}%, ${this.nodeColor[2]}%, ${this.nodeColor[3]})`,
+        color: `hsla(${this.nodeColor.h},${this.nodeColor.s}%, ${this.nodeColor.l}%, ${this.nodeColor.a})`,
         background: "none",
         border: "none",
         userSelect: "none"
@@ -277,15 +285,19 @@ export default {
     getNodeData() {
       // doing: get node data from api
       // todo: check api url validity
-      this.$axios
-        .get(this.apiUrl + `/node/get-data/${this.node_ID}`)
-        .then(response => {
-          console.log(response["data"]);
-          this.node_data = response["data"]["node_viz_data"];
-        });
+      axios({
+        method: "GET",
+        url: this.apiUrl + `/entity/get`,
+        params: { entityID: this.node_ID },
+        paramsSerializer: qs.stringify
+      }).then(response => {
+        console.log(response.data);
+        this.node_data.source = response.data[0];
+        this.node_data.viz_props = response.data[1].Data;
+      });
     },
     savePropToAPI(propName, data) {
-      this.$axios({
+      axios({
         method: "post",
         baseURL: this.apiUrl,
         url: `/updateProps/${this.node_ID}`,
@@ -295,7 +307,7 @@ export default {
       });
       if (this.autoSave) {
         // doing: ask server save state to file
-        this.$axios.post(this.apiUrl + "/save");
+        axios.post(this.apiUrl + "/save");
       }
     },
     updateNodeBBox(time = 100) {
@@ -310,14 +322,23 @@ export default {
     },
     createNodeInDatabase() {
       //console.log(`from createNodeInDatabase: /node/create/${this.nodeLabel}`);
-      this.$axios({
-        method: "post",
+      axios({
+        method: "POST",
         baseURL: this.apiUrl,
-        url: `/node/create/${this.nodeLabel}`
+        url: `/entity/create`,
+        data: qs.stringify({
+          vizProps: JSON.stringify({
+            location: {
+              x: this.nodeLocationDef["x"],
+              y: this.nodeLocationDef["y"],
+              z: this.nodeLocationDef["z"]
+            }
+          })
+        })
       }).then(response => {
         //console.log("getting response");
         //console.log(response);
-        this.node_ID = response.data.ID;
+        this.node_ID = response.data.entityID;
       });
     },
     editNodeLabel(event) {
@@ -364,13 +385,13 @@ export default {
         }
       }
     },
-    node_data() {
-      this.nodeLocation = {
-        x: this.node_data.viz_props.location[0],
-        y: this.node_data.viz_props.location[1]
-      };
-      this.nodeLabel = this.node_data.label;
+    "node_data.viz_props"() {
+      this.nodeLocation.x = this.node_data.viz_props.location.x;
+      this.nodeLocation.y = this.node_data.viz_props.location.y;
       this.nodeColor = this.node_data.viz_props.color;
+    },
+    "node_data.source"() {
+      this.nodeLabel = this.node_data.source.Label;
     },
     newNode() {
       // doing: updating node's bounding box width and height
@@ -380,13 +401,8 @@ export default {
       if (!this.newNode) {
         // doing: updating node's bounding box width and height
         this.updateNodeBBox();
-      }
-      // todo: save node Label to API
-      if (this.apiValidity) {
-        if (this.newNode) {
-          this.newNode = false;
-          this.createNodeInDatabase();
-        } else {
+        // todo: save node Label to API
+        if (this.apiValidity) {
           // todo: also set it to true when api disconnects
           this.$axios({
             method: "post",
@@ -397,7 +413,7 @@ export default {
           });
           if (this.autoSave) {
             // doing: ask server save state to file
-            this.$axios.post(this.apiUrl + "/save");
+            this.$axios.post(this.apiUrl + "/collection/save");
           }
         }
       }
@@ -405,13 +421,13 @@ export default {
     nodeColor() {
       this.savePropToAPI(
         "color",
-        `(${this.nodeColor[0]},${this.nodeColor[1]},${this.nodeColor[2]}, ${
-          this.nodeColor[3] !== undefined ? this.nodeColor[3] : 1
+        `(${this.nodeColor[0]},${this.nodeColor.s},${this.nodeColor.l}, ${
+          this.nodeColor.a !== undefined ? this.nodeColor.a : 1
         })`
       );
       if (this.autoSave) {
         // doing: ask server save state to file
-        this.$axios.post(this.apiUrl + "/save");
+        this.$axios.post(this.apiUrl + "/collection/save");
       }
     }
   },
@@ -428,6 +444,10 @@ export default {
     }
     if (!this.newNode) {
       this.getNodeData();
+    }
+    if (this.newNode && this.apiValidity) {
+      this.newNode = false;
+      this.createNodeInDatabase();
     }
     this.updateNodeBBox(0);
   },
