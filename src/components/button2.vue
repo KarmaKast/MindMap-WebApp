@@ -18,18 +18,18 @@ export default {
   name: "buttonTwo",
   props: {
     colors: Object,
-    buttonText: String
+    buttonText: String,
   },
-  data: function() {
+  data: function () {
     return {
       active: false,
       mainButtonIsHovered: false,
       size: [32, 174],
-      isHovered: false
+      isHovered: false,
     };
   },
   computed: {
-    colorsProcessed: function() {
+    colorsProcessed: function () {
       var colors_ = {};
       for (var key in this.colors) {
         //var color = `hsla($(this.colors[]))`;
@@ -40,7 +40,7 @@ export default {
       }
       return colors_;
     },
-    containerStyle: function() {
+    containerStyle: function () {
       var templateC = `auto ${this.size[0]}px`;
       return {
         position: "relative",
@@ -52,10 +52,10 @@ export default {
         justifyContent: "center",
         alignItems: "center",
         borderRadius: "inherit",
-        padding: "0px"
+        padding: "0px",
       };
     },
-    backgroundStyle: function() {
+    backgroundStyle: function () {
       return {
         background: this.mainButtonIsHovered
           ? "hsla(3, 100%, 87%, 0.16)"
@@ -68,10 +68,10 @@ export default {
         boxSizing: "border-box",
         backdropFilter: "blur(4px)",
         borderRadius: "inherit",
-        textAlign: "center"
+        textAlign: "center",
       };
     },
-    buttonTextStyle: function() {
+    buttonTextStyle: function () {
       return {
         display: this.active ? "none" : "block",
         position: "relative",
@@ -82,10 +82,10 @@ export default {
         fontWeight: "500",
         fontSize: "15px",
         lineHeight: "7px",
-        color: `${this.colorsProcessed["theme"]}`
+        color: `${this.colorsProcessed["theme"]}`,
       };
     },
-    buttonStyle: function() {
+    buttonStyle: function () {
       return {
         display: this.active ? "none" : "block",
         position: "absolute",
@@ -101,9 +101,9 @@ export default {
         background: "none",
         border: "none",
         borderRadius: "inherit",
-        outline: "none"
+        outline: "none",
       };
-    }
+    },
   },
   methods: {
     setActive() {
@@ -127,8 +127,8 @@ export default {
     },
     emitTakeAction() {
       this.$emit("takeAction");
-    }
-  }
+    },
+  },
 };
 </script>
 

@@ -10,7 +10,7 @@ export default new Vuex.Store({
     /*canvas_height: 0,
     canvas_width: 0,*/
     apiUrl: ["", false],
-    theme: []
+    theme: [],
   },
   mutations: {
     update_window_height(state) {
@@ -30,7 +30,7 @@ export default new Vuex.Store({
     },
     update_apiUrlValidity(state, isValid) {
       state.apiUrl[1] = isValid;
-    }
+    },
   },
   getters: {},
   actions: {
@@ -44,7 +44,7 @@ export default new Vuex.Store({
 
       var isValid = url === "" ? false : true;
       context.commit("update_apiUrlValidity", isValid);
-    }
+    },
   },
-  modules: {}
+  modules: {},
 });

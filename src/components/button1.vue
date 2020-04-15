@@ -38,21 +38,21 @@ export default {
     validity: Boolean,
     index: {
       default: 1,
-      type: Number
-    }
+      type: Number,
+    },
   },
-  data: function() {
+  data: function () {
     return {
       buttonText: "Connect to API",
       active: false,
       mainButtonIsHovered: false,
       testButtonIsHovered: false,
       size: [32, 174],
-      urlInField: ""
+      urlInField: "",
     };
   },
   computed: {
-    colorsProcessed: function() {
+    colorsProcessed: function () {
       var colors_ = {};
       for (var key in this.colors) {
         //var color = `hsla($(this.colors[]))`;
@@ -63,7 +63,7 @@ export default {
       }
       return colors_;
     },
-    containerStyle: function() {
+    containerStyle: function () {
       var templateC = `auto ${this.size[0]}px`;
       return {
         position: "relative",
@@ -74,10 +74,10 @@ export default {
         gridTemplateColumns: this.active ? templateC : "unset",
         placeItems: "center",
         borderRadius: "inherit",
-        padding: "0px"
+        padding: "0px",
       };
     },
-    backgroundStyle: function() {
+    backgroundStyle: function () {
       return {
         background: this.mainButtonIsHovered
           ? "hsla(3, 100%, 87%, 0.16)"
@@ -90,10 +90,10 @@ export default {
         boxSizing: "border-box",
         backdropFilter: "blur(4px)",
         borderRadius: "inherit",
-        textAlign: "center"
+        textAlign: "center",
       };
     },
-    buttonTextStyle: function() {
+    buttonTextStyle: function () {
       return {
         display: this.active ? "none" : "block",
         position: "relative",
@@ -104,10 +104,10 @@ export default {
         fontWeight: "500",
         fontSize: "15px",
         lineHeight: "7px",
-        color: `${this.colorsProcessed["theme"]}`
+        color: `${this.colorsProcessed["theme"]}`,
       };
     },
-    buttonStyle: function() {
+    buttonStyle: function () {
       return {
         display: this.active ? "none" : "block",
         position: "absolute",
@@ -123,10 +123,10 @@ export default {
         outline: "none",
         background: "none",
         border: "none",
-        borderRadius: "inherit"
+        borderRadius: "inherit",
       };
     },
-    inputFieldStyle: function() {
+    inputFieldStyle: function () {
       return {
         display: this.active ? "block" : "none",
         position: "relative",
@@ -142,10 +142,10 @@ export default {
         borderRadius: "1px",
         fontSize: "10px",
         pointerEvents: "initial",
-        cursor: "text"
+        cursor: "text",
       };
     },
-    testButtonStyle: function() {
+    testButtonStyle: function () {
       return {
         display: this.active ? "table-cell" : "none",
         order: "2",
@@ -164,9 +164,9 @@ export default {
         backdropFilter: "blur(4px)",
         outline: "none",
         pointerEvents: "initial",
-        cursor: "pointer"
+        cursor: "pointer",
       };
-    }
+    },
   },
   methods: {
     setActive() {
@@ -203,8 +203,8 @@ export default {
       if (bttn == "test") {
         this.testButtonIsHovered = false;
       }
-    }
-  }
+    },
+  },
 };
 </script>
 

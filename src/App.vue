@@ -4,7 +4,7 @@
       :style="{
         height: '400px',
         width: '100%',
-        backgroundColor: 'blue'
+        backgroundColor: 'blue',
       }"
     ></div>
     <div id="mindMapContainer" :style="mindMapContainerStyle">
@@ -19,9 +19,9 @@ import MindMapModule from "./components/MindMapModule.vue";
 export default {
   name: "app",
   components: {
-    MindMapModule
+    MindMapModule,
   },
-  data: function() {
+  data: function () {
     return {
       mindMapContainerStyle: {
         height: "100%",
@@ -29,40 +29,40 @@ export default {
         marginTop: "0px",
         marginLeft: "0px",
         boxSizing: "border-box",
-        padding: "20px"
+        padding: "20px",
       },
       MindMapColors: {
         background: [0, 0, 100, 0.5],
         theme: [358, 97, 67, 1],
-        theme_light: [0, 100, 84, 1]
+        theme_light: [0, 100, 84, 1],
       },
       window_size: {
         width: 0,
-        height: 0
+        height: 0,
       },
-      nodeLimit: 20
+      nodeLimit: 20,
     };
   },
   computed: {
-    appStyle: function() {
+    appStyle: function () {
       return {
         height: `${this.window_size.height}px`,
         width: `${this.window_size.width}px`,
         position: "absolute",
         top: "0px",
         left: "0px",
-        overflowX: "hidden"
+        overflowX: "hidden",
       };
-    }
+    },
   },
   methods: {
     handleResize() {
       this.$store.dispatch("update_window_size");
       //this.$store.commit("update_window_width");
       //this.$store.commit("update_window_height");
-    }
+    },
   },
-  created: function() {
+  created: function () {
     window.addEventListener("resize", this.handleResize);
 
     this.window_size.width = this.$store.state.window_width;
@@ -74,12 +74,12 @@ export default {
           this.window_size.width = state.window_width;
           this.window_size.height = state.window_height;
         }
-      }
+      },
     });
   },
-  destroyed: function() {
+  destroyed: function () {
     window.removeEventListener("resize", this.handleResize);
-  }
+  },
 };
 </script>
 

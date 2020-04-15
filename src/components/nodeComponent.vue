@@ -12,7 +12,7 @@
       :style="{
         position: 'absolute',
         top: '-25px',
-        display: 'grid'
+        display: 'grid',
       }"
     >
       <div
@@ -22,7 +22,7 @@
           width: '25px',
           backgroundColor: 'red',
           borderRadius: '50%',
-          pointerEvents: 'all'
+          pointerEvents: 'all',
         }"
         v-touch:tap.self="editNodeLabel"
       >
@@ -31,7 +31,7 @@
           ref="labelInput"
           type="text"
           :style="inputTextStyle"
-          :value="nodeLabel"
+          v-model.lazy="nodeLabel"
           @input="nodeLabel = $event.target.value"
           @keyup.enter="editNodeLabel"
         />
@@ -80,7 +80,7 @@ import qs from "querystring";
 export default {
   name: "nodeComponent",
   components: {
-    ColorPicker
+    ColorPicker,
   },
   props: {
     ID: String,
@@ -92,7 +92,7 @@ export default {
     canvasMousePos: Object,
     autoSave: {
       default: false,
-      type: Boolean
+      type: Boolean,
     },
     grid: Object,
     defaultColors: Object,
@@ -100,31 +100,31 @@ export default {
     dragging: {
       default() {
         return {
-          state: false
+          state: false,
         };
       },
-      type: Object
+      type: Object,
     },
     pressed: {
       default() {
         return {
-          state: false
+          state: false,
         };
       },
-      type: Object
+      type: Object,
     },
     nodeSelected: {
       default: false,
-      type: Boolean
+      type: Boolean,
     },
     nodeLocationDef: {
       default() {
         return { x: 0, y: 0, z: 0 };
       },
-      type: Object
-    }
+      type: Object,
+    },
   },
-  data: function() {
+  data: function () {
     return {
       minHeight: 60,
       minWidth: 120,
@@ -137,27 +137,31 @@ export default {
         source: { Label: "" },
         viz_props: {
           location: { x: 0, y: 0, z: 0 },
-          color: { h: 166, s: 89, l: 45, a: 1 }
-        }
+          color: { h: 166, s: 89, l: 45, a: 1 },
+        },
       },
       nodeSize: { height: 60, width: 160 },
       nodeBoundingBoxSize: { height: 0, width: 0 },
       draggingDeltas: { x: 0, y: 0 },
-      editingLabel: false
+      editingLabel: false,
     };
   },
   computed: {
-    nodeContainerStyle: function() {
+    nodeContainerStyle: function () {
       return {
         position: "absolute",
-        top: `${this.canvasLocation["y"] +
+        top: `${
+          this.canvasLocation["y"] +
           this.canvasSize.height / 2 +
           this.nodeLocation_.y -
-          this.nodeBoundingBoxSize.height / 2}px`,
-        left: `${this.canvasLocation["x"] +
+          this.nodeBoundingBoxSize.height / 2
+        }px`,
+        left: `${
+          this.canvasLocation["x"] +
           this.canvasSize.width / 2 +
           this.nodeLocation_.x -
-          this.nodeBoundingBoxSize.width / 2}px`,
+          this.nodeBoundingBoxSize.width / 2
+        }px`,
         minWidth: `${this.nodeLabel === "" ? this.minWidth : 0}px`,
         minHeight: `${this.nodeLabel === "" ? this.minHeight : 0}px`,
         cursor: this.dragging.state ? "grabbing" : "grab",
@@ -180,42 +184,44 @@ export default {
         display: "grid",
         gridTemplateColumns: "100%",
         padding: "4px",
-        outline: "none"
+        outline: "none",
       };
     },
-    nodeStyle: function() {
+    nodeStyle: function () {
       return {
         position: "relative",
         borderRadius: "inherit",
-        border: `1px solid hsla(${this.nodeColor.h},${this.nodeColor.s}%, ${this.nodeColor.l}%, ${this.nodeColor.a})`,
+        border: `1px solid hsla(${this.nodeColor.h},${this.nodeColor.s}%, ${this.nodeColor.l}%, 0.8)`,
         backdropFilter: "blur(2px)",
         pointerEvents: "all",
         display: "grid",
         placeItems: "center",
         boxSizing: "border-box",
-        padding: "10px 15px 10px 15px"
+        padding: "10px 15px 10px 15px",
       };
     },
-    nodeTextStyle: function() {
+    nodeTextStyle: function () {
       return {
         pointerEvents: "none",
         margin: "0px",
         maxWidth: "100px",
         overflowWrap: "break-word",
-        color: `hsla(${this.nodeColor.h},${this.nodeColor.s}%, ${this.nodeColor.l}%, ${this.nodeColor.a})`,
+        color: `hsla(${this.nodeColor.h},${this.nodeColor.s}%, ${
+          this.nodeColor.l
+        }%, ${1})`,
         background: "none",
         border: "none",
-        userSelect: "none"
+        userSelect: "none",
       };
     },
-    inputTextStyle: function() {
+    inputTextStyle: function () {
       return {
         position: "absolute",
         bottom: "20px",
-        left: "20px"
+        left: "20px",
       };
     },
-    nodeLocation_: function() {
+    nodeLocation_: function () {
       var nodeLoc = this.nodeLocation;
       if (this.dragging.state) {
         // todo: this is working as intended. Just need to detect drag differently from simply clicking in.
@@ -255,7 +261,7 @@ export default {
       */
 
       return nodeLoc;
-    }
+    },
   },
   methods: {
     startdrag(event) {
@@ -289,8 +295,8 @@ export default {
         method: "GET",
         url: this.apiUrl + `/entity/get`,
         params: { entityID: this.node_ID },
-        paramsSerializer: qs.stringify
-      }).then(response => {
+        paramsSerializer: qs.stringify,
+      }).then((response) => {
         console.log(response.data);
         this.node_data.source = response.data[0];
         this.node_data.viz_props = response.data[1].Data;
@@ -298,17 +304,24 @@ export default {
     },
     savePropToAPI(propName, data) {
       axios({
-        method: "post",
+        method: "POST",
         baseURL: this.apiUrl,
-        url: `/updateProps/${this.node_ID}`,
+        url: `/entity/updateProps/`,
         params: {
-          [propName]: data
+          entityID: this.node_ID,
+        },
+        paramsSerializer: qs.stringify,
+        data: qs.stringify({
+          props: JSON.stringify({
+            [propName]: data,
+          }),
+        }),
+      }).then(() => {
+        if (this.autoSave) {
+          // doing: ask server save state to file
+          axios.post(this.apiUrl + "/collection/save");
         }
       });
-      if (this.autoSave) {
-        // doing: ask server save state to file
-        axios.post(this.apiUrl + "/save");
-      }
     },
     updateNodeBBox(time = 100) {
       // doing: updating node's bounding box width and height
@@ -316,7 +329,7 @@ export default {
         var boundingBox = this.$refs.nodeContainer.getBoundingClientRect();
         this.nodeBoundingBoxSize = {
           width: boundingBox.width,
-          height: boundingBox.height
+          height: boundingBox.height,
         };
       }, time);
     },
@@ -331,11 +344,11 @@ export default {
             location: {
               x: this.nodeLocationDef["x"],
               y: this.nodeLocationDef["y"],
-              z: this.nodeLocationDef["z"]
-            }
-          })
-        })
-      }).then(response => {
+              z: this.nodeLocationDef["z"],
+            },
+          }),
+        }),
+      }).then((response) => {
         //console.log("getting response");
         //console.log(response);
         this.node_ID = response.data.entityID;
@@ -353,7 +366,7 @@ export default {
           this.$refs.labelInput.focus();
         }, 100);
       }
-    }
+    },
   },
   watch: {
     "dragging.state"() {
@@ -377,10 +390,7 @@ export default {
             this.createNodeInDatabase();
           }*/
           if (!this.newNode) {
-            this.savePropToAPI(
-              "location",
-              `(${this.nodeLocation_.x},${this.nodeLocation_.y}, 0)`
-            );
+            this.savePropToAPI("location", this.nodeLocation_);
           }
         }
       }
@@ -404,40 +414,38 @@ export default {
         // todo: save node Label to API
         if (this.apiValidity) {
           // todo: also set it to true when api disconnects
-          this.$axios({
-            method: "post",
-            url: this.apiUrl + `/updateSource/${this.node_ID}`,
+          axios({
+            method: "POST",
+            url: this.apiUrl + `/entity/updateLabel`,
             params: {
-              label: this.nodeLabel
+              entityID: this.node_ID,
+            },
+            paramsSerializer: qs.stringify,
+            data: qs.stringify({ Label: this.nodeLabel }),
+          }).then(() => {
+            if (this.autoSave) {
+              // doing: ask server save state to file
+              this.$axios.post(this.apiUrl + "/collection/save");
             }
           });
-          if (this.autoSave) {
-            // doing: ask server save state to file
-            this.$axios.post(this.apiUrl + "/collection/save");
-          }
         }
       }
     },
     nodeColor() {
-      this.savePropToAPI(
-        "color",
-        `(${this.nodeColor[0]},${this.nodeColor.s},${this.nodeColor.l}, ${
-          this.nodeColor.a !== undefined ? this.nodeColor.a : 1
-        })`
-      );
+      this.savePropToAPI("color", this.nodeColor);
       if (this.autoSave) {
         // doing: ask server save state to file
         this.$axios.post(this.apiUrl + "/collection/save");
       }
-    }
+    },
   },
-  created: function() {
+  created: function () {
     if (this.node_ID === undefined) {
       // create new node using the nodeAPI and take its ID
       console.log(this.node_ID);
     }
   },
-  mounted: function() {
+  mounted: function () {
     if (this.node_ID !== undefined) {
       console.log(`@ mounted ${this.node_ID}`);
       // todo: get node_label, relation_claims, data from the API using the nodeID
@@ -452,7 +460,7 @@ export default {
     this.updateNodeBBox(0);
   },
   beforeUpdate() {},
-  updated() {}
+  updated() {},
 };
 </script>
 

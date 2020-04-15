@@ -9,8 +9,7 @@
       :apiValidity="apiValidity"
       :grid="grid"
       @create-new-node="createNewNode"
-    >
-    </mind-map-canvas>
+    ></mind-map-canvas>
 
     <div
       class="debug"
@@ -27,7 +26,7 @@
         height: '100%',
         width: '100%',
         pointerEvents: 'none',
-        borderRadius: 'inherit'
+        borderRadius: 'inherit',
       }"
     >
       <div
@@ -36,7 +35,7 @@
           position: 'absolute',
           marginTop: '8px',
           marginLeft: '10px',
-          zIndex: 'unset'
+          zIndex: 'unset',
         }"
       >
         <button
@@ -58,7 +57,7 @@
             boxSizing: 'border-box',
             cursor: 'pointer',
             outline: 'none',
-            pointerEvents: 'initial'
+            pointerEvents: 'initial',
           }"
           @click.left="toggleMenu"
         >
@@ -88,13 +87,11 @@
         :colorsProcessed="colorsProcessed"
         :apiUrl="apiUrl"
         :apiValidity="apiValidity"
-      >
-      </status-bar>
+      ></status-bar>
       <about-page
         :showPage="this.showAboutPage"
         @closePage="this.aboutPageDisplay"
-      >
-      </about-page>
+      ></about-page>
     </div>
   </div>
 </template>
@@ -120,17 +117,17 @@ export default {
     aboutPage,
 
     buttonOne,
-    buttonTwo
+    buttonTwo,
   },
   props: {
     // locationHor: {'left':value} or {'right':value}
     colors: Object,
     nodeLimit: {
       default: 10,
-      type: Number
-    }
+      type: Number,
+    },
   },
-  data: function() {
+  data: function () {
     return {
       respo: "",
       showMenu: false,
@@ -141,7 +138,7 @@ export default {
         { ID: "__test_ID__", newNode: true },
         { ID: "__test_ID__1", newNode: true },
         { ID: "__test_ID__2", newNode: true },
-        { ID: "__test_ID__3", newNode: true }
+        { ID: "__test_ID__3", newNode: true },
       ],
       showAboutPage: false,
       grid: {
@@ -149,49 +146,49 @@ export default {
         opacity: 0.3,
         width: 2,
         show: true,
-        snap: true
-      }
+        snap: true,
+      },
     };
   },
   computed: {
-    menuButtons: function() {
+    menuButtons: function () {
       var list = [
         {
           text: "Load Database",
           action: this.loadCollection,
           args: [],
-          if: this.apiValidity
+          if: this.apiValidity,
         },
         {
           text: "Clear Database",
           action: this.clearDatabase,
           args: [],
-          if: this.apiValidity
+          if: this.apiValidity,
         },
         {
           text: "Save Database",
           action: this.saveDatabase,
           args: [],
-          if: this.apiValidity
+          if: this.apiValidity,
         },
         {
           text: "Archive Database",
           action: this.archiveDatabase,
           args: [],
-          if: this.apiValidity
+          if: this.apiValidity,
         },
         {
           text: "Settings",
-          action: function() {},
+          action: function () {},
           args: [],
-          if: true
+          if: true,
         },
         {
           text: "About",
           action: this.aboutPageDisplay,
           args: [true],
-          if: true
-        }
+          if: true,
+        },
       ];
       function process(value) {
         // method to process menu list
@@ -200,7 +197,7 @@ export default {
       var processedList = list.filter(process);
       return processedList;
     },
-    colorsProcessed: function() {
+    colorsProcessed: function () {
       var colors_ = {};
       for (var key in this.colors) {
         var color_ = this.colors[key];
@@ -210,14 +207,14 @@ export default {
       }
       return colors_;
     },
-    containerStyle: function() {
+    containerStyle: function () {
       var style = {
         height: "100%",
         width: "100%",
         overflow: "hidden",
         borderRadius: "15px 15px 10px 10px",
         position: "relative",
-        touchAction: "none"
+        touchAction: "none",
       };
       if (this.colors !== undefined) {
         if ("background" in this.colors) {
@@ -229,7 +226,7 @@ export default {
       }
       return style;
     },
-    centerButtonStyle: function() {
+    centerButtonStyle: function () {
       var size = 25;
       return {
         position: "absolute",
@@ -239,17 +236,19 @@ export default {
         right: 5 + "px",
         backgroundColor: `hsla(${this.colors["theme"][0]},${
           this.colors["theme"][1]
-        }%,${this.colors["theme"][2] * 1.38}%,${this.colors["theme"][3] *
-          0.5})`,
+        }%,${this.colors["theme"][2] * 1.38}%,${
+          this.colors["theme"][3] * 0.5
+        })`,
         backdropFilter: "blur(4px)",
         border: `1px solid hsla(${this.colors["theme"][0]},${
           this.colors["theme"][1]
-        }%,${this.colors["theme"][2] * 1.15}%,${this.colors["theme"][3] *
-          0.3})`,
-        borderRadius: "50%"
+        }%,${this.colors["theme"][2] * 1.15}%,${
+          this.colors["theme"][3] * 0.3
+        })`,
+        borderRadius: "50%",
       };
     },
-    mainItemsStyle: function() {
+    mainItemsStyle: function () {
       return {
         display: this.showMenu ? "grid" : "none",
         gridRowGap: "8px",
@@ -263,9 +262,9 @@ export default {
         boxSizing: "border-box",
         backdropFilter: "blur(4px)",
         borderRadius: "10px",
-        boxShadow: "hsla(0, 0%, 0%, 0.16) 0px 0px 19px 1px"
+        boxShadow: "hsla(0, 0%, 0%, 0.16) 0px 0px 19px 1px",
       };
-    }
+    },
   },
   methods: {
     loadAppSettings() {
@@ -279,22 +278,27 @@ export default {
         method: "POST",
         url: url_ + "/collection/load",
         data: qs.stringify({ Label: "testCollection" }),
-        headers: { "Content-Type": "application/x-www-form-urlencoded" }
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
       }).then(() => {
-        // todo: get a list of nodeIDs and create a list of nodes in the canvas
-        console.log(`getting list of nodes\n${url_}`);
-        axios.get(url_ + "/collection/get").then(response => {
-          //console.log(response);
-          this.collection = response["data"];
-          this.nodes = response.data.Entities.map(function(ID) {
-            return { ID: ID, newNode: false };
-          });
+        this.getCollection();
+      });
+    },
+    getCollection() {
+      var url_ = this.apiUrl;
+      // todo: get a list of nodeIDs and create a list of nodes in the canvas
+      console.log(`getting list of nodes\n${url_}`);
+      axios.get(url_ + "/collection/get").then((response) => {
+        //console.log(response);
+        this.collection = response["data"];
+        this.nodes = response.data.Entities.map(function (ID) {
+          return { ID: ID, newNode: false };
         });
       });
     },
     clearDatabase() {
       var url_ = this.apiUrl;
-      this.$axios.post(url_ + "/clear");
+      this.$axios.post(url_ + "/collection/clear");
+      this.getCollection();
     },
     saveDatabase() {
       var url_ = this.apiUrl;
@@ -312,21 +316,21 @@ export default {
       }
     },
     createNewNode(nodeLocationDef_) {
-      const uuidv1 = require("uuid/v1");
+      const uuid = require("uuid");
       this.nodes.push({
-        ID: `__test_ID__${uuidv1()}`,
+        ID: `__test_ID__${uuid.v1()}`,
         newNode: true,
-        nodeLocationDef: nodeLocationDef_
+        nodeLocationDef: nodeLocationDef_,
       });
     },
     aboutPageDisplay(showOrHide) {
       //var win = window.open('https://github.com/KarmaKast/MindMap-WebApp/tree/develop', '_blank');
       //win.focus();
       this.showAboutPage = showOrHide;
-    }
+    },
   },
   watch: {},
-  created: function() {
+  created: function () {
     //this.testAPI();
 
     //this.$store.subscribeAction((action) => {
@@ -340,11 +344,11 @@ export default {
       after: (action, state) => {
         this.apiUrl = state.apiUrl[0];
         this.apiValidity = state.apiUrl[1];
-      }
+      },
     });
   },
-  mounted: function() {},
-  updated: function() {}
+  mounted: function () {},
+  updated: function () {},
 };
 </script>
 

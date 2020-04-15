@@ -49,7 +49,7 @@
         <v-layer>
           <v-group
             :config="{
-              draggable: false
+              draggable: false,
             }"
           >
           </v-group>
@@ -64,7 +64,7 @@ import nodeComponent from "./nodeComponent";
 export default {
   name: "MindMapCanvas",
   components: {
-    nodeComponent
+    nodeComponent,
   },
   props: {
     colors: Object,
@@ -74,7 +74,7 @@ export default {
       // context: setting this to 10. With some optimizations should be increased to 100
       // or extra nodes could be loaded with minimum memory usage.
       default: 10,
-      type: Number
+      type: Number,
     },
     apiUrl: String,
     apiValidity: Boolean,
@@ -90,18 +90,18 @@ export default {
           opacity: 0,
           width: 0,
           show: true,
-          snap: true
+          snap: true,
         };
       },
-      type: Object
+      type: Object,
     },
     popupLock: {
       // context: if true disables this canvas from using popup feature * WIP *
       default: true,
-      type: Boolean
-    }
+      type: Boolean,
+    },
   },
-  data: function() {
+  data: function () {
     return {
       mindmapCanvas: null,
       dragItemId: null,
@@ -112,26 +112,26 @@ export default {
         nodeID: undefined,
         dragging: { state: false },
         pressed: { state: false },
-        selected: false
+        selected: false,
       },
 
       canvas: {
         taps: {
           timer: undefined,
-          count: 0
+          count: 0,
         },
         dragging: {
           state: false,
           event: undefined,
-          deltas: { x: 0, y: 0 }
-        }
+          deltas: { x: 0, y: 0 },
+        },
       },
       height: 0,
-      width: 0
+      width: 0,
     };
   },
   computed: {
-    processedNodes: function() {
+    processedNodes: function () {
       var nodes_ = {};
       this.nodes.forEach((key, index) => {
         if (index < this.nodeLimit) {
@@ -140,13 +140,13 @@ export default {
               state:
                 this.nodes[index].ID === this.activeNode.nodeID
                   ? this.activeNode.dragging.state
-                  : false
+                  : false,
             },
             pressed: {
               state:
                 this.nodes[index].ID === this.activeNode.nodeID
                   ? this.activeNode.pressed.state
-                  : undefined
+                  : undefined,
             },
             nodeSelected:
               this.nodes[index].ID === this.activeNode.nodeID
@@ -157,19 +157,19 @@ export default {
             nodeLocationDef:
               this.nodes[index]["nodeLocationDef"] === undefined
                 ? { x: 0, y: 0 }
-                : this.nodes[index]["nodeLocationDef"]
+                : this.nodes[index]["nodeLocationDef"],
           };
         }
       });
       return nodes_;
     },
-    canvasConfig: function() {
+    canvasConfig: function () {
       return {
         height: this.height,
-        width: this.width
+        width: this.width,
       };
     },
-    canvasContainerStyle: function() {
+    canvasContainerStyle: function () {
       return {
         height: "100%",
         width: "100%",
@@ -177,10 +177,10 @@ export default {
         top: "0px",
         left: "0px",
         overflow: "hidden",
-        backgroundColor: "inherit"
+        backgroundColor: "inherit",
       };
     },
-    gridStyle: function() {
+    gridStyle: function () {
       // todo: move color processing functionality to vuex store
       var processedColor = `hsla(${this.colors["theme_light"][0]}, ${this.colors["theme_light"][1]}%, ${this.colors["theme_light"][2]}%, ${this.grid.opacity})`;
       var size_ = this.grid.size * 2;
@@ -188,15 +188,17 @@ export default {
         height: "200%",
         width: "200%",
         position: "absolute",
-        top: `${((this.height / 2 + this.canvasLocation["y"]) % size_) -
-          size_}px`,
-        left: `${((this.width / 2 + this.canvasLocation["x"]) % size_) -
-          size_}px`,
+        top: `${
+          ((this.height / 2 + this.canvasLocation["y"]) % size_) - size_
+        }px`,
+        left: `${
+          ((this.width / 2 + this.canvasLocation["x"]) % size_) - size_
+        }px`,
         backgroundImage: `repeating-linear-gradient(rgba(255, 255, 255, 0), ${processedColor} ${this.grid.width}px, rgba(255, 255, 255, 0) ${this.grid.width}px, rgba(255, 255, 255, 0) ${size_}px), repeating-linear-gradient(90deg, rgba(255, 255, 255, 0), ${processedColor} ${this.grid.width}px, rgba(255, 255, 255, 0) ${this.grid.width}px, rgba(255, 255, 255, 0) ${size_}px)`,
-        pointerEvents: "none"
+        pointerEvents: "none",
       };
     },
-    gridCenterStyle: function() {
+    gridCenterStyle: function () {
       var size_x = this.width * 1.5;
       var size_y = this.height * 1.5;
       //var size_ = this.grid.size * 2;
@@ -204,21 +206,25 @@ export default {
         height: "400%",
         width: "400%",
         position: "absolute",
-        top: `${((this.height / 2 + this.canvasLocation["y"]) % size_y) -
-          size_y}px`,
-        left: `${((this.width / 2 + this.canvasLocation["x"]) % size_x) -
-          size_x}px`,
-        backgroundImage: `repeating-linear-gradient(rgba(255, 255, 255, 0), hsla(222, 100%, 50%, ${this
-          .grid.opacity * 2}) ${this.grid.width}px, rgba(255, 255, 255, 0) ${
+        top: `${
+          ((this.height / 2 + this.canvasLocation["y"]) % size_y) - size_y
+        }px`,
+        left: `${
+          ((this.width / 2 + this.canvasLocation["x"]) % size_x) - size_x
+        }px`,
+        backgroundImage: `repeating-linear-gradient(rgba(255, 255, 255, 0), hsla(222, 100%, 50%, ${
+          this.grid.opacity * 2
+        }) ${this.grid.width}px, rgba(255, 255, 255, 0) ${
           this.grid.width
-        }px, rgba(255, 255, 255, 0) ${size_y}px), repeating-linear-gradient(90deg, rgba(255, 255, 255, 0), hsla(177, 73%, 47%, ${this
-          .grid.opacity * 2}) ${this.grid.width}px, rgba(255, 255, 255, 0) ${
+        }px, rgba(255, 255, 255, 0) ${size_y}px), repeating-linear-gradient(90deg, rgba(255, 255, 255, 0), hsla(177, 73%, 47%, ${
+          this.grid.opacity * 2
+        }) ${this.grid.width}px, rgba(255, 255, 255, 0) ${
           this.grid.width
         }px, rgba(255, 255, 255, 0) ${size_x}px)`,
-        pointerEvents: "none"
+        pointerEvents: "none",
         /*backgroundImage: `linear-gradient(90deg, #FFFFFF 49.9%, rgba(0, 0, 0, 0.520833) 50%, rgba(255, 255, 255, 0) 51.1%)`*/
       };
-    }
+    },
   },
   methods: {
     handleTouchEnd(event) {
@@ -387,7 +393,7 @@ export default {
             } else {
               nodeLocationDef_ = {
                 x: event.changedTouches[0].clientX,
-                y: event.changedTouches[0].clientY
+                y: event.changedTouches[0].clientY,
               };
             }
             nodeLocationDef_.x =
@@ -418,37 +424,37 @@ export default {
         this.canvasMousePos.y = event.clientY - this.canvasContainerBoxLoc.y;
       }
       //console.log([this.canvasMousePos.x, this.canvasMousePos.y]);
-    }
+    },
   },
   watch: {},
-  created: function() {
+  created: function () {
     this.$store.subscribeAction({
-      after: action => {
+      after: (action) => {
         if ("update_window_size" === action.type) {
           var box = this.$refs.canvasContainer.getBoundingClientRect();
           this.height = box.height;
           this.width = box.width;
         }
-      }
+      },
     });
   },
-  mounted: function() {
+  mounted: function () {
     var box = this.$refs.canvasContainer.getBoundingClientRect();
     //console.log(box);
     this.height = box.height;
     this.width = box.width;
   },
-  beforeUpdate: function() {
+  beforeUpdate: function () {
     //console.log("before update called");
     var box = this.$refs.canvasContainer.getBoundingClientRect();
     this.height = box.height;
     this.width = box.width;
   },
-  updated: function() {
+  updated: function () {
     /*var box = this.$refs.canvasContainer.getBoundingClientRect();
     this.height = box.height;
     this.width = box.width;*/
-  }
+  },
 };
 </script>
 <style lang="sass" scoped></style>

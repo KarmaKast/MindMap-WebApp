@@ -9,7 +9,7 @@ a wrapper component that handles z-index elevation,
 
 */
 export default {
-  name: "PopupWindow"
+  name: "PopupWindow",
 };
 </script>
 <style lang="sass" scoped></style>
