@@ -48,6 +48,8 @@
   </div>
 </template>
 <script>
+import { version } from "../../package.json";
+
 export default {
   name: "aboutPage",
   props: {
@@ -56,7 +58,7 @@ export default {
   data: function () {
     return {
       isHovered: false,
-      version: "v0.4.4",
+      version: version,
     };
   },
   computed: {
