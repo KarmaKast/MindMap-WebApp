@@ -154,26 +154,26 @@ export default {
     menuButtons: function () {
       var list = [
         {
-          text: "Load Database",
+          text: "Get Collection",
+          action: this.getCollection,
+          args: [],
+          if: this.apiValidity,
+        },
+        {
+          text: "Clear Collection",
+          action: this.clearCollection,
+          args: [],
+          if: this.apiValidity,
+        },
+        {
+          text: "Save Collection",
+          action: this.saveCollection,
+          args: [],
+          if: this.apiValidity,
+        },
+        {
+          text: "Load Collection",
           action: this.loadCollection,
-          args: [],
-          if: this.apiValidity,
-        },
-        {
-          text: "Clear Database",
-          action: this.clearDatabase,
-          args: [],
-          if: this.apiValidity,
-        },
-        {
-          text: "Save Database",
-          action: this.saveDatabase,
-          args: [],
-          if: this.apiValidity,
-        },
-        {
-          text: "Archive Database",
-          action: this.archiveDatabase,
           args: [],
           if: this.apiValidity,
         },
@@ -295,18 +295,14 @@ export default {
         });
       });
     },
-    clearDatabase() {
+    clearCollection() {
       var url_ = this.apiUrl;
       this.$axios.post(url_ + "/collection/clear");
       this.getCollection();
     },
-    saveDatabase() {
+    saveCollection() {
       var url_ = this.apiUrl;
       this.$axios.post(url_ + "/collection/save");
-    },
-    archiveDatabase() {
-      var url_ = this.apiUrl;
-      this.$axios.post(url_ + "/archive/pack");
     },
     toggleMenu() {
       if (this.showMenu) {
