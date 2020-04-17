@@ -18,7 +18,7 @@
           backgroundColor: 'rgba(255,255,255,0.5)',
           color: 'black',
           borderRadius: '5px',
-          boxShadow: `0px 0px 0 1px red`
+          boxShadow: `0px 0px 0 1px red`,
         }"
       >
         {{ apiUrl }}
@@ -34,16 +34,16 @@ export default {
     colors: Object,
     colorsProcessed: Object,
     apiUrl: String,
-    apiValidity: Boolean
+    apiValidity: Boolean,
   },
-  data: function() {
+  data: function () {
     return {
       height: 20,
-      padding: 2
+      padding: 2,
     };
   },
   computed: {
-    statusBarStyle: function() {
+    statusBarStyle: function () {
       return {
         position: "absolute",
         bottom: "0px",
@@ -63,10 +63,10 @@ export default {
 
         backgroundColor: `${this.colorsProcessed["background"]}`,
         backdropFilter: "blur(3px)",
-        backgroundImage: `repeating-linear-gradient(45deg,rgba(255, 255, 255, 0), rgba(255, 173, 173, 0.49) 1px, rgba(255, 255, 255, 0) 1px, rgba(255, 255, 255, 0) 6px), repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0), rgba(255, 173, 173, 0.51) 1px, rgba(255, 255, 255, 0) 1px, rgba(255, 255, 255, 0) 6px)`
+        backgroundImage: `repeating-linear-gradient(45deg,rgba(255, 255, 255, 0), rgba(255, 173, 173, 0.49) 1px, rgba(255, 255, 255, 0) 1px, rgba(255, 255, 255, 0) 6px), repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0), rgba(255, 173, 173, 0.51) 1px, rgba(255, 255, 255, 0) 1px, rgba(255, 255, 255, 0) 6px)`,
       };
     },
-    apiStatusContainerStyle: function() {
+    apiStatusContainerStyle: function () {
       return {
         height: "90%",
         minWidth: `${this.height}px`,
@@ -74,10 +74,10 @@ export default {
         padding: "1px",
         display: "grid",
         gridTemplateColumns: "auto auto",
-        gridColumnGap: this.apiValidity ? "5px" : "0px"
+        gridColumnGap: this.apiValidity ? "5px" : "0px",
       };
     },
-    apiStatusStyle: function() {
+    apiStatusStyle: function () {
       return {
         order: "2",
         height: "100%",
@@ -88,10 +88,10 @@ export default {
         borderRadius: `${this.height}px`,
         border: "1.2px dotted white",
         boxShadow: "0px 0px 3px 1px hsla(0, 0%, 0%, 0.32)",
-        boxSizing: "border-box"
+        boxSizing: "border-box",
       };
-    }
-  }
+    },
+  },
 };
 </script>
 <style lang="sass" scoped></style>

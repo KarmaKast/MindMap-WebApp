@@ -5,11 +5,11 @@
       :colorsProcessed="colorsProcessed"
       :apiUrl="this.apiUrl"
       :nodes="nodes"
+      :nodeLimit="nodeLimit"
       :apiValidity="apiValidity"
       :grid="grid"
       @create-new-node="createNewNode"
-    >
-    </mind-map-canvas>
+    ></mind-map-canvas>
 
     <div
       class="debug"
@@ -26,7 +26,7 @@
         height: '100%',
         width: '100%',
         pointerEvents: 'none',
-        borderRadius: 'inherit'
+        borderRadius: 'inherit',
       }"
     >
       <div
@@ -35,7 +35,7 @@
           position: 'absolute',
           marginTop: '8px',
           marginLeft: '10px',
-          zIndex: 'unset'
+          zIndex: 'unset',
         }"
       >
         <button
@@ -57,7 +57,7 @@
             boxSizing: 'border-box',
             cursor: 'pointer',
             outline: 'none',
-            pointerEvents: 'initial'
+            pointerEvents: 'initial',
           }"
           @click.left="toggleMenu"
         >
@@ -87,13 +87,11 @@
         :colorsProcessed="colorsProcessed"
         :apiUrl="apiUrl"
         :apiValidity="apiValidity"
-      >
-      </status-bar>
+      ></status-bar>
       <about-page
         :showPage="this.showAboutPage"
         @closePage="this.aboutPageDisplay"
-      >
-      </about-page>
+      ></about-page>
     </div>
   </div>
 </template>
@@ -107,6 +105,9 @@ import buttonOne from "./button1.vue";
 import buttonTwo from "./button2.vue";
 
 //import {uuidv1} from 'uuid/v1';
+import axios from "axios";
+import qs from "querystring";
+//import * as morphCore from "@karmakast/morph-dbms-core";
 
 export default {
   name: "MindMapModule",
@@ -116,27 +117,28 @@ export default {
     aboutPage,
 
     buttonOne,
-    buttonTwo
+    buttonTwo,
   },
   props: {
     // locationHor: {'left':value} or {'right':value}
     colors: Object,
     nodeLimit: {
       default: 10,
-      type: Number
-    }
+      type: Number,
+    },
   },
-  data: function() {
+  data: function () {
     return {
       respo: "",
       showMenu: false,
       apiUrl: "",
       apiValidity: false,
+      collection: null,
       nodes: [
         { ID: "__test_ID__", newNode: true },
         { ID: "__test_ID__1", newNode: true },
         { ID: "__test_ID__2", newNode: true },
-        { ID: "__test_ID__3", newNode: true }
+        { ID: "__test_ID__3", newNode: true },
       ],
       showAboutPage: false,
       grid: {
@@ -144,49 +146,49 @@ export default {
         opacity: 0.3,
         width: 2,
         show: true,
-        snap: true
-      }
+        snap: true,
+      },
     };
   },
   computed: {
-    menuButtons: function() {
+    menuButtons: function () {
       var list = [
         {
-          text: "Load Database",
-          action: this.loadDatabase,
+          text: "Get Collection",
+          action: this.getCollection,
           args: [],
-          if: this.apiValidity
+          if: this.apiValidity,
         },
         {
-          text: "Clear Database",
-          action: this.clearDatabase,
+          text: "Clear Collection",
+          action: this.clearCollection,
           args: [],
-          if: this.apiValidity
+          if: this.apiValidity,
         },
         {
-          text: "Save Database",
-          action: this.saveDatabase,
+          text: "Save Collection",
+          action: this.saveCollection,
           args: [],
-          if: this.apiValidity
+          if: this.apiValidity,
         },
         {
-          text: "Archive Database",
-          action: this.archiveDatabase,
+          text: "Load Collection",
+          action: this.loadCollection,
           args: [],
-          if: this.apiValidity
+          if: this.apiValidity,
         },
         {
           text: "Settings",
-          action: function() {},
+          action: function () {},
           args: [],
-          if: true
+          if: true,
         },
         {
           text: "About",
           action: this.aboutPageDisplay,
           args: [true],
-          if: true
-        }
+          if: true,
+        },
       ];
       function process(value) {
         // method to process menu list
@@ -195,7 +197,7 @@ export default {
       var processedList = list.filter(process);
       return processedList;
     },
-    colorsProcessed: function() {
+    colorsProcessed: function () {
       var colors_ = {};
       for (var key in this.colors) {
         var color_ = this.colors[key];
@@ -205,14 +207,14 @@ export default {
       }
       return colors_;
     },
-    containerStyle: function() {
+    containerStyle: function () {
       var style = {
         height: "100%",
         width: "100%",
         overflow: "hidden",
         borderRadius: "15px 15px 10px 10px",
         position: "relative",
-        touchAction: "none"
+        touchAction: "none",
       };
       if (this.colors !== undefined) {
         if ("background" in this.colors) {
@@ -224,7 +226,7 @@ export default {
       }
       return style;
     },
-    centerButtonStyle: function() {
+    centerButtonStyle: function () {
       var size = 25;
       return {
         position: "absolute",
@@ -234,17 +236,19 @@ export default {
         right: 5 + "px",
         backgroundColor: `hsla(${this.colors["theme"][0]},${
           this.colors["theme"][1]
-        }%,${this.colors["theme"][2] * 1.38}%,${this.colors["theme"][3] *
-          0.5})`,
+        }%,${this.colors["theme"][2] * 1.38}%,${
+          this.colors["theme"][3] * 0.5
+        })`,
         backdropFilter: "blur(4px)",
         border: `1px solid hsla(${this.colors["theme"][0]},${
           this.colors["theme"][1]
-        }%,${this.colors["theme"][2] * 1.15}%,${this.colors["theme"][3] *
-          0.3})`,
-        borderRadius: "50%"
+        }%,${this.colors["theme"][2] * 1.15}%,${
+          this.colors["theme"][3] * 0.3
+        })`,
+        borderRadius: "50%",
       };
     },
-    mainItemsStyle: function() {
+    mainItemsStyle: function () {
       return {
         display: this.showMenu ? "grid" : "none",
         gridRowGap: "8px",
@@ -258,38 +262,47 @@ export default {
         boxSizing: "border-box",
         backdropFilter: "blur(4px)",
         borderRadius: "10px",
-        boxShadow: "hsla(0, 0%, 0%, 0.16) 0px 0px 19px 1px"
+        boxShadow: "hsla(0, 0%, 0%, 0.16) 0px 0px 19px 1px",
       };
-    }
+    },
   },
   methods: {
     loadAppSettings() {
       // todo: WIP
       // load app settings from app_settings.json either during mounted or created
     },
-    loadDatabase() {
+    loadCollection() {
       var url_ = this.apiUrl;
-      this.$axios.get(url_ + "/load");
+      // todo: directly using testCollection for now. Later a collection explorer feature need to be added.
+      axios({
+        method: "POST",
+        url: url_ + "/collection/load",
+        data: qs.stringify({ Label: "testCollection" }),
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      }).then(() => {
+        this.getCollection();
+      });
+    },
+    getCollection() {
+      var url_ = this.apiUrl;
       // todo: get a list of nodeIDs and create a list of nodes in the canvas
       console.log(`getting list of nodes\n${url_}`);
-      this.$axios.get(url_ + "/get/nodeIDs").then(response => {
+      axios.get(url_ + "/collection/get").then((response) => {
         //console.log(response);
-        this.nodes = response["data"]["IDs"].map(function(ID) {
+        this.collection = response["data"];
+        this.nodes = response.data.Entities.map(function (ID) {
           return { ID: ID, newNode: false };
         });
       });
     },
-    clearDatabase() {
+    clearCollection() {
       var url_ = this.apiUrl;
-      this.$axios.post(url_ + "/clear");
+      this.$axios.post(url_ + "/collection/clear");
+      this.getCollection();
     },
-    saveDatabase() {
+    saveCollection() {
       var url_ = this.apiUrl;
-      this.$axios.post(url_ + "/save");
-    },
-    archiveDatabase() {
-      var url_ = this.apiUrl;
-      this.$axios.post(url_ + "/archive/pack");
+      this.$axios.post(url_ + "/collection/save");
     },
     toggleMenu() {
       if (this.showMenu) {
@@ -298,18 +311,22 @@ export default {
         this.showMenu = true;
       }
     },
-    createNewNode() {
-      const uuidv1 = require("uuid/v1");
-      this.nodes.push({ ID: `__test_ID__${uuidv1()}`, newNode: true });
+    createNewNode(nodeLocationDef_) {
+      const uuid = require("uuid");
+      this.nodes.push({
+        ID: `__test_ID__${uuid.v1()}`,
+        newNode: true,
+        nodeLocationDef: nodeLocationDef_,
+      });
     },
     aboutPageDisplay(showOrHide) {
       //var win = window.open('https://github.com/KarmaKast/MindMap-WebApp/tree/develop', '_blank');
       //win.focus();
       this.showAboutPage = showOrHide;
-    }
+    },
   },
   watch: {},
-  created: function() {
+  created: function () {
     //this.testAPI();
 
     //this.$store.subscribeAction((action) => {
@@ -323,11 +340,11 @@ export default {
       after: (action, state) => {
         this.apiUrl = state.apiUrl[0];
         this.apiValidity = state.apiUrl[1];
-      }
+      },
     });
   },
-  mounted: function() {},
-  updated: function() {}
+  mounted: function () {},
+  updated: function () {},
 };
 </script>
 

@@ -20,15 +20,15 @@
         <br />
         A Mindmap web app that uses
         <a
-          href="https://github.com/KarmaKast/nodeLib/tree/develop"
+          href="https://github.com/KarmaKast/morph-dbms-core"
           :style="{ pointerEvents: 'initial' }"
           target="_blank"
-          >nodeLib</a
+          >morph-dbms-core</a
         >
-        graph DBMS library. Currently everything is in prototyping state. <br />
+        . Currently everything is in prototyping state. <br />
         <br />
         <a
-          href="https://github.com/KarmaKast/MindMap-WebApp/tree/develop"
+          href="https://github.com/KarmaKast/MindMap-WebApp"
           :style="{ pointerEvents: 'initial' }"
           target="_blank"
         >
@@ -48,19 +48,21 @@
   </div>
 </template>
 <script>
+import { version } from "../../package.json";
+
 export default {
   name: "aboutPage",
   props: {
-    showPage: Boolean
+    showPage: Boolean,
   },
-  data: function() {
+  data: function () {
     return {
       isHovered: false,
-      version: "v0.4.3"
+      version: version,
     };
   },
   computed: {
-    containerStyle: function() {
+    containerStyle: function () {
       return {
         height: "100%",
         width: "100%",
@@ -69,10 +71,10 @@ export default {
         display: "grid",
         placeItems: "center",
 
-        pointerEvents: "all"
+        pointerEvents: "all",
       };
     },
-    aboutSectionStyle: function() {
+    aboutSectionStyle: function () {
       return {
         background: "rgba(255, 255, 255, 0.5)",
         borderRadius: "28px",
@@ -87,10 +89,10 @@ export default {
         display: "grid",
         gridTemplateRows: "30px auto",
         gridTemplateColumns: "30px auto",
-        gridRowGap: "10px"
+        gridRowGap: "10px",
       };
     },
-    closeButtonStyle: function() {
+    closeButtonStyle: function () {
       return {
         background: this.isHovered
           ? "rgba(255, 255, 255, 0.8)"
@@ -104,10 +106,10 @@ export default {
         display: "grid",
         placeItems: "center",
         outline: "none",
-        cursor: "pointer"
+        cursor: "pointer",
       };
     },
-    pStyle: function() {
+    pStyle: function () {
       return {
         height: "auto",
         width: "auto",
@@ -116,9 +118,9 @@ export default {
         boxSizing: "border-box",
         padding: "20px 20px",
         margin: "0px",
-        textAlign: "left"
+        textAlign: "left",
       };
-    }
+    },
   },
   watch: {
     showPage() {
@@ -127,7 +129,7 @@ export default {
       } else {
         window.removeEventListener("keyup", this.onEscapeKeyUp);
       }
-    }
+    },
   },
   methods: {
     onEscapeKeyUp(event) {
@@ -138,8 +140,8 @@ export default {
     },
     closePage() {
       this.$emit("closePage", false);
-    }
-  }
+    },
+  },
 };
 </script>
 <style lang="sass" scoped></style>

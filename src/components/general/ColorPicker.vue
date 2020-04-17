@@ -4,7 +4,7 @@
       :style="{
         padding: '8px 15px',
         background: '#ffa7a7',
-        borderRadius: '20px 5px 5px 5px'
+        borderRadius: '20px 5px 5px 5px',
       }"
     >
       <div
@@ -12,7 +12,7 @@
           width: '200px',
           height: '100px',
           backgroundColor: 'blue',
-          borderRadius: '5px'
+          borderRadius: '5px',
         }"
       ></div>
     </div>
@@ -21,7 +21,7 @@
         width: '20px',
         height: '20px',
         borderRadius: '50%',
-        backgroundColor: 'blue'
+        backgroundColor: 'blue',
       }"
     ></div>
   </div>
@@ -34,19 +34,19 @@ a color picker component that mainly deals with hsla and looks consistant with t
 export default {
   name: "ColorPicker",
   components: {},
-  data: function() {
+  data: function () {
     return {};
   },
   computed: {
-    ContainerStyle: function() {
+    ContainerStyle: function () {
       return {
         display: "grid",
         position: "absolute",
         bottom: "40px",
-        gridGap: "2px"
+        gridGap: "2px",
       };
-    }
-  }
+    },
+  },
 };
 </script>
 <style lang="sass" scoped></style>
