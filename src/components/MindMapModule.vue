@@ -338,8 +338,10 @@ export default {
     //});
     this.$store.subscribeAction({
       after: (action, state) => {
-        this.apiUrl = state.apiUrl[0];
-        this.apiValidity = state.apiUrl[1];
+        if (action.type === "update_apiUrl") {
+          this.apiUrl = state.apiUrl[0];
+          this.apiValidity = state.apiUrl[1];
+        }
       },
     });
   },

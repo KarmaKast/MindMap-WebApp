@@ -11,6 +11,11 @@ export default new Vuex.Store({
     canvas_width: 0,*/
     apiUrl: ["", false],
     theme: [],
+
+    relClaimMode: {
+      mode: false,
+      targetID: null,
+    },
   },
   mutations: {
     update_window_height(state) {
@@ -30,6 +35,11 @@ export default new Vuex.Store({
     },
     update_apiUrlValidity(state, isValid) {
       state.apiUrl[1] = isValid;
+    },
+
+    update_relClaimMode(state, relClaimMode) {
+      state.relClaimMode.mode = relClaimMode.mode;
+      state.relClaimMode.targetID = relClaimMode.targetID;
     },
   },
   getters: {},
