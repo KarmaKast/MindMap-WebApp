@@ -41,8 +41,13 @@
         :grid="grid"
         :targetRelSpots="value.targetRelSpots"
         @nodeActivated="nodeActivated"
+        @setSelfRelSpots="
+          (relSpots) => {
+            setSelfRelSpots(key_, relSpots);
+          }
+        "
         @getTargetRelSpots="
-          function a(targetID) {
+          (targetID) => {
             getTargetRelSpots(key_, targetID);
           }
         "
@@ -121,6 +126,7 @@ export default {
       },
       height: 0,
       width: 0,
+      relClaimTargetSpots: {},
       relClaimSpots: {},
     };
   },
@@ -128,32 +134,32 @@ export default {
     processedNodes: function () {
       var nodes_ = {};
       this.nodes.forEach((value, index) => {
-        console.log({ value, index });
+        //console.log({ value, index });
         if (index < this.nodeLimit) {
           nodes_[value.ID] = {
             dragging: {
               state:
-                this.nodes[index].ID === this.activeNode.nodeID
+                value.ID === this.activeNode.nodeID
                   ? this.activeNode.dragging.state
                   : false,
             },
             pressed: {
               state:
-                this.nodes[index].ID === this.activeNode.nodeID
+                value.ID === this.activeNode.nodeID
                   ? this.activeNode.pressed.state
                   : undefined,
             },
             nodeSelected:
-              this.nodes[index].ID === this.activeNode.nodeID
+              value.ID === this.activeNode.nodeID
                 ? this.activeNode.selected
                 : false,
             canvasMousePos: this.canvasMousePos,
-            newNode: this.nodes[index].newNode,
+            newNode: value.newNode,
             nodeLocationDef:
               this.nodes[index]["nodeLocationDef"] === undefined
                 ? { x: 0, y: 0 }
                 : this.nodes[index]["nodeLocationDef"],
-            targetRelSpots: this.relClaimSpots[value.ID],
+            targetRelSpots: this.relClaimTargetSpots[value.ID],
           };
         }
       });
@@ -422,8 +428,22 @@ export default {
       //console.log([this.canvasMousePos.x, this.canvasMousePos.y]);
     },
     getTargetRelSpots(claimantID, targetID) {
-      console.log(claimantID, targetID);
-      this.relClaimSpots[claimantID] = { [targetID]: [200, 25] };
+      //console.log(claimantID, targetID);
+      this.relClaimTargetSpots[claimantID] = {
+        [targetID]: this.relClaimSpots[targetID],
+      };
+    },
+    setSelfRelSpots(entityID, relSpots) {
+      //console.log(claimantID, targetID);
+      this.relClaimSpots[entityID] = relSpots;
+      for (const claimantID in this.relClaimTargetSpots) {
+        for (const targetID in this.relClaimTargetSpots[claimantID]) {
+          if (targetID === entityID) {
+            this.relClaimTargetSpots[claimantID] = { [targetID]: relSpots };
+            console.log("this should be happening", claimantID);
+          }
+        }
+      }
     },
   },
   watch: {},

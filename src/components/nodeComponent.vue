@@ -1,19 +1,10 @@
 <template>
   <div ref="nodeContainer" :style="nodeContainerStyle">
-    <div
-      id="relationWires"
-      :style="{
-        position: 'absolute',
-        left: '0px',
-        top: '0px',
-        pointerEvents: 'none',
-        position: 'absolute',
-      }"
-    >
+    <div id="relationWires" :style="relationWiresStyle">
       <v-stage
         :config="{
-          width: this.canvasSize.width,
-          height: this.canvasSize.height,
+          width: this.relStageSize.width,
+          height: this.relStageSize.height,
         }"
       >
         <v-layer>
@@ -22,7 +13,7 @@
               v-for="(relClaim, index) in node_data.source.RelationClaims"
               :key="index"
               :config="{
-                points: getRelWirePoints(relClaim),
+                points: targetRelationSpots[relClaim.To],
                 stroke: 'red',
                 strokeWidth: 1,
                 lineCap: 'round',
@@ -284,14 +275,59 @@ export default {
       return nodeLoc;
     },
     relationWiresStyle: function () {
-      return 0;
+      return {
+        position: "absolute",
+        left:
+          0 -
+          this.canvasLocation.x -
+          this.canvasSize.width / 2 -
+          this.nodeLocation_.x +
+          this.nodeBoundingBoxSize.width / 2 +
+          "px",
+        top:
+          0 -
+          this.canvasLocation.y -
+          this.canvasSize.height / 2 -
+          this.nodeLocation_.y +
+          this.nodeBoundingBoxSize.height / 2 +
+          "px",
+        pointerEvents: "none",
+        position: "absolute",
+      };
     },
     relationSpots: function () {
       var boundingBox = this.$refs.nodeContainer.getBoundingClientRect();
       //console.log(boundingBox);
-      if (this.dragging.state)
+      if (this.dragging.state && this.canvasLocation.x)
         boundingBox = this.$refs.nodeContainer.getBoundingClientRect();
-      return [boundingBox.left, boundingBox.right];
+      return [
+        boundingBox.left,
+        boundingBox.right,
+        boundingBox.top,
+        boundingBox.bottom,
+      ];
+    },
+    targetRelationSpots: function () {
+      //console.log({ relClaim });
+      //this.$emit("getTargetRelSpots", relClaim.To);
+
+      let res = {};
+      for (const relClaim of this.node_data.source.RelationClaims) {
+        let spots = this.targetRelSpots
+          ? this.targetRelSpots[relClaim.To]
+          : undefined;
+        //console.log(this.targetRelSpots[relClaim.To]);
+        res[relClaim.To] = [
+          this.relationSpots[0],
+          (this.relationSpots[2] + this.relationSpots[3]) / 2,
+          spots ? spots[0] : 0,
+          spots ? (spots[2] + spots[3]) / 2 : 0,
+        ];
+      }
+      return res;
+    },
+    relStageSize: function () {
+      return this.canvasSize;
     },
   },
   methods: {
@@ -328,9 +364,12 @@ export default {
         params: { entityID: this.node_ID },
         paramsSerializer: qs.stringify,
       }).then((response) => {
-        console.log(response.data);
+        //console.log(response.data);
         this.node_data.source = response.data[0];
         this.node_data.viz_props = response.data[1].Data;
+        this.$emit("setSelfRelSpots", this.relationSpots);
+        for (const relClaim of this.node_data.source.RelationClaims)
+          this.$emit("getTargetRelSpots", relClaim.To);
       });
     },
     savePropToAPI(propName, data) {
@@ -407,8 +446,6 @@ export default {
       if (!this.relClaimMode.mode && this.$store.state.relClaimMode.mode) {
         console.log(event);
         if (event.type === "mouseup") {
-          this.$emit("");
-
           this.$store.commit("update_relClaimMode", {
             mode: true,
             targetID: this.node_ID,
@@ -440,9 +477,13 @@ export default {
       });
     },
     getRelWirePoints(relClaim) {
-      console.log({ relClaim });
+      //console.log({ relClaim });
       this.$emit("getTargetRelSpots", relClaim.To);
-      return [0, 25, 200, 25];
+      let spots = this.targetRelSpots
+        ? this.targetRelSpots[relClaim.to]
+        : undefined;
+      console.log(spots);
+      return [0, 25, spots ? spots[0] : 200, 25];
     },
   },
   watch: {
@@ -469,6 +510,7 @@ export default {
           if (!this.newNode) {
             this.savePropToAPI("location", this.nodeLocation_);
           }
+          this.$emit("setSelfRelSpots", this.relationSpots);
         }
       }
     },
