@@ -1,23 +1,42 @@
 <template>
   <div ref="nodeContainer" :style="nodeContainerStyle">
-    <div id="node" :style="nodeStyle" v-touch:start.self="startdrag">
-      <!--<input type="text" :style="nodeTextStyle" :value="nodeLabel" />-->
-      <p :style="nodeTextStyle">
-        {{ nodeLabel }}
-      </p>
+    <div id="relationWires" :style="relationWiresStyle">
+      <v-stage
+        :config="{
+          width: this.relStageSize.width,
+          height: this.relStageSize.height,
+        }"
+      >
+        <v-layer>
+          <v-group>
+            <v-line
+              v-for="(relClaim, index) in node_data.source.RelationClaims"
+              :key="index"
+              :config="{
+                points: targetRelationSpots[relClaim.To],
+                stroke: 'red',
+                strokeWidth: 1,
+                lineCap: 'round',
+                lineJoin: 'round',
+              }"
+            ></v-line>
+          </v-group>
+        </v-layer>
+      </v-stage>
     </div>
     <div
       v-if="nodeSelected"
       id="nodeUI"
       :style="{
         position: 'absolute',
-        top: '-25px',
         display: 'grid',
       }"
     >
       <div
         id="editLabelBttn"
         :style="{
+          position: 'absolute',
+          bottom: '5px',
           height: '25px',
           width: '25px',
           backgroundColor: 'red',
@@ -36,37 +55,33 @@
           @keyup.enter="editNodeLabel"
         />
       </div>
-      <color-picker> </color-picker>
+      <color-picker v-if="false"></color-picker>
+
+      <div
+        :style="{
+          position: 'absolute',
+          top: '18px',
+          left: '130px',
+          height: '25px',
+          width: '25px',
+          backgroundColor: 'blue',
+          borderRadius: '50%',
+          pointerEvents: 'all',
+        }"
+        v-touch:start.self="startRelClaimMode"
+        v-touch:end="confirmRelClaimTarget"
+      ></div>
+    </div>
+    <div
+      id="node"
+      :style="nodeStyle"
+      v-touch:start.self="startdrag"
+      v-touch:end="confirmRelClaimTarget"
+    >
+      <!--<input type="text" :style="nodeTextStyle" :value="nodeLabel" />-->
+      <p :style="nodeTextStyle">{{ nodeLabel }}</p>
     </div>
   </div>
-  <!--<v-group
-    ref="nodeGroup"
-    :config="{
-      x: this.canvasSize['width'] / 2 - 80,
-      y: this.canvasSize['height'] / 2 - 20,
-      draggable: true
-    }"
-  >
-    <v-rect
-      ref="rect"
-      :config="{
-        width: 160,
-        height: 40,
-        fill: 'rgba(255,255,255,0.2)',
-        shadowBlur: 0,
-        cornerRadius: 50,
-        stroke: 'red',
-        strokeWidth: 0.5,
-        draggable: false
-      }"
-    />
-    <v-text
-      :config="{
-        text: this.nodeLabel
-      }"
-    >
-    </v-text>
-  </v-group>-->
 </template>
 
 <script>
@@ -87,7 +102,7 @@ export default {
     newNodeDef: Boolean,
     apiUrl: String,
     apiValidity: Boolean,
-    canvasSize: Object,
+    canvasSize: { height: Number, width: Number },
     canvasLocation: Object,
     canvasMousePos: Object,
     autoSave: {
@@ -123,6 +138,7 @@ export default {
       },
       type: Object,
     },
+    targetRelSpots: Object,
   },
   data: function () {
     return {
@@ -134,7 +150,7 @@ export default {
       nodeColor: { h: 0, s: 0, l: 0, a: 1 },
       newNode: this.newNodeDef,
       node_data: {
-        source: { Label: "" },
+        source: { Label: "", RelationClaims: [] },
         viz_props: {
           location: { x: 0, y: 0, z: 0 },
           color: { h: 166, s: 89, l: 45, a: 1 },
@@ -144,6 +160,7 @@ export default {
       nodeBoundingBoxSize: { height: 0, width: 0 },
       draggingDeltas: { x: 0, y: 0 },
       editingLabel: false,
+      relClaimMode: { mode: false, targetID: null },
     };
   },
   computed: {
@@ -167,7 +184,10 @@ export default {
         cursor: this.dragging.state ? "grabbing" : "grab",
         zIndex: this.dragging.state ? "5000" : "unset",
 
-        backgroundColor: this.editingLabel ? "white" : "hsla(0,0%,0%,0.01)",
+        backgroundColor:
+          this.editingLabel && this.nodeSelected
+            ? "white"
+            : "hsla(0,0%,0%,0.01)",
         border: `1px dotted hsla(${this.nodeColor.h},${this.nodeColor.s}%,${this.nodeColor.l}%, 0.2)`,
         borderRadius:
           this.nodeSize["height"] > this.nodeSize["width"]
@@ -252,15 +272,62 @@ export default {
           nodeLoc.y += boundingBox.height / 2 - this.draggingDeltas.y;
         }
       }
-      //console.log(nodeLoc);
-      /*
-      doing: debugging: on touch start nodelocation goes wrong
-      Note: if I touch somewhere on the canvas and then touch the node the node goes to that location
-      Analysis: while using mouse this.canvasMousePos already is on the node but with mouse it is not.
-      Solution: before emitting event set canvasMousePos.x using the same calculation in nodeContainerStyle.left
-      */
-
       return nodeLoc;
+    },
+    relationWiresStyle: function () {
+      return {
+        position: "absolute",
+        left:
+          0 -
+          this.canvasLocation.x -
+          this.canvasSize.width / 2 -
+          this.nodeLocation_.x +
+          this.nodeBoundingBoxSize.width / 2 +
+          "px",
+        top:
+          0 -
+          this.canvasLocation.y -
+          this.canvasSize.height / 2 -
+          this.nodeLocation_.y +
+          this.nodeBoundingBoxSize.height / 2 +
+          "px",
+        pointerEvents: "none",
+        position: "absolute",
+      };
+    },
+    relationSpots: function () {
+      var boundingBox = this.$refs.nodeContainer.getBoundingClientRect();
+      //console.log(boundingBox);
+      if (this.dragging.state && this.canvasLocation.x)
+        boundingBox = this.$refs.nodeContainer.getBoundingClientRect();
+      return [
+        boundingBox.left,
+        boundingBox.right,
+        boundingBox.top,
+        boundingBox.bottom,
+      ];
+    },
+    targetRelationSpots: function () {
+      //console.log({ relClaim });
+      //this.$emit("getTargetRelSpots", relClaim.To);
+
+      let res = {};
+      for (const relClaim of this.node_data.source.RelationClaims) {
+        let spots = this.targetRelSpots
+          ? this.targetRelSpots[relClaim.To]
+          : undefined;
+        //console.log(this.targetRelSpots[relClaim.To]);
+        res[relClaim.To] = [
+          this.relationSpots[0],
+          (this.relationSpots[2] + this.relationSpots[3]) / 2,
+          spots ? spots[0] : 0,
+          spots ? (spots[2] + spots[3]) / 2 : 0,
+        ];
+      }
+      return res;
+    },
+    relStageSize: function () {
+      return this.canvasSize;
     },
   },
   methods: {
@@ -297,9 +364,12 @@ export default {
         params: { entityID: this.node_ID },
         paramsSerializer: qs.stringify,
       }).then((response) => {
-        console.log(response.data);
+        //console.log(response.data);
         this.node_data.source = response.data[0];
         this.node_data.viz_props = response.data[1].Data;
+        this.$emit("setSelfRelSpots", this.relationSpots);
+        for (const relClaim of this.node_data.source.RelationClaims)
+          this.$emit("getTargetRelSpots", relClaim.To);
       });
     },
     savePropToAPI(propName, data) {
@@ -367,6 +437,54 @@ export default {
         }, 100);
       }
     },
+    startRelClaimMode() {
+      this.relClaimMode.mode = true;
+      this.$store.commit("update_relClaimMode", this.relClaimMode);
+      console.log("starting relclaim mode on node : ", this.node_ID);
+    },
+    confirmRelClaimTarget(event) {
+      if (!this.relClaimMode.mode && this.$store.state.relClaimMode.mode) {
+        console.log(event);
+        if (event.type === "mouseup") {
+          this.$store.commit("update_relClaimMode", {
+            mode: true,
+            targetID: this.node_ID,
+          });
+        } else {
+          console.log("touch mode not implimented yet");
+        }
+      }
+    },
+    addRelClaim() {
+      axios({
+        method: "POST",
+        baseURL: this.apiUrl,
+        url: `/entity/addRelClaim`,
+        data: qs.stringify({
+          claimantID: this.node_ID,
+          targetID: this.relClaimMode.targetID,
+        }),
+      }).then((response) => {
+        //console.log("getting response");
+        //console.log(response);
+        //this.node_ID = response.data.entityID;
+        this.relClaimMode.mode = false;
+        this.relClaimMode.targetID = null;
+        console.log(JSON.parse(response.data.relClaim));
+        this.node_data.source.RelationClaims.push(
+          JSON.parse(response.data.relClaim)
+        );
+      });
+    },
+    getRelWirePoints(relClaim) {
+      //console.log({ relClaim });
+      this.$emit("getTargetRelSpots", relClaim.To);
+      let spots = this.targetRelSpots
+        ? this.targetRelSpots[relClaim.to]
+        : undefined;
+      console.log(spots);
+      return [0, 25, spots ? spots[0] : 200, 25];
+    },
   },
   watch: {
     "dragging.state"() {
@@ -392,6 +510,7 @@ export default {
           if (!this.newNode) {
             this.savePropToAPI("location", this.nodeLocation_);
           }
+          this.$emit("setSelfRelSpots", this.relationSpots);
         }
       }
     },
@@ -458,6 +577,17 @@ export default {
       this.createNodeInDatabase();
     }
     this.updateNodeBBox(0);
+
+    //if (this.relClaimMode.mode)
+    this.$store.subscribe((mutation, state) => {
+      if (this.relClaimMode.mode)
+        if (mutation.type === "update_relClaimMode") {
+          console.log(state.relClaimMode.targetID);
+          this.relClaimMode.targetID = state.relClaimMode.targetID;
+          if (this.relClaimMode.targetID !== null && this.apiValidity)
+            this.addRelClaim();
+        }
+    });
   },
   beforeUpdate() {},
   updated() {},

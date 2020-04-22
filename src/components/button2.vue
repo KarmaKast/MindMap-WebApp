@@ -6,9 +6,14 @@
     </p>
     <button
       :style="this.buttonStyle"
+      @mousedown="clickStarted = true"
+      @mouseup="clickStarted = false"
       @click.left="emitTakeAction"
       @mouseover="setButtonHovered('main')"
-      @mouseout="unsetButtonHovered('main')"
+      @mouseout="
+        clickStarted = false;
+        unsetButtonHovered('main');
+      "
     ></button>
   </div>
 </template>
@@ -26,6 +31,7 @@ export default {
       mainButtonIsHovered: false,
       size: [32, 174],
       isHovered: false,
+      clickStarted: false,
     };
   },
   computed: {
@@ -64,10 +70,17 @@ export default {
         top: "0px",
         height: `100%`,
         width: `100%`,
-        border: `0.5px dashed ${this.colorsProcessed["theme"]}`,
+        border: this.mainButtonIsHovered
+          ? `0.5px dashed ${this.colorsProcessed["theme"]}`
+          : "none",
         boxSizing: "border-box",
+        boxShadow: this.mainButtonIsHovered
+          ? this.clickStarted
+            ? "rgba(0, 0, 0, 0.24) 0px 0px 3px 0px"
+            : "rgba(0, 0, 0, 0.24) 0px 0px 6px 0px"
+          : "rgba(0, 0, 0, 0.24) 0px 0px 3px 0px",
         backdropFilter: "blur(4px)",
-        borderRadius: "inherit",
+        borderRadius: "8px",
         textAlign: "center",
       };
     },

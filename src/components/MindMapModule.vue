@@ -66,7 +66,7 @@
             :style="{ color: 'rgb(255, 164, 164)', userSelect: 'none' }"
           />
         </button>
-        <div id="menuItems" :style="this.mainItemsStyle">
+        <div id="menuItems" :style="this.menuItemsStyle">
           <button-one
             :validity="this.apiValidity"
             :colors="colors"
@@ -248,10 +248,10 @@ export default {
         borderRadius: "50%",
       };
     },
-    mainItemsStyle: function () {
+    menuItemsStyle: function () {
       return {
         display: this.showMenu ? "grid" : "none",
-        gridRowGap: "8px",
+        gridRowGap: "12px",
         position: "absolute",
         top: "0px",
         left: "60px",
@@ -261,7 +261,7 @@ export default {
         border: `0.5px dashed ${this.colorsProcessed["theme"]}`,
         boxSizing: "border-box",
         backdropFilter: "blur(4px)",
-        borderRadius: "10px",
+        borderRadius: "15px",
         boxShadow: "hsla(0, 0%, 0%, 0.16) 0px 0px 19px 1px",
       };
     },
@@ -338,8 +338,10 @@ export default {
     //});
     this.$store.subscribeAction({
       after: (action, state) => {
-        this.apiUrl = state.apiUrl[0];
-        this.apiValidity = state.apiUrl[1];
+        if (action.type === "update_apiUrl") {
+          this.apiUrl = state.apiUrl[0];
+          this.apiValidity = state.apiUrl[1];
+        }
       },
     });
   },

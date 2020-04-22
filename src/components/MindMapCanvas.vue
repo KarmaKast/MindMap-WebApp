@@ -39,22 +39,20 @@
         :nodeLocationDef="value.nodeLocationDef"
         :newNodeDef="value.newNode"
         :grid="grid"
+        :targetRelSpots="value.targetRelSpots"
         @nodeActivated="nodeActivated"
+        @setSelfRelSpots="
+          (relSpots) => {
+            setSelfRelSpots(key_, relSpots);
+          }
+        "
+        @getTargetRelSpots="
+          (targetID) => {
+            getTargetRelSpots(key_, targetID);
+          }
+        "
       >
       </nodeComponent>
-    </div>
-
-    <div id="relationWires" :style="{ pointerEvents: 'none' }">
-      <v-stage ref="stage" :config="canvasConfig">
-        <v-layer>
-          <v-group
-            :config="{
-              draggable: false,
-            }"
-          >
-          </v-group>
-        </v-layer>
-      </v-stage>
     </div>
   </div>
 </template>
@@ -128,36 +126,40 @@ export default {
       },
       height: 0,
       width: 0,
+      relClaimTargetSpots: {},
+      relClaimSpots: {},
     };
   },
   computed: {
     processedNodes: function () {
       var nodes_ = {};
-      this.nodes.forEach((key, index) => {
+      this.nodes.forEach((value, index) => {
+        //console.log({ value, index });
         if (index < this.nodeLimit) {
-          nodes_[this.nodes[index].ID] = {
+          nodes_[value.ID] = {
             dragging: {
               state:
-                this.nodes[index].ID === this.activeNode.nodeID
+                value.ID === this.activeNode.nodeID
                   ? this.activeNode.dragging.state
                   : false,
             },
             pressed: {
               state:
-                this.nodes[index].ID === this.activeNode.nodeID
+                value.ID === this.activeNode.nodeID
                   ? this.activeNode.pressed.state
                   : undefined,
             },
             nodeSelected:
-              this.nodes[index].ID === this.activeNode.nodeID
+              value.ID === this.activeNode.nodeID
                 ? this.activeNode.selected
                 : false,
             canvasMousePos: this.canvasMousePos,
-            newNode: this.nodes[index].newNode,
+            newNode: value.newNode,
             nodeLocationDef:
               this.nodes[index]["nodeLocationDef"] === undefined
                 ? { x: 0, y: 0 }
                 : this.nodes[index]["nodeLocationDef"],
+            targetRelSpots: this.relClaimTargetSpots[value.ID],
           };
         }
       });
@@ -378,14 +380,14 @@ export default {
     },
     handleCanvasTap(event) {
       event.preventDefault();
-      console.log(event);
+      //console.log(event);
       this.canvas.taps.count += 1;
       var tapMaxInterval = 250;
       if (this.canvas.taps.timer === undefined) {
         this.canvas.taps.timer = setTimeout(() => {
           if (this.canvas.taps.count > 1) {
             this.canvas.taps.count = 0;
-            console.log("this is double tap i guess?");
+            //console.log("this is double tap i guess?");
 
             var nodeLocationDef_ = { x: 0, y: 0 };
             if (event.type.startsWith("mouse")) {
@@ -404,7 +406,7 @@ export default {
             this.$emit("create-new-node", nodeLocationDef_);
           } else {
             this.canvas.taps.count = 0;
-            console.log("this is single tap i guess?");
+            //console.log("this is single tap i guess?");
           }
           this.canvas.taps.timer = undefined;
         }, tapMaxInterval);
@@ -424,6 +426,24 @@ export default {
         this.canvasMousePos.y = event.clientY - this.canvasContainerBoxLoc.y;
       }
       //console.log([this.canvasMousePos.x, this.canvasMousePos.y]);
+    },
+    getTargetRelSpots(claimantID, targetID) {
+      //console.log(claimantID, targetID);
+      this.relClaimTargetSpots[claimantID] = {
+        [targetID]: this.relClaimSpots[targetID],
+      };
+    },
+    setSelfRelSpots(entityID, relSpots) {
+      //console.log(claimantID, targetID);
+      this.relClaimSpots[entityID] = relSpots;
+      for (const claimantID in this.relClaimTargetSpots) {
+        for (const targetID in this.relClaimTargetSpots[claimantID]) {
+          if (targetID === entityID) {
+            this.relClaimTargetSpots[claimantID] = { [targetID]: relSpots };
+            console.log("this should be happening", claimantID);
+          }
+        }
+      }
     },
   },
   watch: {},
