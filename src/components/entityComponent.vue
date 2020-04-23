@@ -25,7 +25,7 @@
       </v-stage>
     </div>
     <div
-      v-if="nodeSelected"
+      v-if="entitySelected"
       id="nodeUI"
       :style="{
         position: 'absolute',
@@ -70,7 +70,7 @@
         }"
         v-touch:tap.self="
           () => {
-            this.$emit('removeEntity', this.node_ID);
+            this.$emit('removeEntity', this.entityID);
           }
         "
       ></div>
@@ -110,12 +110,12 @@ import qs from "querystring";
 //import * as morphCore from "@karmakast/morph-dbms-core";
 
 export default {
-  name: "nodeComponent",
+  name: "entityComponent",
   components: {
     ColorPicker,
   },
   props: {
-    ID: String,
+    entityID: String,
     apiUrl: String,
     apiValidity: Boolean,
     canvasSize: { height: Number, width: Number },
@@ -144,11 +144,11 @@ export default {
       },
       type: Object,
     },
-    nodeSelected: {
+    entitySelected: {
       default: false,
       type: Boolean,
     },
-    nodeLocationDef: {
+    entityLocationDef: {
       default() {
         return { x: 0, y: 0, z: 0 };
       },
@@ -160,9 +160,8 @@ export default {
     return {
       minHeight: 60,
       minWidth: 120,
-      nodeLocation: this.nodeLocationDef,
+      nodeLocation: this.entityLocationDef,
       nodeLabel: "",
-      node_ID: this.ID,
       nodeColor: { h: 0, s: 0, l: 0, a: 1 },
       node_data: {
         source: { Label: "", RelationClaims: [] },
@@ -200,7 +199,7 @@ export default {
         zIndex: this.dragging.state ? "5000" : "unset",
 
         backgroundColor:
-          this.editingLabel && this.nodeSelected
+          this.editingLabel && this.entitySelected
             ? "white"
             : "hsla(0,0%,0%,0.01)",
         border: `1px dotted hsla(${this.nodeColor.h},${this.nodeColor.s}%,${this.nodeColor.l}%, 0.2)`,
@@ -366,7 +365,7 @@ export default {
               event.touches[0].clientY - boundingBox.y + this.canvasLocation.y;
           }
           this.$emit("setStartingCanvasMousePos", event);
-          this.$emit("nodeActivated", event, this.ID);
+          this.$emit("entityActivated", event, this.entityID);
         }
       }
     },
@@ -376,7 +375,7 @@ export default {
       axios({
         method: "GET",
         url: this.apiUrl + `/entity/get`,
-        params: { entityID: this.node_ID },
+        params: { entityID: this.entityID },
         paramsSerializer: qs.stringify,
       }).then((response) => {
         //console.log(response.data);
@@ -393,7 +392,7 @@ export default {
         baseURL: this.apiUrl,
         url: `/entity/updateProps/`,
         params: {
-          entityID: this.node_ID,
+          entityID: this.entityID,
         },
         paramsSerializer: qs.stringify,
         data: qs.stringify({
@@ -431,7 +430,7 @@ export default {
     startRelClaimMode() {
       this.relClaimMode.mode = true;
       this.$store.commit("update_relClaimMode", this.relClaimMode);
-      console.log("starting relclaim mode on node : ", this.node_ID);
+      console.log("starting relclaim mode on node : ", this.entityID);
     },
     confirmRelClaimTarget(event) {
       if (!this.relClaimMode.mode && this.$store.state.relClaimMode.mode) {
@@ -439,7 +438,7 @@ export default {
         if (event.type === "mouseup") {
           this.$store.commit("update_relClaimMode", {
             mode: true,
-            targetID: this.node_ID,
+            targetID: this.entityID,
           });
         } else {
           console.log("touch mode not implimented yet");
@@ -452,13 +451,10 @@ export default {
         baseURL: this.apiUrl,
         url: `/entity/addRelClaim`,
         data: qs.stringify({
-          claimantID: this.node_ID,
+          claimantID: this.entityID,
           targetID: this.relClaimMode.targetID,
         }),
       }).then((response) => {
-        //console.log("getting response");
-        //console.log(response);
-        //this.node_ID = response.data.entityID;
         this.relClaimMode.mode = false;
         this.relClaimMode.targetID = null;
         console.log(JSON.parse(response.data.relClaim));
@@ -517,7 +513,7 @@ export default {
           method: "POST",
           url: this.apiUrl + `/entity/updateLabel`,
           params: {
-            entityID: this.node_ID,
+            entityID: this.entityID,
           },
           paramsSerializer: qs.stringify,
           data: qs.stringify({ Label: this.nodeLabel }),
@@ -537,15 +533,10 @@ export default {
       }
     },
   },
-  created: function () {
-    if (this.node_ID === undefined) {
-      // create new node using the nodeAPI and take its ID
-      console.log(this.node_ID);
-    }
-  },
+  created: function () {},
   mounted: function () {
-    if (this.node_ID !== undefined) {
-      console.log(`@ mounted ${this.node_ID}`);
+    if (this.entityID !== undefined) {
+      console.log(`@ mounted ${this.entityID}`);
       // todo: get node_label, relation_claims, data from the API using the nodeID
     }
     this.getNodeData();

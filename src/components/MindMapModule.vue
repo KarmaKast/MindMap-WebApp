@@ -4,11 +4,11 @@
       :colors="this.colors"
       :colorsProcessed="colorsProcessed"
       :apiUrl="this.apiUrl"
-      :nodes="nodes"
-      :nodeLimit="nodeLimit"
+      :entities="entities"
+      :entityLimit="entityLimit"
       :apiValidity="apiValidity"
       :grid="grid"
-      @create-new-node="createNewNode"
+      @create-new-entity="createNewNode"
       @dropEntity="dropEntity"
     ></mind-map-canvas>
 
@@ -123,8 +123,8 @@ export default {
   props: {
     // locationHor: {'left':value} or {'right':value}
     colors: Object,
-    nodeLimit: {
-      default: 10,
+    entityLimit: {
+      default: 25,
       type: Number,
     },
   },
@@ -135,7 +135,7 @@ export default {
       apiUrl: "",
       apiValidity: false,
       collection: null,
-      nodes: [],
+      entities: [],
       showAboutPage: false,
       grid: {
         size: 25,
@@ -288,8 +288,8 @@ export default {
         .then((response) => {
           //console.log(response);
           this.collection = response["data"];
-          this.nodes = response.data.Entities.map(function (ID) {
-            return { ID: ID, newNode: false };
+          this.entities = response.data.Entities.map((ID) => {
+            return { ID: ID };
           });
         })
         .catch((err) => this.loadCollection());
@@ -311,7 +311,11 @@ export default {
       }
     },
     createNewNode(nodeLocationDef_) {
-      if (this.apiValidity)
+      if (!this.apiValidity) {
+        alert("Connect to API");
+      } else if (!this.entities.length >= this.entityLimit) {
+        alert(`Sorry! Max nodes are limited to : ${this.entityLimit} for now.`);
+      } else {
         axios({
           method: "POST",
           baseURL: this.apiUrl,
@@ -319,9 +323,9 @@ export default {
           data: qs.stringify({
             vizProps: JSON.stringify({
               location: {
-                x: nodeLocationDef_["x"],
-                y: nodeLocationDef_["y"],
-                z: nodeLocationDef_["z"],
+                x: nodeLocationDef_.x,
+                y: nodeLocationDef_.y,
+                z: nodeLocationDef_.z,
               },
             }),
           }),
@@ -330,27 +334,24 @@ export default {
             //console.log("getting response");
             console.log(response);
             //this.node_ID = response.data.entityID;
-            this.nodes.push({
+            this.entities.push({
               ID: response.data.entityID,
-              newNode: false,
               nodeLocationDef: nodeLocationDef_,
             });
           })
           .catch((err) => console.log("Error: ", err));
-      else {
-        alert("Connect to API");
       }
       /*
-      this.nodes.push({
+      this.entities.push({
         ID: `__test_ID__${uuid.v1()}`,
         newNode: true,
         nodeLocationDef: nodeLocationDef_,
       });*/
     },
     dropEntity(entityID) {
-      for (const index in this.nodes) {
-        if (this.nodes[index].ID === entityID) {
-          this.$delete(this.nodes, index);
+      for (const index in this.entities) {
+        if (this.entities[index].ID === entityID) {
+          this.$delete(this.entities, index);
           break;
         }
       }
