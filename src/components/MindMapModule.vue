@@ -134,12 +134,7 @@ export default {
       apiUrl: "",
       apiValidity: false,
       collection: null,
-      nodes: [
-        { ID: "__test_ID__", newNode: true },
-        { ID: "__test_ID__1", newNode: true },
-        { ID: "__test_ID__2", newNode: true },
-        { ID: "__test_ID__3", newNode: true },
-      ],
+      nodes: [],
       showAboutPage: false,
       grid: {
         size: 25,
@@ -312,12 +307,39 @@ export default {
       }
     },
     createNewNode(nodeLocationDef_) {
-      const uuid = require("uuid");
+      if (this.apiValidity)
+        axios({
+          method: "POST",
+          baseURL: this.apiUrl,
+          url: `/entity/create`,
+          data: qs.stringify({
+            vizProps: JSON.stringify({
+              location: {
+                x: this.nodeLocationDef["x"],
+                y: this.nodeLocationDef["y"],
+                z: this.nodeLocationDef["z"],
+              },
+            }),
+          }),
+        }).then((response) => {
+          //console.log("getting response");
+          //console.log(response);
+          //this.node_ID = response.data.entityID;
+          this.nodes.push({
+            ID: response.data.entityID,
+            newNode: false,
+            nodeLocationDef: nodeLocationDef_,
+          });
+        });
+      else {
+        alert("Connect to API");
+      }
+      /*
       this.nodes.push({
         ID: `__test_ID__${uuid.v1()}`,
         newNode: true,
         nodeLocationDef: nodeLocationDef_,
-      });
+      });*/
     },
     aboutPageDisplay(showOrHide) {
       //var win = window.open('https://github.com/KarmaKast/MindMap-WebApp/tree/develop', '_blank');

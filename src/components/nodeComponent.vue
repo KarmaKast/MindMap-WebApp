@@ -99,7 +99,6 @@ export default {
   },
   props: {
     ID: String,
-    newNodeDef: Boolean,
     apiUrl: String,
     apiValidity: Boolean,
     canvasSize: { height: Number, width: Number },
@@ -148,7 +147,6 @@ export default {
       nodeLabel: "",
       node_ID: this.ID,
       nodeColor: { h: 0, s: 0, l: 0, a: 1 },
-      newNode: this.newNodeDef,
       node_data: {
         source: { Label: "", RelationClaims: [] },
         viz_props: {
@@ -426,9 +424,6 @@ export default {
     },
     editNodeLabel(event) {
       console.log(event);
-      /*if (this.newNode) {
-        this.newNode = false;
-      }*/
       this.editingLabel = this.editingLabel ? false : true;
       //setInterval
       if (this.editingLabel) {
@@ -503,13 +498,7 @@ export default {
           //console.log(msg);
           // todo: WIP
           //console.log([this.nodeLocation_.x, this.nodeLocation_.y, 0]);
-          /*if (this.newNode) {
-            this.newNode = false;
-            this.createNodeInDatabase();
-          }*/
-          if (!this.newNode) {
-            this.savePropToAPI("location", this.nodeLocation_);
-          }
+          this.savePropToAPI("location", this.nodeLocation_);
           this.$emit("setSelfRelSpots", this.relationSpots);
         }
       }
@@ -522,32 +511,26 @@ export default {
     "node_data.source"() {
       this.nodeLabel = this.node_data.source.Label;
     },
-    newNode() {
+    nodeLabel() {
       // doing: updating node's bounding box width and height
       this.updateNodeBBox();
-    },
-    nodeLabel() {
-      if (!this.newNode) {
-        // doing: updating node's bounding box width and height
-        this.updateNodeBBox();
-        // todo: save node Label to API
-        if (this.apiValidity) {
-          // todo: also set it to true when api disconnects
-          axios({
-            method: "POST",
-            url: this.apiUrl + `/entity/updateLabel`,
-            params: {
-              entityID: this.node_ID,
-            },
-            paramsSerializer: qs.stringify,
-            data: qs.stringify({ Label: this.nodeLabel }),
-          }).then(() => {
-            if (this.autoSave) {
-              // doing: ask server save state to file
-              this.$axios.post(this.apiUrl + "/collection/save");
-            }
-          });
-        }
+      // todo: save node Label to API
+      if (this.apiValidity) {
+        // todo: also set it to true when api disconnects
+        axios({
+          method: "POST",
+          url: this.apiUrl + `/entity/updateLabel`,
+          params: {
+            entityID: this.node_ID,
+          },
+          paramsSerializer: qs.stringify,
+          data: qs.stringify({ Label: this.nodeLabel }),
+        }).then(() => {
+          if (this.autoSave) {
+            // doing: ask server save state to file
+            this.$axios.post(this.apiUrl + "/collection/save");
+          }
+        });
       }
     },
     nodeColor() {
@@ -569,13 +552,8 @@ export default {
       console.log(`@ mounted ${this.node_ID}`);
       // todo: get node_label, relation_claims, data from the API using the nodeID
     }
-    if (!this.newNode) {
-      this.getNodeData();
-    }
-    if (this.newNode && this.apiValidity) {
-      this.newNode = false;
-      this.createNodeInDatabase();
-    }
+    this.getNodeData();
+
     this.updateNodeBBox(0);
 
     //if (this.relClaimMode.mode)
