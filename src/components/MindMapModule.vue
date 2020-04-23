@@ -9,6 +9,7 @@
       :apiValidity="apiValidity"
       :grid="grid"
       @create-new-node="createNewNode"
+      @dropEntity="dropEntity"
     ></mind-map-canvas>
 
     <div
@@ -291,7 +292,7 @@ export default {
             return { ID: ID, newNode: false };
           });
         })
-        .catch((err) => console.log(err, err.message));
+        .catch((err) => this.loadCollection());
     },
     clearCollection() {
       var url_ = this.apiUrl;
@@ -346,6 +347,14 @@ export default {
         nodeLocationDef: nodeLocationDef_,
       });*/
     },
+    dropEntity(entityID) {
+      for (const index in this.nodes) {
+        if (this.nodes[index].ID === entityID) {
+          this.$delete(this.nodes, index);
+          break;
+        }
+      }
+    },
     aboutPageDisplay(showOrHide) {
       //var win = window.open('https://github.com/KarmaKast/MindMap-WebApp/tree/develop', '_blank');
       //win.focus();
@@ -355,11 +364,7 @@ export default {
   watch: {
     apiValidity() {
       if (this.apiValidity) {
-        try {
-          this.getCollection();
-        } catch (err) {
-          this.loadCollection();
-        }
+        this.getCollection();
       }
     },
   },

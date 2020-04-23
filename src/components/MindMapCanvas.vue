@@ -40,6 +40,7 @@
         :newNodeDef="value.newNode"
         :grid="grid"
         :targetRelSpots="value.targetRelSpots"
+        @removeEntity="removeEntity"
         @nodeActivated="nodeActivated"
         @setSelfRelSpots="
           (relSpots) => {
@@ -57,7 +58,11 @@
   </div>
 </template>
 <script>
+import Vue from "vue";
 import nodeComponent from "./nodeComponent";
+
+import axios from "axios";
+import qs from "querystring";
 
 export default {
   name: "MindMapCanvas",
@@ -429,9 +434,29 @@ export default {
     },
     getTargetRelSpots(claimantID, targetID) {
       //console.log(claimantID, targetID);
-      this.relClaimTargetSpots[claimantID] = {
+      const value = {
         [targetID]: this.relClaimSpots[targetID],
       };
+      this.relClaimTargetSpots[claimantID] = this.relClaimTargetSpots[
+        claimantID
+      ]
+        ? Object.assign(this.relClaimTargetSpots[claimantID], value)
+        : value;
+      //this.relClaimTargetSpots =
+      console.log(
+        Object.assign({}, this.relClaimTargetSpots, {
+          [claimantID]: { [targetID]: this.relClaimSpots[targetID] },
+        })
+      );
+      /*
+      Vue.set(this.relClaimTargetSpots, claimantID, {
+        [targetID]: this.relClaimSpots[claimantID],
+      });*/
+
+      /*
+      this.relClaimTargetSpots = Object.assign({}, this.relClaimTargetSpots, {
+        [claimantID]: { [targetID]: this.relClaimSpots[claimantID] },
+      });*/
     },
     setSelfRelSpots(entityID, relSpots) {
       //console.log(claimantID, targetID);
@@ -439,11 +464,50 @@ export default {
       for (const claimantID in this.relClaimTargetSpots) {
         for (const targetID in this.relClaimTargetSpots[claimantID]) {
           if (targetID === entityID) {
-            this.relClaimTargetSpots[claimantID] = { [targetID]: relSpots };
+            const value = {
+              [targetID]: relSpots,
+            };
+            this.relClaimTargetSpots[claimantID] = this.relClaimTargetSpots[
+              claimantID
+            ]
+              ? Object.assign(this.relClaimTargetSpots[claimantID], value)
+              : value;
+            //this.relClaimTargetSpots[claimantID] = { [targetID]: relSpots };
             //console.log("this should be happening", claimantID);
           }
         }
       }
+      /*
+      this.relClaimSpots = Object.assign({}, this.relClaimSpots, {
+        [entityID]: relSpots,
+      });
+      for (const claimantID in this.relClaimTargetSpots) {
+        for (const targetID in this.relClaimTargetSpots[claimantID]) {
+          if (targetID === entityID) {
+            this.relClaimTargetSpots = Object.assign(
+              {},
+              this.relClaimTargetSpots,
+              {
+                [claimantID]: {
+                  [targetID]: relSpots,
+                },
+              }
+            );
+            //console.log("this should be happening", claimantID);
+          }
+        }
+      }*/
+    },
+    removeEntity(entityID) {
+      var url_ = this.apiUrl;
+      axios({
+        method: "POST",
+        url: url_ + "/entity/remove",
+        data: qs.stringify({ entityID: entityID }),
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      }).then(() => {
+        this.$emit("dropEntity", entityID);
+      });
     },
   },
   watch: {},

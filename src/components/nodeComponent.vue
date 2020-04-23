@@ -39,7 +39,7 @@
           bottom: '5px',
           height: '25px',
           width: '25px',
-          backgroundColor: 'red',
+          backgroundColor: '#ad37de',
           borderRadius: '50%',
           pointerEvents: 'all',
         }"
@@ -56,12 +56,29 @@
         />
       </div>
       <color-picker v-if="false"></color-picker>
-
+      <div
+        id="removeEntityBttn"
+        :style="{
+          position: 'absolute',
+          left: '30px',
+          bottom: '5px',
+          height: '25px',
+          width: '25px',
+          backgroundColor: '#ff1a02',
+          borderRadius: '50%',
+          pointerEvents: 'all',
+        }"
+        v-touch:tap.self="
+          () => {
+            this.$emit('removeEntity', this.node_ID);
+          }
+        "
+      ></div>
       <div
         :style="{
           position: 'absolute',
-          top: '18px',
-          left: '130px',
+          top: '14px',
+          left: '140px',
           height: '25px',
           width: '25px',
           backgroundColor: 'blue',
