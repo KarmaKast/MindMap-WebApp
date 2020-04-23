@@ -5,7 +5,7 @@
     :style="canvasContainerStyle"
     @mousemove="getMousePos"
     v-touch:moving="getMousePos"
-    v-touch:end.prevent="deactivateAllNodes"
+    v-touch:end.prevent="deactivateAllEntities"
     v-touch:start.self="setCanvasDragging"
     v-touch:end.self="setCanvasDragging"
     v-touch:tap.self="handleCanvasTap"
@@ -20,11 +20,11 @@
       id="grid"
       :style="gridCenterStyle"
     ></div>
-    <div id="nodes">
-      <nodeComponent
-        v-for="(value, key_) in processedNodes"
+    <div id="entities">
+      <entityComponent
+        v-for="(value, key_) in processedEntities"
         :key="key_"
-        :ID="key_"
+        :entityID="key_"
         :apiUrl="apiUrl"
         :autoSave="false"
         :apiValidity="apiValidity"
@@ -35,12 +35,12 @@
         :defaultColors="colors"
         :dragging="value.dragging"
         :pressed="value.pressed"
-        :nodeSelected="value.nodeSelected"
-        :nodeLocationDef="value.nodeLocationDef"
-        :newNodeDef="value.newNode"
+        :entitySelected="value.entitySelected"
+        :entityLocationDef="value.entityLocationDef"
         :grid="grid"
         :targetRelSpots="value.targetRelSpots"
-        @nodeActivated="nodeActivated"
+        @removeEntity="removeEntity"
+        @entityActivated="entityActivated"
         @setSelfRelSpots="
           (relSpots) => {
             setSelfRelSpots(key_, relSpots);
@@ -52,23 +52,27 @@
           }
         "
       >
-      </nodeComponent>
+      </entityComponent>
     </div>
   </div>
 </template>
 <script>
-import nodeComponent from "./nodeComponent";
+import Vue from "vue";
+import entityComponent from "./entityComponent";
+
+import axios from "axios";
+import qs from "querystring";
 
 export default {
   name: "MindMapCanvas",
   components: {
-    nodeComponent,
+    entityComponent,
   },
   props: {
     colors: Object,
     colorsProcessed: Object,
-    nodes: Array,
-    nodeLimit: {
+    entities: Array,
+    entityLimit: {
       // context: setting this to 10. With some optimizations should be increased to 100
       // or extra nodes could be loaded with minimum memory usage.
       default: 10,
@@ -106,8 +110,8 @@ export default {
       canvasLocation: { x: 0, y: 0 },
       canvasMousePos: { x: 0, y: 0 },
       canvasContainerBoxLoc: { x: 0, y: 0 },
-      activeNode: {
-        nodeID: undefined,
+      activeEntity: {
+        entityID: undefined,
         dragging: { state: false },
         pressed: { state: false },
         selected: false,
@@ -131,39 +135,38 @@ export default {
     };
   },
   computed: {
-    processedNodes: function () {
-      var nodes_ = {};
-      this.nodes.forEach((value, index) => {
+    processedEntities: function () {
+      var processedEntities = {};
+      this.entities.forEach((value, index) => {
         //console.log({ value, index });
-        if (index < this.nodeLimit) {
-          nodes_[value.ID] = {
+        if (index < this.entityLimit) {
+          processedEntities[value.ID] = {
             dragging: {
               state:
-                value.ID === this.activeNode.nodeID
-                  ? this.activeNode.dragging.state
+                value.ID === this.activeEntity.entityID
+                  ? this.activeEntity.dragging.state
                   : false,
             },
             pressed: {
               state:
-                value.ID === this.activeNode.nodeID
-                  ? this.activeNode.pressed.state
+                value.ID === this.activeEntity.entityID
+                  ? this.activeEntity.pressed.state
                   : undefined,
             },
-            nodeSelected:
-              value.ID === this.activeNode.nodeID
-                ? this.activeNode.selected
+            entitySelected:
+              value.ID === this.activeEntity.entityID
+                ? this.activeEntity.selected
                 : false,
             canvasMousePos: this.canvasMousePos,
-            newNode: value.newNode,
-            nodeLocationDef:
-              this.nodes[index]["nodeLocationDef"] === undefined
+            entityLocationDef:
+              this.entities[index]["entityLocationDef"] === undefined
                 ? { x: 0, y: 0 }
-                : this.nodes[index]["nodeLocationDef"],
+                : this.entities[index]["entityLocationDef"],
             targetRelSpots: this.relClaimTargetSpots[value.ID],
           };
         }
       });
-      return nodes_;
+      return processedEntities;
     },
     canvasConfig: function () {
       return {
@@ -234,72 +237,72 @@ export default {
 
       if (event.target) this.setcanvas.dragging();
 
-      this.deactivateAllNodes(event);
+      this.deactivateAllEntities(event);
     },
     updateCanvasContainerBoxLoc() {
       // context: since canvas bounding box x,y is taken once at the start of the drag, if for some reason canvas container position changes relative to the window top-left it will make the drag to malfunction
       this.canvasContainerBoxLoc.x = this.$refs.canvasContainer.getBoundingClientRect().x;
       this.canvasContainerBoxLoc.y = this.$refs.canvasContainer.getBoundingClientRect().y;
     },
-    nodeActivated(event, ID) {
+    entityActivated(event, ID) {
       /**
        * context: wait for 100ms to see if canvas has no mouseup Event.
        * If it does within 100ms consider it as a mouse press else drag.
        */
       //console.log("drag started at canvas");
 
-      var diffNode = this.activeNode.nodeID !== ID;
-      this.activeNode.nodeID = ID;
+      var diffEntity = this.activeEntity.entityID !== ID;
+      this.activeEntity.entityID = ID;
       //console.log("node pressed");
-      this.activeNode.pressed.state = true;
+      this.activeEntity.pressed.state = true;
 
       setTimeout(() => {
-        if (this.activeNode.pressed.state) {
+        if (this.activeEntity.pressed.state) {
           //console.log("started dragging");
           /**
            * also check for mouse position change to detect drag. eg: if delta is more than 5px
            */
-          this.activeNode.dragging.state = true;
-          this.activeNode.selected = false;
+          this.activeEntity.dragging.state = true;
+          this.activeEntity.selected = false;
 
           this.updateCanvasContainerBoxLoc();
         } else {
-          if (ID === this.activeNode.nodeID) {
-            this.activeNode.selected = diffNode
+          if (ID === this.activeEntity.entityID) {
+            this.activeEntity.selected = diffEntity
               ? true
-              : this.activeNode.selected
+              : this.activeEntity.selected
               ? false
               : true;
-            //console.log(this.activeNode.selected);
+            //console.log(this.activeEntity.selected);
           }
         }
       }, 100);
     },
-    deactivateAllNodes(event) {
+    deactivateAllEntities(event) {
       if ([1].includes(event.which) || event.type === "touchend") {
         //console.log(event);
-        if (this.activeNode.pressed.state === false) {
+        if (this.activeEntity.pressed.state === false) {
           // context: this is on the canvas
           if (this.$refs.canvasContainer === event.target) {
-            this.activeNode.selected = false;
-            this.activeNode.nodeID = undefined;
+            this.activeEntity.selected = false;
+            this.activeEntity.entityID = undefined;
           }
         } else {
           // context: this is for the node
           //console.log("node unpressed");
-          this.activeNode.pressed.state = false;
-          if (this.activeNode.dragging.state) {
+          this.activeEntity.pressed.state = false;
+          if (this.activeEntity.dragging.state) {
             //console.log(event);
-            this.activeNode.dragging.state = false;
+            this.activeEntity.dragging.state = false;
           }
         }
       }
     },
     getMousePos(event) {
-      if (this.activeNode.dragging.state === true) {
+      if (this.activeEntity.dragging.state === true) {
         // todo: if dragging pass canvasMousePos to nodes else pass undefined
       }
-      if (this.activeNode.dragging.state || this.canvas.dragging.state) {
+      if (this.activeEntity.dragging.state || this.canvas.dragging.state) {
         if (event.type === "mousemove") {
           //console.log(event);
           this.canvasMousePos.x = event.clientX - this.canvasContainerBoxLoc.x;
@@ -383,34 +386,34 @@ export default {
       //console.log(event);
       this.canvas.taps.count += 1;
       var tapMaxInterval = 250;
-      if (this.canvas.taps.timer === undefined) {
-        this.canvas.taps.timer = setTimeout(() => {
-          if (this.canvas.taps.count > 1) {
-            this.canvas.taps.count = 0;
-            //console.log("this is double tap i guess?");
+      //if (this.canvas.taps.timer === undefined) {
+      this.canvas.taps.timer = setTimeout(() => {
+        if (this.canvas.taps.count > 1) {
+          this.canvas.taps.count = 0;
+          //console.log("this is double tap i guess?");
 
-            var nodeLocationDef_ = { x: 0, y: 0 };
-            if (event.type.startsWith("mouse")) {
-              nodeLocationDef_ = { x: event.clientX, y: event.clientY };
-            } else {
-              nodeLocationDef_ = {
-                x: event.changedTouches[0].clientX,
-                y: event.changedTouches[0].clientY,
-              };
-            }
-            nodeLocationDef_.x =
-              nodeLocationDef_.x - this.width / 2 - this.canvasLocation.x;
-            nodeLocationDef_.y =
-              nodeLocationDef_.y - this.height / 2 - this.canvasLocation.y;
-
-            this.$emit("create-new-node", nodeLocationDef_);
+          var entityLocationDef_ = { x: 0, y: 0 };
+          if (event.type.startsWith("mouse")) {
+            entityLocationDef_ = { x: event.clientX, y: event.clientY };
           } else {
-            this.canvas.taps.count = 0;
-            //console.log("this is single tap i guess?");
+            entityLocationDef_ = {
+              x: event.changedTouches[0].clientX,
+              y: event.changedTouches[0].clientY,
+            };
           }
-          this.canvas.taps.timer = undefined;
-        }, tapMaxInterval);
-      }
+          entityLocationDef_.x =
+            entityLocationDef_.x - this.width / 2 - this.canvasLocation.x;
+          entityLocationDef_.y =
+            entityLocationDef_.y - this.height / 2 - this.canvasLocation.y;
+          console.log(entityLocationDef_);
+          this.$emit("create-new-entity", entityLocationDef_);
+        } else {
+          this.canvas.taps.count = 0;
+          //console.log("this is single tap i guess?");
+        }
+        this.canvas.taps.timer = undefined;
+      }, tapMaxInterval);
+      //}
     },
     setStartingCanvasMousePos(event) {
       this.updateCanvasContainerBoxLoc();
@@ -429,9 +432,34 @@ export default {
     },
     getTargetRelSpots(claimantID, targetID) {
       //console.log(claimantID, targetID);
-      this.relClaimTargetSpots[claimantID] = {
+      /*
+      const value = {
         [targetID]: this.relClaimSpots[targetID],
       };
+      this.relClaimTargetSpots[claimantID] = this.relClaimTargetSpots[
+        claimantID
+      ]
+        ? Object.assign(this.relClaimTargetSpots[claimantID], value)
+        : value;*/
+
+      const value = {
+        [targetID]: this.relClaimSpots[targetID],
+      };
+      this.relClaimTargetSpots = Object.assign({}, this.relClaimTargetSpots, {
+        [claimantID]: this.relClaimTargetSpots[claimantID]
+          ? Object.assign(this.relClaimTargetSpots[claimantID], value)
+          : value,
+      });
+
+      /*
+      Vue.set(this.relClaimTargetSpots, claimantID, {
+        [targetID]: this.relClaimSpots[claimantID],
+      });*/
+
+      /*
+      this.relClaimTargetSpots = Object.assign({}, this.relClaimTargetSpots, {
+        [claimantID]: { [targetID]: this.relClaimSpots[claimantID] },
+      });*/
     },
     setSelfRelSpots(entityID, relSpots) {
       //console.log(claimantID, targetID);
@@ -439,11 +467,61 @@ export default {
       for (const claimantID in this.relClaimTargetSpots) {
         for (const targetID in this.relClaimTargetSpots[claimantID]) {
           if (targetID === entityID) {
-            this.relClaimTargetSpots[claimantID] = { [targetID]: relSpots };
-            console.log("this should be happening", claimantID);
+            const value = {
+              [targetID]: relSpots,
+            };
+
+            this.relClaimTargetSpots[claimantID] = this.relClaimTargetSpots[
+              claimantID
+            ]
+              ? Object.assign(this.relClaimTargetSpots[claimantID], value)
+              : value;
+
+            /*this.relClaimTargetSpots = Object.assign(
+              {},
+              this.relClaimTargetSpots,
+              {
+                [claimantID]: this.relClaimTargetSpots[claimantID]
+                  ? Object.assign(this.relClaimTargetSpots[claimantID], value)
+                  : value,
+              }
+            );*/
+            //this.relClaimTargetSpots[claimantID] = { [targetID]: relSpots };
+            //console.log("this should be happening", claimantID);
           }
         }
       }
+      /*
+      this.relClaimSpots = Object.assign({}, this.relClaimSpots, {
+        [entityID]: relSpots,
+      });
+      for (const claimantID in this.relClaimTargetSpots) {
+        for (const targetID in this.relClaimTargetSpots[claimantID]) {
+          if (targetID === entityID) {
+            this.relClaimTargetSpots = Object.assign(
+              {},
+              this.relClaimTargetSpots,
+              {
+                [claimantID]: {
+                  [targetID]: relSpots,
+                },
+              }
+            );
+            //console.log("this should be happening", claimantID);
+          }
+        }
+      }*/
+    },
+    removeEntity(entityID) {
+      var url_ = this.apiUrl;
+      axios({
+        method: "POST",
+        url: url_ + "/entity/remove",
+        data: qs.stringify({ entityID: entityID }),
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      }).then(() => {
+        this.$emit("dropEntity", entityID);
+      });
     },
   },
   watch: {},

@@ -27,22 +27,24 @@
         >
         . Currently everything is in prototyping state. <br />
         <br />
+        Setting up: <br />
+        - Download your release from
         <a
           href="https://github.com/KarmaKast/MindMap-WebApp"
           :style="{ pointerEvents: 'initial' }"
           target="_blank"
         >
-          Github Repo
+          MapThyMind Github Repo
         </a>
         <br />
-        Depends on
+        - setup
         <a
           href="https://github.com/KarmaKast/nodeAPI/"
           :style="{ pointerEvents: 'initial' }"
           target="_blank"
-          >nodeAPI-0.1.0</a
+          >nodeAPI</a
         >
-        (run nodeVizAPI.py)
+        (runs at localhost:3000)
       </p>
     </div>
   </div>

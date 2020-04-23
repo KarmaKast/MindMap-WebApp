@@ -4,11 +4,12 @@
       :colors="this.colors"
       :colorsProcessed="colorsProcessed"
       :apiUrl="this.apiUrl"
-      :nodes="nodes"
-      :nodeLimit="nodeLimit"
+      :entities="entities"
+      :entityLimit="entityLimit"
       :apiValidity="apiValidity"
       :grid="grid"
-      @create-new-node="createNewNode"
+      @create-new-entity="createNewEntity"
+      @dropEntity="dropEntity"
     ></mind-map-canvas>
 
     <div
@@ -122,8 +123,8 @@ export default {
   props: {
     // locationHor: {'left':value} or {'right':value}
     colors: Object,
-    nodeLimit: {
-      default: 10,
+    entityLimit: {
+      default: 25,
       type: Number,
     },
   },
@@ -134,12 +135,7 @@ export default {
       apiUrl: "",
       apiValidity: false,
       collection: null,
-      nodes: [
-        { ID: "__test_ID__", newNode: true },
-        { ID: "__test_ID__1", newNode: true },
-        { ID: "__test_ID__2", newNode: true },
-        { ID: "__test_ID__3", newNode: true },
-      ],
+      entities: [],
       showAboutPage: false,
       grid: {
         size: 25,
@@ -287,13 +283,16 @@ export default {
       var url_ = this.apiUrl;
       // todo: get a list of nodeIDs and create a list of nodes in the canvas
       console.log(`getting list of nodes\n${url_}`);
-      axios.get(url_ + "/collection/get").then((response) => {
-        //console.log(response);
-        this.collection = response["data"];
-        this.nodes = response.data.Entities.map(function (ID) {
-          return { ID: ID, newNode: false };
-        });
-      });
+      axios
+        .get(url_ + "/collection/get")
+        .then((response) => {
+          //console.log(response);
+          this.collection = response["data"];
+          this.entities = response.data.Entities.map((ID) => {
+            return { ID: ID };
+          });
+        })
+        .catch((err) => this.loadCollection());
     },
     clearCollection() {
       var url_ = this.apiUrl;
@@ -311,13 +310,51 @@ export default {
         this.showMenu = true;
       }
     },
-    createNewNode(nodeLocationDef_) {
-      const uuid = require("uuid");
-      this.nodes.push({
+    createNewEntity(entityLocationDef_) {
+      if (!this.apiValidity) {
+        alert("Connect to API");
+      } else if (!this.entities.length >= this.entityLimit) {
+        alert(`Sorry! Max nodes are limited to : ${this.entityLimit} for now.`);
+      } else {
+        axios({
+          method: "POST",
+          baseURL: this.apiUrl,
+          url: `/entity/create`,
+          data: qs.stringify({
+            vizProps: JSON.stringify({
+              location: {
+                x: entityLocationDef_.x,
+                y: entityLocationDef_.y,
+                z: entityLocationDef_.z,
+              },
+            }),
+          }),
+        })
+          .then((response) => {
+            //console.log("getting response");
+            console.log(response);
+            //this.node_ID = response.data.entityID;
+            this.entities.push({
+              ID: response.data.entityID,
+              entityLocationDef: entityLocationDef_,
+            });
+          })
+          .catch((err) => console.log("Error: ", err));
+      }
+      /*
+      this.entities.push({
         ID: `__test_ID__${uuid.v1()}`,
         newNode: true,
-        nodeLocationDef: nodeLocationDef_,
-      });
+        entityLocationDef: entityLocationDef_,
+      });*/
+    },
+    dropEntity(entityID) {
+      for (const index in this.entities) {
+        if (this.entities[index].ID === entityID) {
+          this.$delete(this.entities, index);
+          break;
+        }
+      }
     },
     aboutPageDisplay(showOrHide) {
       //var win = window.open('https://github.com/KarmaKast/MindMap-WebApp/tree/develop', '_blank');
@@ -325,7 +362,13 @@ export default {
       this.showAboutPage = showOrHide;
     },
   },
-  watch: {},
+  watch: {
+    apiValidity() {
+      if (this.apiValidity) {
+        this.getCollection();
+      }
+    },
+  },
   created: function () {
     //this.testAPI();
 

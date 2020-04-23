@@ -8,7 +8,7 @@
       }"
     ></div>
     <div id="mindMapContainer" :style="mindMapContainerStyle">
-      <MindMapModule :colors="MindMapColors" :nodeLimit="nodeLimit" />
+      <MindMapModule :colors="MindMapColors" :entityLimit="entityLimit" />
     </div>
   </div>
 </template>
@@ -40,7 +40,7 @@ export default {
         width: 0,
         height: 0,
       },
-      nodeLimit: 20,
+      entityLimit: 20,
     };
   },
   computed: {
