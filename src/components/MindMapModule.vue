@@ -282,13 +282,16 @@ export default {
       var url_ = this.apiUrl;
       // todo: get a list of nodeIDs and create a list of nodes in the canvas
       console.log(`getting list of nodes\n${url_}`);
-      axios.get(url_ + "/collection/get").then((response) => {
-        //console.log(response);
-        this.collection = response["data"];
-        this.nodes = response.data.Entities.map(function (ID) {
-          return { ID: ID, newNode: false };
-        });
-      });
+      axios
+        .get(url_ + "/collection/get")
+        .then((response) => {
+          //console.log(response);
+          this.collection = response["data"];
+          this.nodes = response.data.Entities.map(function (ID) {
+            return { ID: ID, newNode: false };
+          });
+        })
+        .catch((err) => console.log(err, err.message));
     },
     clearCollection() {
       var url_ = this.apiUrl;
@@ -315,22 +318,24 @@ export default {
           data: qs.stringify({
             vizProps: JSON.stringify({
               location: {
-                x: this.nodeLocationDef["x"],
-                y: this.nodeLocationDef["y"],
-                z: this.nodeLocationDef["z"],
+                x: nodeLocationDef_["x"],
+                y: nodeLocationDef_["y"],
+                z: nodeLocationDef_["z"],
               },
             }),
           }),
-        }).then((response) => {
-          //console.log("getting response");
-          //console.log(response);
-          //this.node_ID = response.data.entityID;
-          this.nodes.push({
-            ID: response.data.entityID,
-            newNode: false,
-            nodeLocationDef: nodeLocationDef_,
-          });
-        });
+        })
+          .then((response) => {
+            //console.log("getting response");
+            console.log(response);
+            //this.node_ID = response.data.entityID;
+            this.nodes.push({
+              ID: response.data.entityID,
+              newNode: false,
+              nodeLocationDef: nodeLocationDef_,
+            });
+          })
+          .catch((err) => console.log("Error: ", err));
       else {
         alert("Connect to API");
       }
@@ -347,7 +352,17 @@ export default {
       this.showAboutPage = showOrHide;
     },
   },
-  watch: {},
+  watch: {
+    apiValidity() {
+      if (this.apiValidity) {
+        try {
+          this.getCollection();
+        } catch (err) {
+          this.loadCollection();
+        }
+      }
+    },
+  },
   created: function () {
     //this.testAPI();
 

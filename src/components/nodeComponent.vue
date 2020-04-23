@@ -401,27 +401,6 @@ export default {
         };
       }, time);
     },
-    createNodeInDatabase() {
-      //console.log(`from createNodeInDatabase: /node/create/${this.nodeLabel}`);
-      axios({
-        method: "POST",
-        baseURL: this.apiUrl,
-        url: `/entity/create`,
-        data: qs.stringify({
-          vizProps: JSON.stringify({
-            location: {
-              x: this.nodeLocationDef["x"],
-              y: this.nodeLocationDef["y"],
-              z: this.nodeLocationDef["z"],
-            },
-          }),
-        }),
-      }).then((response) => {
-        //console.log("getting response");
-        //console.log(response);
-        this.node_ID = response.data.entityID;
-      });
-    },
     editNodeLabel(event) {
       console.log(event);
       this.editingLabel = this.editingLabel ? false : true;

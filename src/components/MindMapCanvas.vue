@@ -383,34 +383,34 @@ export default {
       //console.log(event);
       this.canvas.taps.count += 1;
       var tapMaxInterval = 250;
-      if (this.canvas.taps.timer === undefined) {
-        this.canvas.taps.timer = setTimeout(() => {
-          if (this.canvas.taps.count > 1) {
-            this.canvas.taps.count = 0;
-            //console.log("this is double tap i guess?");
+      //if (this.canvas.taps.timer === undefined) {
+      this.canvas.taps.timer = setTimeout(() => {
+        if (this.canvas.taps.count > 1) {
+          this.canvas.taps.count = 0;
+          //console.log("this is double tap i guess?");
 
-            var nodeLocationDef_ = { x: 0, y: 0 };
-            if (event.type.startsWith("mouse")) {
-              nodeLocationDef_ = { x: event.clientX, y: event.clientY };
-            } else {
-              nodeLocationDef_ = {
-                x: event.changedTouches[0].clientX,
-                y: event.changedTouches[0].clientY,
-              };
-            }
-            nodeLocationDef_.x =
-              nodeLocationDef_.x - this.width / 2 - this.canvasLocation.x;
-            nodeLocationDef_.y =
-              nodeLocationDef_.y - this.height / 2 - this.canvasLocation.y;
-
-            this.$emit("create-new-node", nodeLocationDef_);
+          var nodeLocationDef_ = { x: 0, y: 0 };
+          if (event.type.startsWith("mouse")) {
+            nodeLocationDef_ = { x: event.clientX, y: event.clientY };
           } else {
-            this.canvas.taps.count = 0;
-            //console.log("this is single tap i guess?");
+            nodeLocationDef_ = {
+              x: event.changedTouches[0].clientX,
+              y: event.changedTouches[0].clientY,
+            };
           }
-          this.canvas.taps.timer = undefined;
-        }, tapMaxInterval);
-      }
+          nodeLocationDef_.x =
+            nodeLocationDef_.x - this.width / 2 - this.canvasLocation.x;
+          nodeLocationDef_.y =
+            nodeLocationDef_.y - this.height / 2 - this.canvasLocation.y;
+          console.log(nodeLocationDef_);
+          this.$emit("create-new-node", nodeLocationDef_);
+        } else {
+          this.canvas.taps.count = 0;
+          //console.log("this is single tap i guess?");
+        }
+        this.canvas.taps.timer = undefined;
+      }, tapMaxInterval);
+      //}
     },
     setStartingCanvasMousePos(event) {
       this.updateCanvasContainerBoxLoc();
@@ -440,7 +440,7 @@ export default {
         for (const targetID in this.relClaimTargetSpots[claimantID]) {
           if (targetID === entityID) {
             this.relClaimTargetSpots[claimantID] = { [targetID]: relSpots };
-            console.log("this should be happening", claimantID);
+            //console.log("this should be happening", claimantID);
           }
         }
       }
