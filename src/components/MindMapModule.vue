@@ -8,7 +8,7 @@
       :entityLimit="entityLimit"
       :apiValidity="apiValidity"
       :grid="grid"
-      @create-new-entity="createNewNode"
+      @create-new-entity="createNewEntity"
       @dropEntity="dropEntity"
     ></mind-map-canvas>
 
@@ -310,7 +310,7 @@ export default {
         this.showMenu = true;
       }
     },
-    createNewNode(nodeLocationDef_) {
+    createNewEntity(entityLocationDef_) {
       if (!this.apiValidity) {
         alert("Connect to API");
       } else if (!this.entities.length >= this.entityLimit) {
@@ -323,9 +323,9 @@ export default {
           data: qs.stringify({
             vizProps: JSON.stringify({
               location: {
-                x: nodeLocationDef_.x,
-                y: nodeLocationDef_.y,
-                z: nodeLocationDef_.z,
+                x: entityLocationDef_.x,
+                y: entityLocationDef_.y,
+                z: entityLocationDef_.z,
               },
             }),
           }),
@@ -336,7 +336,7 @@ export default {
             //this.node_ID = response.data.entityID;
             this.entities.push({
               ID: response.data.entityID,
-              nodeLocationDef: nodeLocationDef_,
+              entityLocationDef: entityLocationDef_,
             });
           })
           .catch((err) => console.log("Error: ", err));
@@ -345,7 +345,7 @@ export default {
       this.entities.push({
         ID: `__test_ID__${uuid.v1()}`,
         newNode: true,
-        nodeLocationDef: nodeLocationDef_,
+        entityLocationDef: entityLocationDef_,
       });*/
     },
     dropEntity(entityID) {

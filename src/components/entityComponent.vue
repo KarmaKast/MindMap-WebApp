@@ -1,5 +1,5 @@
 <template>
-  <div ref="nodeContainer" :style="nodeContainerStyle">
+  <div ref="entityContainer" :style="entityContainerStyle">
     <div id="relationWires" :style="relationWiresStyle">
       <v-stage
         :config="{
@@ -10,7 +10,7 @@
         <v-layer>
           <v-group>
             <v-line
-              v-for="(relClaim, index) in node_data.source.RelationClaims"
+              v-for="(relClaim, index) in entityData.source.RelationClaims"
               :key="index"
               :config="{
                 points: targetRelationSpots[relClaim.To],
@@ -26,7 +26,7 @@
     </div>
     <div
       v-if="entitySelected"
-      id="nodeUI"
+      id="entityUI"
       :style="{
         position: 'absolute',
         display: 'grid',
@@ -43,16 +43,16 @@
           borderRadius: '50%',
           pointerEvents: 'all',
         }"
-        v-touch:tap.self="editNodeLabel"
+        v-touch:tap.self="editentityLabel"
       >
         <input
           v-if="editingLabel"
           ref="labelInput"
           type="text"
           :style="inputTextStyle"
-          v-model.lazy="nodeLabel"
-          @input="nodeLabel = $event.target.value"
-          @keyup.enter="editNodeLabel"
+          v-model.lazy="entityLabel"
+          @input="entityLabel = $event.target.value"
+          @keyup.enter="editentityLabel"
         />
       </div>
       <color-picker v-if="false"></color-picker>
@@ -90,13 +90,13 @@
       ></div>
     </div>
     <div
-      id="node"
-      :style="nodeStyle"
+      id="entity"
+      :style="entityStyle"
       v-touch:start.self="startdrag"
       v-touch:end="confirmRelClaimTarget"
     >
-      <!--<input type="text" :style="nodeTextStyle" :value="nodeLabel" />-->
-      <p :style="nodeTextStyle">{{ nodeLabel }}</p>
+      <!--<input type="text" :style="entityTextStyle" :value="entityLabel" />-->
+      <p :style="entityTextStyle">{{ entityLabel }}</p>
     </div>
   </div>
 </template>
@@ -160,41 +160,41 @@ export default {
     return {
       minHeight: 60,
       minWidth: 120,
-      nodeLocation: this.entityLocationDef,
-      nodeLabel: "",
-      nodeColor: { h: 0, s: 0, l: 0, a: 1 },
-      node_data: {
+      entityLocation: this.entityLocationDef,
+      entityLabel: "",
+      entityColor: { h: 0, s: 0, l: 0, a: 1 },
+      entityData: {
         source: { Label: "", RelationClaims: [] },
         viz_props: {
           location: { x: 0, y: 0, z: 0 },
           color: { h: 166, s: 89, l: 45, a: 1 },
         },
       },
-      nodeSize: { height: 60, width: 160 },
-      nodeBoundingBoxSize: { height: 0, width: 0 },
+      entitySize: { height: 60, width: 160 },
+      entityBoundingBoxSize: { height: 0, width: 0 },
       draggingDeltas: { x: 0, y: 0 },
       editingLabel: false,
       relClaimMode: { mode: false, targetID: null },
     };
   },
   computed: {
-    nodeContainerStyle: function () {
+    entityContainerStyle: function () {
       return {
         position: "absolute",
         top: `${
           this.canvasLocation["y"] +
           this.canvasSize.height / 2 +
-          this.nodeLocation_.y -
-          this.nodeBoundingBoxSize.height / 2
+          this.entityLocation_.y -
+          this.entityBoundingBoxSize.height / 2
         }px`,
         left: `${
           this.canvasLocation["x"] +
           this.canvasSize.width / 2 +
-          this.nodeLocation_.x -
-          this.nodeBoundingBoxSize.width / 2
+          this.entityLocation_.x -
+          this.entityBoundingBoxSize.width / 2
         }px`,
-        minWidth: `${this.nodeLabel === "" ? this.minWidth : 0}px`,
-        minHeight: `${this.nodeLabel === "" ? this.minHeight : 0}px`,
+        minWidth: `${this.entityLabel === "" ? this.minWidth : 0}px`,
+        minHeight: `${this.entityLabel === "" ? this.minHeight : 0}px`,
         cursor: this.dragging.state ? "grabbing" : "grab",
         zIndex: this.dragging.state ? "5000" : "unset",
 
@@ -202,18 +202,18 @@ export default {
           this.editingLabel && this.entitySelected
             ? "white"
             : "hsla(0,0%,0%,0.01)",
-        border: `1px dotted hsla(${this.nodeColor.h},${this.nodeColor.s}%,${this.nodeColor.l}%, 0.2)`,
+        border: `1px dotted hsla(${this.entityColor.h},${this.entityColor.s}%,${this.entityColor.l}%, 0.2)`,
         borderRadius:
-          this.nodeSize["height"] > this.nodeSize["width"]
-            ? `${this.nodeSize["height"]}px`
-            : `${this.nodeSize["width"]}px`,
+          this.entitySize["height"] > this.entitySize["width"]
+            ? `${this.entitySize["height"]}px`
+            : `${this.entitySize["width"]}px`,
         boxShadow: `${
           this.dragging.state
             ? "rgba(0, 0, 0, 0.2) 0px 0px 13px 4px"
             : "rgba(0, 0, 0, 0.15) 0px 0px 3px 2px"
-        }, inset 0px 0px 0 4px hsla(${this.nodeColor.h},
-        ${this.nodeColor.s}%,
-        ${this.nodeColor.l}%, 0.2)`,
+        }, inset 0px 0px 0 4px hsla(${this.entityColor.h},
+        ${this.entityColor.s}%,
+        ${this.entityColor.l}%, 0.2)`,
         boxSizing: "border-box",
         display: "grid",
         gridTemplateColumns: "100%",
@@ -221,11 +221,11 @@ export default {
         outline: "none",
       };
     },
-    nodeStyle: function () {
+    entityStyle: function () {
       return {
         position: "relative",
         borderRadius: "inherit",
-        border: `1px solid hsla(${this.nodeColor.h},${this.nodeColor.s}%, ${this.nodeColor.l}%, 0.8)`,
+        border: `1px solid hsla(${this.entityColor.h},${this.entityColor.s}%, ${this.entityColor.l}%, 0.8)`,
         backdropFilter: "blur(2px)",
         pointerEvents: "all",
         display: "grid",
@@ -234,14 +234,14 @@ export default {
         padding: "10px 15px 10px 15px",
       };
     },
-    nodeTextStyle: function () {
+    entityTextStyle: function () {
       return {
         pointerEvents: "none",
         margin: "0px",
         maxWidth: "100px",
         overflowWrap: "break-word",
-        color: `hsla(${this.nodeColor.h},${this.nodeColor.s}%, ${
-          this.nodeColor.l
+        color: `hsla(${this.entityColor.h},${this.entityColor.s}%, ${
+          this.entityColor.l
         }%, ${1})`,
         background: "none",
         border: "none",
@@ -255,38 +255,38 @@ export default {
         left: "20px",
       };
     },
-    nodeLocation_: function () {
-      var nodeLoc = this.nodeLocation;
+    entityLocation_: function () {
+      var entityLoc = this.entityLocation;
       if (this.dragging.state) {
         // todo: this is working as intended. Just need to detect drag differently from simply clicking in.
 
-        nodeLoc.x =
+        entityLoc.x =
           this.canvasMousePos.x -
           this.canvasSize.width / 2 -
           this.canvasLocation.x;
 
-        nodeLoc.y =
+        entityLoc.y =
           this.canvasMousePos.y -
           this.canvasSize.height / 2 -
           this.canvasLocation.y;
 
         if (this.grid.snap) {
-          nodeLoc.x =
-            (Math.floor((nodeLoc.x - this.grid.size / 2) / this.grid.size) +
+          entityLoc.x =
+            (Math.floor((entityLoc.x - this.grid.size / 2) / this.grid.size) +
               1) *
             this.grid.size;
 
-          nodeLoc.y =
-            (Math.floor((nodeLoc.y - this.grid.size / 2) / this.grid.size) +
+          entityLoc.y =
+            (Math.floor((entityLoc.y - this.grid.size / 2) / this.grid.size) +
               1) *
             this.grid.size;
         } else {
-          var boundingBox = this.$refs.nodeContainer.getBoundingClientRect();
-          nodeLoc.x += boundingBox.width / 2 - this.draggingDeltas.x;
-          nodeLoc.y += boundingBox.height / 2 - this.draggingDeltas.y;
+          var boundingBox = this.$refs.entityContainer.getBoundingClientRect();
+          entityLoc.x += boundingBox.width / 2 - this.draggingDeltas.x;
+          entityLoc.y += boundingBox.height / 2 - this.draggingDeltas.y;
         }
       }
-      return nodeLoc;
+      return entityLoc;
     },
     relationWiresStyle: function () {
       return {
@@ -295,25 +295,25 @@ export default {
           0 -
           this.canvasLocation.x -
           this.canvasSize.width / 2 -
-          this.nodeLocation_.x +
-          this.nodeBoundingBoxSize.width / 2 +
+          this.entityLocation_.x +
+          this.entityBoundingBoxSize.width / 2 +
           "px",
         top:
           0 -
           this.canvasLocation.y -
           this.canvasSize.height / 2 -
-          this.nodeLocation_.y +
-          this.nodeBoundingBoxSize.height / 2 +
+          this.entityLocation_.y +
+          this.entityBoundingBoxSize.height / 2 +
           "px",
         pointerEvents: "none",
         position: "absolute",
       };
     },
     relationSpots: function () {
-      var boundingBox = this.$refs.nodeContainer.getBoundingClientRect();
+      var boundingBox = this.$refs.entityContainer.getBoundingClientRect();
       //console.log(boundingBox);
       if (this.dragging.state && this.canvasLocation.x)
-        boundingBox = this.$refs.nodeContainer.getBoundingClientRect();
+        boundingBox = this.$refs.entityContainer.getBoundingClientRect();
       return [
         boundingBox.left,
         boundingBox.right,
@@ -326,7 +326,7 @@ export default {
       //this.$emit("getTargetRelSpots", relClaim.To);
 
       let res = {};
-      for (const relClaim of this.node_data.source.RelationClaims) {
+      for (const relClaim of this.entityData.source.RelationClaims) {
         let spots = this.targetRelSpots
           ? this.targetRelSpots[relClaim.To]
           : undefined;
@@ -350,7 +350,7 @@ export default {
       // doing: calculating draggingDeltas
       if ([1].includes(event.which) || event.type === "touchstart") {
         if (!this.pressed.state) {
-          var boundingBox = this.$refs.nodeContainer.getBoundingClientRect();
+          var boundingBox = this.$refs.entityContainer.getBoundingClientRect();
           //console.log(boundingBox);
 
           if (event.type === "mousedown") {
@@ -369,7 +369,7 @@ export default {
         }
       }
     },
-    getNodeData() {
+    getEntityData() {
       // doing: get node data from api
       // todo: check api url validity
       axios({
@@ -379,10 +379,10 @@ export default {
         paramsSerializer: qs.stringify,
       }).then((response) => {
         //console.log(response.data);
-        this.node_data.source = response.data[0];
-        this.node_data.viz_props = response.data[1].Data;
+        this.entityData.source = response.data[0];
+        this.entityData.viz_props = response.data[1].Data;
         this.$emit("setSelfRelSpots", this.relationSpots);
-        for (const relClaim of this.node_data.source.RelationClaims)
+        for (const relClaim of this.entityData.source.RelationClaims)
           this.$emit("getTargetRelSpots", relClaim.To);
       });
     },
@@ -407,17 +407,17 @@ export default {
         }
       });
     },
-    updateNodeBBox(time = 100) {
+    updateEntityBoundaryBox(time = 100) {
       // doing: updating node's bounding box width and height
       setTimeout(() => {
-        var boundingBox = this.$refs.nodeContainer.getBoundingClientRect();
-        this.nodeBoundingBoxSize = {
+        var boundingBox = this.$refs.entityContainer.getBoundingClientRect();
+        this.entityBoundingBoxSize = {
           width: boundingBox.width,
           height: boundingBox.height,
         };
       }, time);
     },
-    editNodeLabel(event) {
+    editentityLabel(event) {
       console.log(event);
       this.editingLabel = this.editingLabel ? false : true;
       //setInterval
@@ -458,7 +458,7 @@ export default {
         this.relClaimMode.mode = false;
         this.relClaimMode.targetID = null;
         console.log(JSON.parse(response.data.relClaim));
-        this.node_data.source.RelationClaims.push(
+        this.entityData.source.RelationClaims.push(
           JSON.parse(response.data.relClaim)
         );
       });
@@ -476,36 +476,36 @@ export default {
   watch: {
     "dragging.state"() {
       if (!this.dragging.state) {
-        this.nodeLocation = this.nodeLocation_;
+        this.entityLocation = this.entityLocation_;
       }
     },
     apiValidity() {},
 
-    nodeLocation_() {
+    entityLocation_() {
       // todo: save node location to database on drag end
       if (!this.dragging.state) {
         if (this.apiValidity) {
-          //var msg = `updated location from {x:${this.node_data.viz_props.location[0]},y: ${this.node_data.viz_props.location[1]}} to
-          //  {x:${this.nodeLocation_.x},y:${this.nodeLocation_.y}}`;
+          //var msg = `updated location from {x:${this.entityData.viz_props.location[0]},y: ${this.entityData.viz_props.location[1]}} to
+          //  {x:${this.entityLocation_.x},y:${this.entityLocation_.y}}`;
           //console.log(msg);
           // todo: WIP
-          //console.log([this.nodeLocation_.x, this.nodeLocation_.y, 0]);
-          this.savePropToAPI("location", this.nodeLocation_);
+          //console.log([this.entityLocation_.x, this.entityLocation_.y, 0]);
+          this.savePropToAPI("location", this.entityLocation_);
           this.$emit("setSelfRelSpots", this.relationSpots);
         }
       }
     },
-    "node_data.viz_props"() {
-      this.nodeLocation.x = this.node_data.viz_props.location.x;
-      this.nodeLocation.y = this.node_data.viz_props.location.y;
-      this.nodeColor = this.node_data.viz_props.color;
+    "entityData.viz_props"() {
+      this.entityLocation.x = this.entityData.viz_props.location.x;
+      this.entityLocation.y = this.entityData.viz_props.location.y;
+      this.entityColor = this.entityData.viz_props.color;
     },
-    "node_data.source"() {
-      this.nodeLabel = this.node_data.source.Label;
+    "entityData.source"() {
+      this.entityLabel = this.entityData.source.Label;
     },
-    nodeLabel() {
+    entityLabel() {
       // doing: updating node's bounding box width and height
-      this.updateNodeBBox();
+      this.updateEntityBoundaryBox();
       // todo: save node Label to API
       if (this.apiValidity) {
         // todo: also set it to true when api disconnects
@@ -516,7 +516,7 @@ export default {
             entityID: this.entityID,
           },
           paramsSerializer: qs.stringify,
-          data: qs.stringify({ Label: this.nodeLabel }),
+          data: qs.stringify({ Label: this.entityLabel }),
         }).then(() => {
           if (this.autoSave) {
             // doing: ask server save state to file
@@ -525,8 +525,8 @@ export default {
         });
       }
     },
-    nodeColor() {
-      this.savePropToAPI("color", this.nodeColor);
+    entityColor() {
+      this.savePropToAPI("color", this.entityColor);
       if (this.autoSave) {
         // doing: ask server save state to file
         this.$axios.post(this.apiUrl + "/collection/save");
@@ -539,9 +539,9 @@ export default {
       console.log(`@ mounted ${this.entityID}`);
       // todo: get node_label, relation_claims, data from the API using the nodeID
     }
-    this.getNodeData();
+    this.getEntityData();
 
-    this.updateNodeBBox(0);
+    this.updateEntityBoundaryBox(0);
 
     //if (this.relClaimMode.mode)
     this.$store.subscribe((mutation, state) => {
