@@ -314,12 +314,40 @@ export default {
       //console.log(boundingBox);
       if (this.dragging.state && this.canvasLocation.x)
         boundingBox = this.$refs.entityContainer.getBoundingClientRect();
-      return [
+      /*return [
         boundingBox.left,
         boundingBox.right,
         boundingBox.top,
         boundingBox.bottom,
-      ];
+      ];*/
+      /*return [
+        this.entityBoundingBoxSize.left,
+        this.entityBoundingBoxSize.right,
+        this.entityBoundingBoxSize.top,
+        this.entityBoundingBoxSize.bottom,
+      ];*/
+      return {
+        left:
+          this.canvasLocation.x +
+          this.canvasSize.width / 2 +
+          this.entityLocation_.x -
+          this.entityBoundingBoxSize.width / 2,
+        right:
+          this.canvasLocation.x +
+          this.canvasSize.width / 2 +
+          this.entityLocation_.x +
+          this.entityBoundingBoxSize.width / 2,
+        top:
+          this.canvasLocation.y +
+          this.canvasSize.height / 2 +
+          this.entityLocation_.y -
+          this.entityBoundingBoxSize.height / 2,
+        bottom:
+          this.canvasLocation.y +
+          this.canvasSize.height / 2 +
+          this.entityLocation_.y +
+          this.entityBoundingBoxSize.height / 2,
+      };
     },
     targetRelationSpots: function () {
       //console.log({ relClaim });
@@ -332,10 +360,10 @@ export default {
           : undefined;
         //console.log(this.targetRelSpots[relClaim.To]);
         res[relClaim.To] = [
-          this.relationSpots[0],
-          (this.relationSpots[2] + this.relationSpots[3]) / 2,
-          spots ? spots[0] : 0,
-          spots ? (spots[2] + spots[3]) / 2 : 0,
+          this.relationSpots.left,
+          (this.relationSpots.top + this.relationSpots.bottom) / 2,
+          spots ? spots.left : 0,
+          spots ? (spots.top + spots.bottom) / 2 : 0,
         ];
       }
       return res;
@@ -411,10 +439,13 @@ export default {
       // doing: updating node's bounding box width and height
       setTimeout(() => {
         var boundingBox = this.$refs.entityContainer.getBoundingClientRect();
+
         this.entityBoundingBoxSize = {
           width: boundingBox.width,
           height: boundingBox.height,
         };
+        //console.log(boundingBox);
+        //this.entityBoundingBoxSize = boundingBox;
       }, time);
     },
     editentityLabel(event) {
@@ -463,15 +494,6 @@ export default {
         );
       });
     },
-    getRelWirePoints(relClaim) {
-      //console.log({ relClaim });
-      this.$emit("getTargetRelSpots", relClaim.To);
-      let spots = this.targetRelSpots
-        ? this.targetRelSpots[relClaim.to]
-        : undefined;
-      console.log(spots);
-      return [0, 25, spots ? spots[0] : 200, 25];
-    },
   },
   watch: {
     "dragging.state"() {
@@ -480,6 +502,12 @@ export default {
       }
     },
     apiValidity() {},
+    canvasLocation: {
+      handler() {
+        this.$emit("setSelfRelSpots", this.relationSpots);
+      },
+      deep: true,
+    },
 
     entityLocation_() {
       // todo: save node location to database on drag end
