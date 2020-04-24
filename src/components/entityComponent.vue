@@ -356,18 +356,59 @@ export default {
 
       let res = {};
       for (const relClaim of this.entityData.source.RelationClaims) {
-        let spots = this.targetRelSpots
+        let targetSpots = this.targetRelSpots
           ? this.targetRelSpots[relClaim.To]
           : undefined;
         //console.log(this.targetRelSpots[relClaim.To]);
-        res[relClaim.To] = [
+        /*res[relClaim.To] = [
           this.relationSpots.left,
           (this.relationSpots.top + this.relationSpots.bottom) / 2,
-          spots ? spots.left : 0,
-          spots ? (spots.top + spots.bottom) / 2 : 0,
-        ];
+          targetSpots ? targetSpots.left : 0,
+          targetSpots ? (targetSpots.top + targetSpots.bottom) / 2 : 0,
+        ];*/
 
         // todo: find closest set of points between this entity and target entity
+        function dist(p1, p2) {
+          return Math.sqrt((p1.x - p2.x) ** 2 + (p1.y - p2.y) ** 2);
+        }
+        const yMidSelf =
+          (this.relationSpots.top + this.relationSpots.bottom) / 2;
+        const xMidSelf =
+          (this.relationSpots.left + this.relationSpots.right) / 2;
+        const yMidTarget = (targetSpots.top + targetSpots.bottom) / 2;
+        const xMidTarget = (targetSpots.left + targetSpots.right) / 2;
+        targetSpots = {
+          left: { x: targetSpots.left, y: yMidTarget },
+          top: { x: xMidTarget, y: targetSpots.top },
+          right: { x: targetSpots.right, y: yMidTarget },
+          bottom: { x: xMidTarget, y: targetSpots.bottom },
+        };
+        let selfSpots = {
+          left: { x: this.relationSpots.left, y: yMidSelf },
+          top: { x: xMidSelf, y: this.relationSpots.top },
+          right: { x: this.relationSpots.right, y: yMidSelf },
+          bottom: { x: xMidSelf, y: this.relationSpots.bottom },
+        };
+        let minDistance;
+        let minDistanceKeys;
+        if (targetSpots) {
+          for (const targetKey in targetSpots) {
+            for (const selfKey in selfSpots) {
+              const distance = dist(targetSpots[targetKey], selfSpots[selfKey]);
+              if (minDistance === undefined || distance < minDistance) {
+                minDistance = distance;
+                minDistanceKeys = { target: targetKey, self: selfKey };
+              }
+            }
+          }
+          //console.log(minDistance, minDistanceKeys);
+          res[relClaim.To] = [
+            selfSpots[minDistanceKeys.self].x,
+            selfSpots[minDistanceKeys.self].y,
+            targetSpots[minDistanceKeys.target].x,
+            targetSpots[minDistanceKeys.target].y,
+          ];
+        } else res[relClaim.To] = [0, 0, 0, 0];
       }
       return res;
     },
@@ -409,7 +450,7 @@ export default {
         params: { entityID: this.entityID },
         paramsSerializer: qs.stringify,
       }).then((response) => {
-        console.log(JSON.stringify(response.data));
+        //console.log(JSON.stringify(response.data));
         this.entityData.source = response.data[0];
         this.entityData.viz_props = response.data[1].Data;
         this.$emit("setSelfRelSpots", this.relationSpots);
