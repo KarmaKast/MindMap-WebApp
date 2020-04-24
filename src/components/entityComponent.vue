@@ -409,7 +409,7 @@ export default {
         params: { entityID: this.entityID },
         paramsSerializer: qs.stringify,
       }).then((response) => {
-        //console.log(response.data);
+        console.log(JSON.stringify(response.data));
         this.entityData.source = response.data[0];
         this.entityData.viz_props = response.data[1].Data;
         this.$emit("setSelfRelSpots", this.relationSpots);
@@ -492,9 +492,14 @@ export default {
         this.relClaimMode.mode = false;
         this.relClaimMode.targetID = null;
         console.log(JSON.parse(response.data.relClaim));
-        this.entityData.source.RelationClaims.push(
+        /*this.entityData.source.RelationClaims.push(
           JSON.parse(response.data.relClaim)
-        );
+        );*/
+        //const relClaims = this.entityData.source.RelationClaims;
+        const temp = this.entityData;
+        temp.source.RelationClaims.push(JSON.parse(response.data.relClaim));
+        this.entityData = Object.assign({}, temp);
+        this.$emit("getTargetRelSpots", JSON.parse(response.data.relClaim).To);
       });
     },
   },
@@ -523,6 +528,8 @@ export default {
           // todo: WIP
           //console.log([this.entityLocation_.x, this.entityLocation_.y, 0]);
           this.savePropToAPI("location", this.entityLocation_);
+          //this.entityData.viz_props.location = this.entityLocation_;
+          //this.getEntityData();
         }
       }
     },
@@ -537,6 +544,7 @@ export default {
     entityLabel() {
       // doing: updating node's bounding box width and height
       this.updateEntityBoundaryBox();
+      this.$emit("setSelfRelSpots", this.relationSpots);
       // todo: save node Label to API
       if (this.apiValidity) {
         // todo: also set it to true when api disconnects
@@ -549,6 +557,8 @@ export default {
           paramsSerializer: qs.stringify,
           data: qs.stringify({ Label: this.entityLabel }),
         }).then(() => {
+          this.entityData.source.Label = this.entityLabel;
+          //this.getEntityData();
           if (this.autoSave) {
             // doing: ask server save state to file
             this.$axios.post(this.apiUrl + "/collection/save");
@@ -558,6 +568,8 @@ export default {
     },
     entityColor() {
       this.savePropToAPI("color", this.entityColor);
+      this.entityData.viz_props.color = this.entityColor;
+      //this.getEntityData();
       if (this.autoSave) {
         // doing: ask server save state to file
         this.$axios.post(this.apiUrl + "/collection/save");

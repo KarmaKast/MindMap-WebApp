@@ -156,6 +156,12 @@ export default {
           if: this.apiValidity,
         },
         {
+          text: "New Collection",
+          action: this.createCollection,
+          args: [],
+          if: this.apiValidity,
+        },
+        {
           text: "Clear Collection",
           action: this.clearCollection,
           args: [],
@@ -275,9 +281,11 @@ export default {
         url: url_ + "/collection/load",
         data: qs.stringify({ Label: "testCollection" }),
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      }).then(() => {
-        this.getCollection();
-      });
+      })
+        .then(() => {
+          this.getCollection();
+        })
+        .catch((err) => this.createCollection());
     },
     getCollection() {
       var url_ = this.apiUrl;
@@ -288,11 +296,26 @@ export default {
         .then((response) => {
           //console.log(response);
           this.collection = response["data"];
+          this.entities = [];
           this.entities = response.data.Entities.map((ID) => {
             return { ID: ID };
           });
         })
         .catch((err) => this.loadCollection());
+    },
+    createCollection() {
+      var url_ = this.apiUrl;
+      // todo: get a list of nodeIDs and create a list of nodes in the canvas
+      console.log(`getting list of nodes\n${url_}`);
+      axios({
+        method: "POST",
+        url: url_ + "/collection/create",
+        data: qs.stringify({ Label: "testCollection" }),
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      }).then(() => {
+        this.saveCollection();
+        this.getCollection();
+      });
     },
     clearCollection() {
       var url_ = this.apiUrl;
