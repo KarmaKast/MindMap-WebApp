@@ -39,6 +39,7 @@
         :entityLocationDef="value.entityLocationDef"
         :grid="grid"
         :targetRelSpots="value.targetRelSpots"
+        :updateEntityData="value.updateEntityData"
         @removeEntity="removeEntity"
         @entityActivated="entityActivated"
         @setSelfRelSpots="
@@ -132,6 +133,7 @@ export default {
       width: 0,
       relClaimTargetSpots: {},
       relClaimSpots: {},
+      entitiesToUpdate: [],
     };
   },
   computed: {
@@ -163,7 +165,16 @@ export default {
                 ? { x: 0, y: 0 }
                 : this.entities[index]["entityLocationDef"],
             targetRelSpots: this.relClaimTargetSpots[value.ID],
+            updateEntityData: this.entitiesToUpdate.includes(value.ID),
           };
+
+          if (this.entitiesToUpdate.includes(value.ID)) {
+            const index = this.entitiesToUpdate.indexOf(value.ID);
+            let temp = this.entitiesToUpdate.slice(0, index);
+            if (!(index + 1 > this.entitiesToUpdate.length))
+              temp.push(this.entitiesToUpdate.slice(index + 1));
+            this.entitiesToUpdate = temp;
+          }
         }
       });
       return processedEntities;
@@ -519,8 +530,11 @@ export default {
         url: url_ + "/entity/remove",
         data: qs.stringify({ entityID: entityID }),
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      }).then(() => {
-        this.$emit("dropEntity", entityID);
+      }).then((response) => {
+        console.log(response.data.claimantIDs);
+        this.$emit("dropEntity", entityID, response.data.claimantIDs);
+        // for all entities with claimantIDs, update node_data
+        this.entitiesToUpdate = response.data.claimantIDs;
       });
     },
   },

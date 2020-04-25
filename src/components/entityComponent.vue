@@ -155,6 +155,10 @@ export default {
       type: Object,
     },
     targetRelSpots: Object,
+    updateEntityData: {
+      default: false,
+      type: Boolean,
+    },
   },
   data: function () {
     return {
@@ -615,6 +619,9 @@ export default {
         // doing: ask server save state to file
         this.$axios.post(this.apiUrl + "/collection/save");
       }
+    },
+    updateEntityData() {
+      if (this.updateEntityData) this.getEntityData();
     },
   },
   created: function () {},

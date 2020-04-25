@@ -371,7 +371,7 @@ export default {
         entityLocationDef: entityLocationDef_,
       });*/
     },
-    dropEntity(entityID) {
+    dropEntity(entityID, claimantIDs) {
       for (const index in this.entities) {
         if (this.entities[index].ID === entityID) {
           this.$delete(this.entities, index);
