@@ -275,6 +275,7 @@ export default {
     },
     loadCollection() {
       var url_ = this.apiUrl;
+      this.entities = [];
       // todo: directly using testCollection for now. Later a collection explorer feature need to be added.
       axios({
         method: "POST",
@@ -289,6 +290,7 @@ export default {
     },
     getCollection() {
       var url_ = this.apiUrl;
+      this.entities = [];
       // todo: get a list of nodeIDs and create a list of nodes in the canvas
       console.log(`getting list of nodes\n${url_}`);
       axios
@@ -296,7 +298,6 @@ export default {
         .then((response) => {
           //console.log(response);
           this.collection = response["data"];
-          this.entities = [];
           this.entities = response.data.Entities.map((ID) => {
             return { ID: ID };
           });

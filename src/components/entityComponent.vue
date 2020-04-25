@@ -621,7 +621,9 @@ export default {
       }
     },
     updateEntityData() {
-      if (this.updateEntityData) this.getEntityData();
+      if (this.updateEntityData) {
+        this.getEntityData();
+      }
     },
   },
   created: function () {},

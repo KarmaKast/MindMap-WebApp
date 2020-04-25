@@ -172,7 +172,7 @@ export default {
             const index = this.entitiesToUpdate.indexOf(value.ID);
             let temp = this.entitiesToUpdate.slice(0, index);
             if (!(index + 1 > this.entitiesToUpdate.length))
-              temp.push(this.entitiesToUpdate.slice(index + 1));
+              temp.push(...this.entitiesToUpdate.slice(index + 1));
             this.entitiesToUpdate = temp;
           }
         }
@@ -458,7 +458,7 @@ export default {
       };
       this.relClaimTargetSpots = Object.assign({}, this.relClaimTargetSpots, {
         [claimantID]: this.relClaimTargetSpots[claimantID]
-          ? Object.assign(this.relClaimTargetSpots[claimantID], value)
+          ? Object.assign({}, this.relClaimTargetSpots[claimantID], value)
           : value,
       });
 
@@ -474,7 +474,9 @@ export default {
     },
     setSelfRelSpots(entityID, relSpots) {
       //console.log(claimantID, targetID);
-      this.relClaimSpots[entityID] = relSpots;
+      this.relClaimSpots = Object.assign({}, this.relClaimSpots, {
+        [entityID]: relSpots,
+      });
       for (const claimantID in this.relClaimTargetSpots) {
         for (const targetID in this.relClaimTargetSpots[claimantID]) {
           if (targetID === entityID) {
@@ -531,7 +533,7 @@ export default {
         data: qs.stringify({ entityID: entityID }),
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
       }).then((response) => {
-        console.log(response.data.claimantIDs);
+        //console.log(response.data.claimantIDs);
         this.$emit("dropEntity", entityID, response.data.claimantIDs);
         // for all entities with claimantIDs, update node_data
         this.entitiesToUpdate = response.data.claimantIDs;
