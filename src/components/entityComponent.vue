@@ -86,7 +86,6 @@
           pointerEvents: 'all',
         }"
         v-touch:start.self="startRelClaimMode"
-        v-touch:end="confirmRelClaimTarget"
       ></div>
     </div>
     <div
@@ -209,7 +208,7 @@ export default {
           this.editingLabel && this.entitySelected
             ? "white"
             : "hsla(0,0%,0%,0.01)",
-        border: `1px dotted hsla(${this.entityColor.h},${this.entityColor.s}%,${this.entityColor.l}%, 0.2)`,
+        /*border: `1px dotted hsla(${this.entityColor.h},${this.entityColor.s}%,${this.entityColor.l}%, 0.2)`,*/
         borderRadius:
           this.entitySize["height"] > this.entitySize["width"]
             ? `${this.entitySize["height"]}px`
@@ -234,6 +233,7 @@ export default {
         borderRadius: "inherit",
         border: `1px solid hsla(${this.entityColor.h},${this.entityColor.s}%, ${this.entityColor.l}%, 0.8)`,
         backdropFilter: "blur(2px)",
+        backgroundColor: "hsla(0,0%,100%,0.1)",
         pointerEvents: "all",
         display: "grid",
         placeItems: "center",
@@ -515,6 +515,7 @@ export default {
       console.log("starting relclaim mode on node : ", this.entityID);
     },
     confirmRelClaimTarget(event) {
+      event.preventDefault();
       if (!this.relClaimMode.mode && this.$store.state.relClaimMode.mode) {
         console.log(event);
         if (event.type === "mouseup") {
@@ -523,7 +524,11 @@ export default {
             targetID: this.entityID,
           });
         } else {
-          console.log("touch mode not implimented yet");
+          this.$store.commit("update_relClaimMode", {
+            mode: true,
+            targetID: this.entityID,
+          });
+          //alert("touch mode for adding relclaim not implimented yet");
         }
       }
     },
@@ -539,6 +544,7 @@ export default {
       }).then((response) => {
         this.relClaimMode.mode = false;
         this.relClaimMode.targetID = null;
+        this.$store.commit("update_relClaimMode", this.relClaimMode);
         console.log(JSON.parse(response.data.relClaim));
         /*this.entityData.source.RelationClaims.push(
           JSON.parse(response.data.relClaim)

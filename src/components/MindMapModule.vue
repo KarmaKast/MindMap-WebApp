@@ -70,7 +70,8 @@
         :colorsProcessed="colorsProcessed"
         :apiUrl="apiUrl"
         :apiValidity="apiValidity"
-        :showThemeToggle="true"
+        :showThemeToggle="!lockTheming"
+        :toggleCurrent="CurrentTheme === 'theme_light' ? 'light' : 'dark'"
         @themeToggle="
           CurrentTheme === 'theme_light'
             ? (CurrentTheme = 'theme_dark')
@@ -144,8 +145,8 @@ export default {
         },
         theme_dark: {
           background: { h: 0, s: 0, l: 10, a: 0.5 },
-          theme: { h: 141, s: 100, l: 84, a: 0.8 },
-          theme_light: { h: 141, s: 85, l: 32, a: 0.3 },
+          theme: { h: 151, s: 70, l: 67, a: 1 },
+          theme_light: { h: 151, s: 85, l: 32, a: 0.3 },
         },
       },
       CurrentTheme: "theme_light",
@@ -267,7 +268,9 @@ export default {
         left: "60px",
         padding: "10px",
 
-        background: "rgba(255, 255, 255, 0.5)",
+        background: `hsla(${this.colorsFinal["background"].h}, ${
+          this.colorsFinal["background"].s
+        }%, ${this.colorsFinal["background"].l + 50}%, ${0.38}`,
         border: `0.5px dashed ${this.colorsProcessed["theme"]}`,
         boxSizing: "border-box",
         backdropFilter: "blur(4px)",
@@ -285,7 +288,7 @@ export default {
         background: `hsla(${this.colorsFinal["background"].h}, ${
           this.colorsFinal["background"].s
         }%, ${this.colorsFinal["background"].l + 50}%, ${0.38}`,
-        border: `1px solid ${this.colorsProcessed["theme_light"]}`,
+        border: `1px solid ${this.colorsProcessed["theme"]}`,
         backdropFilter: "blur(4px)",
         borderRadius: "12px",
         padding: "0px",

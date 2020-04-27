@@ -11,7 +11,7 @@
         v-if="showNextToggle"
         id="next"
         :style="lightDarkToggleNextStyle"
-        @click="toggleTheme"
+        v-touch:tap="toggleTheme"
       ></div>
     </div>
     <div></div>
@@ -32,7 +32,7 @@
           backgroundColor: 'rgba(255,255,255,0.5)',
           color: 'black',
           borderRadius: '5px',
-          boxShadow: `0px 0px 0 1px red`,
+          boxShadow: `0px 0px 0 1px ${colorsProcessed['theme_light']}`,
         }"
       >
         {{ apiUrl }}
@@ -49,13 +49,13 @@ export default {
     colorsProcessed: Object,
     apiUrl: String,
     apiValidity: Boolean,
+    toggleCurrent: String,
   },
   data: function () {
     return {
       height: 20,
       padding: 2,
       showNextToggle: false,
-      toggleCurrent: "light",
     };
   },
   computed: {
@@ -73,6 +73,7 @@ export default {
         borderBottomRightRadius: "inherit",
 
         display: "grid",
+        pointerEvents: "all",
         placeItems: "center",
         gridTemplateColumns: `min-content auto min-content`,
         columnGap: "5px",
@@ -102,10 +103,11 @@ export default {
         borderRadius: `${this.height}px`,
         padding: "1px",
         display: "grid",
-        backgroundColor: this.toggleCurrent === "light" ? "white" : "black",
-        border: `1px solid ${
-          this.toggleCurrent === "light" ? "black" : "white"
-        }`,
+        backgroundColor:
+          this.toggleCurrent === "light"
+            ? "hsla(0,0%,100%,1)" // white
+            : "hsla(0,0%,10%,1)", // black
+        boxShadow: "0px 0px 3px 1px grey",
       };
     },
     lightDarkToggleNextStyle: function () {
@@ -116,13 +118,12 @@ export default {
         borderRadius: `${this.height}px`,
         padding: "1px",
         display: "grid",
-        backgroundColor: this.toggleCurrent === "light" ? "black" : "white",
-        /*border: `1px solid ${
-          this.toggleCurrent === "light" ? "white" : "black"
-        }`,*/
-        boxShadow: `0px 0px 3px 1px ${
-          this.toggleCurrent === "light" ? "white" : "black"
-        }`,
+        backgroundColor:
+          this.toggleCurrent === "light"
+            ? "hsla(0,0%,10%,1)" // black
+            : "hsla(0,0%,85%,1)", // white
+        boxShadow: "0px 0px 3px 1px grey",
+        cursor: "pointer",
       };
     },
     apiStatusContainerStyle: function () {
@@ -142,8 +143,8 @@ export default {
         height: "100%",
         width: `${this.height * 1}px`,
         backgroundColor: this.apiValidity
-          ? "hsla(130, 100%, 40%, 0.95)"
-          : "hsla(0, 100%, 60%, 0.95)",
+          ? "hsla(130, 100%, 40%, 0.95)" // green
+          : "hsla(0, 100%, 60%, 0.95)", // red
         borderRadius: `${this.height}px`,
         border: "1.2px dotted white",
         boxShadow: "0px 0px 3px 1px hsla(0, 0%, 0%, 0.32)",
@@ -154,7 +155,7 @@ export default {
   methods: {
     toggleTheme: function () {
       //this.showNextToggle = true;
-      this.toggleCurrent = this.toggleCurrent === "light" ? "dark" : "light";
+      //this.toggleCurrent = this.toggleCurrent === "light" ? "dark" : "light";
       this.$emit("themeToggle");
     },
   },

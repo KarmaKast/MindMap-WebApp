@@ -339,6 +339,7 @@ export default {
       }
     },
     setCanvasDragging(event) {
+      event.preventDefault();
       if (
         event.which === 2 ||
         ["touchend", "touchstart"].includes(event.type)
