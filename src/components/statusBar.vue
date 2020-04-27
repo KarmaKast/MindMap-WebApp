@@ -1,5 +1,19 @@
 <template>
   <div id="statusBar" :style="statusBarStyle">
+    <div
+      id="light-dark-toggle"
+      :style="lightDarkToggleContainerStyle"
+      @mouseenter="showNextToggle = true"
+      @mouseleave="showNextToggle = false"
+    >
+      <div id="current" :style="lightDarkToggleCurrentStyle"></div>
+      <div
+        v-if="showNextToggle"
+        id="next"
+        :style="lightDarkToggleNextStyle"
+        @click="toggleTheme"
+      ></div>
+    </div>
     <div></div>
     <div id="apiStatusContainer" :style="apiStatusContainerStyle">
       <div
@@ -40,6 +54,8 @@ export default {
     return {
       height: 20,
       padding: 2,
+      showNextToggle: false,
+      toggleCurrent: "light",
     };
   },
   computed: {
@@ -58,12 +74,55 @@ export default {
 
         display: "grid",
         placeItems: "center",
-        gridTemplateColumns: `auto min-content`,
+        gridTemplateColumns: `min-content auto min-content`,
         columnGap: "5px",
 
         backgroundColor: `${this.colorsProcessed["background"]}`,
         backdropFilter: "blur(3px)",
         backgroundImage: `repeating-linear-gradient(45deg,rgba(255, 255, 255, 0), ${this.colorsProcessed["theme_light"]} 1px, rgba(255, 255, 255, 0) 1px, rgba(255, 255, 255, 0) 6px), repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0), ${this.colorsProcessed["theme_light"]} 1px, rgba(255, 255, 255, 0) 1px, rgba(255, 255, 255, 0) 6px)`,
+      };
+    },
+    lightDarkToggleContainerStyle: function () {
+      return {
+        height: "95%",
+        minWidth: `${this.height}px`,
+        boxSizing: "border-box",
+        padding: "1px",
+        display: "grid",
+        gridTemplateColumns: "auto auto",
+        gridColumnGap: "3px",
+        pointerEvents: "all",
+      };
+    },
+    lightDarkToggleCurrentStyle: function () {
+      return {
+        height: "100%",
+        width: `${this.height}px`,
+        boxSizing: "border-box",
+        borderRadius: `${this.height}px`,
+        padding: "1px",
+        display: "grid",
+        backgroundColor: this.toggleCurrent === "light" ? "white" : "black",
+        border: `1px solid ${
+          this.toggleCurrent === "light" ? "black" : "white"
+        }`,
+      };
+    },
+    lightDarkToggleNextStyle: function () {
+      return {
+        height: "100%",
+        width: `${this.height}px`,
+        boxSizing: "border-box",
+        borderRadius: `${this.height}px`,
+        padding: "1px",
+        display: "grid",
+        backgroundColor: this.toggleCurrent === "light" ? "black" : "white",
+        /*border: `1px solid ${
+          this.toggleCurrent === "light" ? "white" : "black"
+        }`,*/
+        boxShadow: `0px 0px 3px 1px ${
+          this.toggleCurrent === "light" ? "white" : "black"
+        }`,
       };
     },
     apiStatusContainerStyle: function () {
@@ -90,6 +149,13 @@ export default {
         boxShadow: "0px 0px 3px 1px hsla(0, 0%, 0%, 0.32)",
         boxSizing: "border-box",
       };
+    },
+  },
+  methods: {
+    toggleTheme: function () {
+      //this.showNextToggle = true;
+      this.toggleCurrent = this.toggleCurrent === "light" ? "dark" : "light";
+      this.$emit("themeToggle");
     },
   },
 };

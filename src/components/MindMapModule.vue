@@ -52,13 +52,13 @@
         <div id="menuItems" :style="this.menuItemsStyle">
           <button-one
             :validity="this.apiValidity"
-            :colors="colors"
+            :colors="colorsFinal"
             :style="{ order: 0 }"
           ></button-one>
           <button-two
             v-for="(button, index) in menuButtons"
             :key="index + 1"
-            :colors="colors"
+            :colors="colorsFinal"
             :buttonText="button['text']"
             @takeAction="button['action'](...button['args'])"
             :style="{ order: index }"
@@ -70,6 +70,12 @@
         :colorsProcessed="colorsProcessed"
         :apiUrl="apiUrl"
         :apiValidity="apiValidity"
+        :showThemeToggle="true"
+        @themeToggle="
+          CurrentTheme === 'theme_light'
+            ? (CurrentTheme = 'theme_dark')
+            : (CurrentTheme = 'theme_light')
+        "
       ></status-bar>
       <about-page
         :showPage="this.showAboutPage"
@@ -139,7 +145,7 @@ export default {
         theme_dark: {
           background: { h: 0, s: 0, l: 10, a: 0.5 },
           theme: { h: 141, s: 100, l: 84, a: 0.8 },
-          theme_light: { h: 141, s: 100, l: 84, a: 0.3 },
+          theme_light: { h: 141, s: 85, l: 32, a: 0.3 },
         },
       },
       CurrentTheme: "theme_light",
