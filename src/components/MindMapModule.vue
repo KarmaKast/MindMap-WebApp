@@ -1,7 +1,7 @@
 <template>
   <div class="MindMapModule" :style="this.containerStyle">
     <mind-map-canvas
-      :colors="this.colors"
+      :colors="this.colorsFinal"
       :colorsProcessed="colorsProcessed"
       :apiUrl="this.apiUrl"
       :entities="entities"
@@ -14,7 +14,7 @@
 
     <div
       class="debug"
-      v-html="this.respo"
+      v-html="this.debugMsg"
       style="display: block; position: relative; bottom: 0px; margin: 0px auto;"
     ></div>
 
@@ -41,25 +41,7 @@
       >
         <button
           id="burgerTimeButton"
-          :style="{
-            position: 'relative',
-            top: '0px',
-            left: '0px',
-            height: '38px',
-            width: '48px',
-            background: 'rgba(255, 255, 255, 0.5)',
-            border: '1px solid rgb(255, 164, 164)',
-            backdropFilter: 'blur(4px)',
-            borderRadius: '12px',
-            padding: '0px',
-            boxShadow: this.showMenu
-              ? 'hsla(0, 0%, 0%, 0.16) 0px 0px 19px 1px'
-              : 'unset',
-            boxSizing: 'border-box',
-            cursor: 'pointer',
-            outline: 'none',
-            pointerEvents: 'initial',
-          }"
+          :style="burgerTimeButtonStyle"
           @click.left="toggleMenu"
         >
           <img
@@ -123,6 +105,10 @@ export default {
   props: {
     // locationHor: {'left':value} or {'right':value}
     colors: Object,
+    lockTheming: {
+      default: false,
+      type: Boolean,
+    },
     entityLimit: {
       default: 25,
       type: Number,
@@ -130,7 +116,7 @@ export default {
   },
   data: function () {
     return {
-      respo: "",
+      debugMsg: "",
       showMenu: false,
       apiUrl: "",
       apiValidity: false,
@@ -144,9 +130,25 @@ export default {
         show: true,
         snap: true,
       },
+      MindMapColors: {
+        theme_light: {
+          background: { h: 0, s: 0, l: 100, a: 0.5 },
+          theme: { h: 358, s: 97, l: 67, a: 1 },
+          theme_light: { h: 0, s: 100, l: 84, a: 1 },
+        },
+        theme_dark: {
+          background: { h: 0, s: 0, l: 10, a: 0.5 },
+          theme: { h: 141, s: 100, l: 84, a: 0.8 },
+          theme_light: { h: 141, s: 100, l: 84, a: 0.3 },
+        },
+      },
+      CurrentTheme: "theme_light",
     };
   },
   computed: {
+    colorsFinal: function () {
+      return this.colors ? this.colors : this.MindMapColors[this.CurrentTheme];
+    },
     menuButtons: function () {
       var list = [
         {
@@ -201,11 +203,11 @@ export default {
     },
     colorsProcessed: function () {
       var colors_ = {};
-      for (var key in this.colors) {
-        var color_ = this.colors[key];
+      for (var key in this.colorsFinal) {
+        var color_ = this.colorsFinal[key];
         colors_[
           key
-        ] = `hsla(${color_[0]},${color_[1]}%,${color_[2]}%,${color_[3]})`;
+        ] = `hsla(${color_.h},${color_.s}%,${color_.l}%,${color_.a})`;
       }
       return colors_;
     },
@@ -218,8 +220,8 @@ export default {
         position: "relative",
         touchAction: "none",
       };
-      if (this.colors !== undefined) {
-        if ("background" in this.colors) {
+      if (this.colorsProcessed !== undefined) {
+        if ("background" in this.colorsProcessed) {
           style["backgroundColor"] = `${this.colorsProcessed["background"]}`;
           style[
             "boxShadow"
@@ -236,16 +238,16 @@ export default {
         width: `${size}px`,
         top: 5 + "px",
         right: 5 + "px",
-        backgroundColor: `hsla(${this.colors["theme"][0]},${
-          this.colors["theme"][1]
-        }%,${this.colors["theme"][2] * 1.38}%,${
-          this.colors["theme"][3] * 0.5
+        backgroundColor: `hsla(${this.colorsProcessed["theme"].h},${
+          this.colorsProcessed["theme"].s
+        }%,${this.colorsProcessed["theme"].l * 1.38}%,${
+          this.colorsProcessed["theme"].a * 0.5
         })`,
         backdropFilter: "blur(4px)",
-        border: `1px solid hsla(${this.colors["theme"][0]},${
-          this.colors["theme"][1]
-        }%,${this.colors["theme"][2] * 1.15}%,${
-          this.colors["theme"][3] * 0.3
+        border: `1px solid hsla(${this.colorsProcessed["theme"].h},${
+          this.colorsProcessed["theme"].s
+        }%,${this.colorsProcessed["theme"].l * 1.15}%,${
+          this.colorsProcessed["theme"].a * 0.3
         })`,
         borderRadius: "50%",
       };
@@ -265,6 +267,31 @@ export default {
         backdropFilter: "blur(4px)",
         borderRadius: "15px",
         boxShadow: "hsla(0, 0%, 0%, 0.16) 0px 0px 19px 1px",
+      };
+    },
+    burgerTimeButtonStyle: function () {
+      return {
+        position: "relative",
+        top: "0px",
+        left: "0px",
+        height: "38px",
+        width: "48px",
+        background: `hsla(${this.colorsFinal["background"].h}, ${
+          this.colorsFinal["background"].s
+        }%, ${this.colorsFinal["background"].l + 50}%, ${0.38}`,
+        border: `1px solid ${this.colorsProcessed["theme_light"]}`,
+        backdropFilter: "blur(4px)",
+        borderRadius: "12px",
+        padding: "0px",
+        boxShadow: this.showMenu
+          ? `hsla(0, 0%, ${
+              this.colorsFinal["background"].l - 20
+            }%, 0.5) 0px 0px 19px 1px`
+          : "unset",
+        boxSizing: "border-box",
+        cursor: "pointer",
+        outline: "none",
+        pointerEvents: "initial",
       };
     },
   },
@@ -419,10 +446,10 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
-div.container {
+/*div.container {
   position: relative;
   margin-left: auto;
   margin-right: auto;
   background-color: rgb(49, 49, 49);
-}
+}*/
 </style>

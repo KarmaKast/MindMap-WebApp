@@ -8,7 +8,8 @@
       }"
     ></div>
     <div id="mindMapContainer" :style="mindMapContainerStyle">
-      <MindMapModule :colors="MindMapColors" :entityLimit="entityLimit" />
+      <!-- <MindMapModule :colors="MindMapColors" :entityLimit="entityLimit" />-->
+      <MindMapModule :entityLimit="entityLimit" />
     </div>
   </div>
 </template>
@@ -32,9 +33,9 @@ export default {
         padding: "20px",
       },
       MindMapColors: {
-        background: [0, 0, 100, 0.5],
-        theme: [358, 97, 67, 1],
-        theme_light: [0, 100, 84, 1],
+        background: { h: 0, s: 0, l: 100, a: 0.5 },
+        theme: { h: 358, s: 97, l: 67, a: 1 },
+        theme_light: { h: 0, s: 100, l: 84, a: 1 },
       },
       window_size: {
         width: 0,

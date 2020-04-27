@@ -63,7 +63,7 @@ export default {
 
         backgroundColor: `${this.colorsProcessed["background"]}`,
         backdropFilter: "blur(3px)",
-        backgroundImage: `repeating-linear-gradient(45deg,rgba(255, 255, 255, 0), rgba(255, 173, 173, 0.49) 1px, rgba(255, 255, 255, 0) 1px, rgba(255, 255, 255, 0) 6px), repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0), rgba(255, 173, 173, 0.51) 1px, rgba(255, 255, 255, 0) 1px, rgba(255, 255, 255, 0) 6px)`,
+        backgroundImage: `repeating-linear-gradient(45deg,rgba(255, 255, 255, 0), ${this.colorsProcessed["theme_light"]} 1px, rgba(255, 255, 255, 0) 1px, rgba(255, 255, 255, 0) 6px), repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0), ${this.colorsProcessed["theme_light"]} 1px, rgba(255, 255, 255, 0) 1px, rgba(255, 255, 255, 0) 6px)`,
       };
     },
     apiStatusContainerStyle: function () {

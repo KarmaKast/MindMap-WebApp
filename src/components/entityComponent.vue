@@ -14,8 +14,8 @@
               :key="index"
               :config="{
                 points: relationWirePoints[relClaim.To],
-                stroke: 'red',
-                strokeWidth: 1,
+                stroke: relWireColor,
+                strokeWidth: dragging.state || entitySelected ? 2 : 1,
                 lineCap: 'round',
                 lineJoin: 'round',
               }"
@@ -182,6 +182,9 @@ export default {
     };
   },
   computed: {
+    relWireColor: function () {
+      return `hsla(${this.entityColor.h},${this.entityColor.s}%,${this.entityColor.l}%, ${this.entityColor.a})`;
+    },
     entityContainerStyle: function () {
       return {
         position: "absolute",
@@ -214,7 +217,7 @@ export default {
         boxShadow: `${
           this.dragging.state
             ? "rgba(0, 0, 0, 0.2) 0px 0px 13px 4px"
-            : "rgba(0, 0, 0, 0.15) 0px 0px 3px 2px"
+            : "rgba(0, 0, 0, 0.05) 0px 0px 3px 2px"
         }, inset 0px 0px 0 4px hsla(${this.entityColor.h},
         ${this.entityColor.s}%,
         ${this.entityColor.l}%, 0.2)`,
@@ -611,14 +614,20 @@ export default {
         });
       }
     },
-    entityColor() {
-      this.savePropToAPI("color", this.entityColor);
-      this.entityData.viz_props.color = this.entityColor;
-      //this.getEntityData();
-      if (this.autoSave) {
-        // doing: ask server save state to file
-        this.$axios.post(this.apiUrl + "/collection/save");
-      }
+    entityColor: {
+      handler() {
+        //if (this.entityColor != this.entityData.viz_props.color) {
+        console.log("color should have updated in the backend");
+        this.savePropToAPI("color", this.entityColor);
+        //this.entityData.viz_props.color = this.entityColor;
+        //this.getEntityData();
+        if (this.autoSave) {
+          // doing: ask server save state to file
+          this.$axios.post(this.apiUrl + "/collection/save");
+        }
+        //}
+      },
+      deep: true,
     },
     updateEntityData() {
       if (this.updateEntityData) {
