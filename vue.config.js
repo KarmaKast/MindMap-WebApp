@@ -7,5 +7,6 @@ module.exports = {
   },
   pwa: {
     display: "fullscreen",
+    //manifestOptions: { CacheControl: "must-revalidate, max-age=600" },
   },
 };
