@@ -79,6 +79,8 @@
         "
       ></status-bar>
       <about-page
+        :colors="colorsFinal"
+        :colorsProcessed="colorsProcessed"
         :showPage="this.showAboutPage"
         @closePage="this.aboutPageDisplay"
       ></about-page>

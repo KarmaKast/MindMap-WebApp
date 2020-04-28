@@ -55,6 +55,8 @@ import { version } from "../../package.json";
 export default {
   name: "aboutPage",
   props: {
+    colors: Object,
+    colorsProcessed: Object,
     showPage: Boolean,
   },
   data: function () {
@@ -85,7 +87,7 @@ export default {
         maxWidth: "400px",
         minWidth: "280px",
         width: "20%",
-        border: "1px dashed hsl(358, 96%, 67%)",
+        border: `1px dashed ${this.colorsProcessed["theme"]}`,
         boxSizing: "border-box",
 
         display: "grid",
@@ -99,7 +101,7 @@ export default {
         background: this.isHovered
           ? "rgba(255, 255, 255, 0.8)"
           : "rgba(255, 255, 255, 0.4)",
-        border: "0.5px dashed hsl(358, 96%, 67%)",
+        border: `0.5px dashed ${this.colorsProcessed["theme"]}`,
         boxShadow: "0px 0px 2px 1px hsla(0, 0%, 0%, 0.1882)",
         boxSizing: "border-box",
         borderRadius: "100%",

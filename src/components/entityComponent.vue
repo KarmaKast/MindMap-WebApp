@@ -75,10 +75,11 @@
         "
       ></div>
       <div
+        id="startRelClaimBttn"
         :style="{
           position: 'absolute',
           top: '14px',
-          left: '140px',
+          left: `${relationSpots.right - relationSpots.left + 5}px`,
           height: '25px',
           width: '25px',
           backgroundColor: 'blue',

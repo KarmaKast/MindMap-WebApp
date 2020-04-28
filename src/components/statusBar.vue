@@ -3,13 +3,15 @@
     <div
       id="light-dark-toggle"
       :style="lightDarkToggleContainerStyle"
-      @mouseenter="showNextToggle = true"
-      @mouseleave="showNextToggle = false"
+      @mouseenter="toggleShowNext"
+      @mouseleave="toggleShowNext"
+      v-touch:tap="toggleShowNext"
     >
       <div id="current" :style="lightDarkToggleCurrentStyle"></div>
       <div
         v-if="showNextToggle"
         id="next"
+        ref="next"
         :style="lightDarkToggleNextStyle"
         v-touch:tap="toggleTheme"
       ></div>
@@ -157,6 +159,23 @@ export default {
       //this.showNextToggle = true;
       //this.toggleCurrent = this.toggleCurrent === "light" ? "dark" : "light";
       this.$emit("themeToggle");
+    },
+    toggleShowNext: function (event) {
+      event.preventDefault();
+      //console.log(event);
+      if (event.target !== this.$refs.next)
+        if (event.type.startsWith("mouse")) {
+          console.log(event);
+          this.showNextToggle
+            ? (this.showNextToggle = false)
+            : (this.showNextToggle = true);
+        } else {
+          // todo: for touch event toggle off showNext after a few seconds
+          console.log(event);
+          this.showNextToggle
+            ? (this.showNextToggle = false)
+            : (this.showNextToggle = true);
+        }
     },
   },
 };
