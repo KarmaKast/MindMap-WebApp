@@ -41,11 +41,13 @@
       >
         <button
           id="burgerTimeButton"
+          aria-label="burgerTimeButton"
           :style="burgerTimeButtonStyle"
           @click.left="toggleMenu"
         >
           <img
             src="../assets/ic_more_vert_18px.svg"
+            alt="Menu"
             :style="{ color: 'rgb(255, 164, 164)', userSelect: 'none' }"
           />
         </button>
