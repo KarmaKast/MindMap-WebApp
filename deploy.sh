@@ -4,11 +4,16 @@
 set -e
 
 # build
-echo Linting..
-npm run lint
-echo Building. this may take a minute...
-npm run build
+#echo Linting..
+#npm run lint
+#echo Building. this may take a minute...
+#npm run build
 
+if [ ! -d "dist" ]  
+then
+    echo "dist folder not found. run build manually."
+    exit 1
+fi
 # navigate into the build output directory
 cd dist
 

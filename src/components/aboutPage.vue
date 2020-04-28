@@ -15,7 +15,15 @@
       </button>
 
       <p :style="pStyle">
-        <span :style="{ fontSize: '20px' }">MapThyMind - {{ version }}</span>
+        <span :style="{ fontSize: '20px' }"
+          ><a
+            href="https://github.com/KarmaKast/MindMap-WebApp"
+            :style="{ pointerEvents: 'initial' }"
+            target="_blank"
+            >{{ productName }}</a
+          >
+          - v{{ version }}</span
+        >
         <br />
         <br />
         A Mindmap web app that uses
@@ -27,15 +35,6 @@
         >
         . Currently everything is in prototyping state. <br />
         <br />
-        Setting up: <br />
-        - Download your release from
-        <a
-          href="https://github.com/KarmaKast/MindMap-WebApp"
-          :style="{ pointerEvents: 'initial' }"
-          target="_blank"
-        >
-          MapThyMind Github Repo
-        </a>
         <br />
         - setup
         <a
@@ -50,7 +49,7 @@
   </div>
 </template>
 <script>
-import { version } from "../../package.json";
+import { version, productName, name } from "../../package.json";
 
 export default {
   name: "aboutPage",
@@ -62,7 +61,8 @@ export default {
   data: function () {
     return {
       isHovered: false,
-      version: version,
+      version,
+      productName: productName ? productName : name,
     };
   },
   computed: {
