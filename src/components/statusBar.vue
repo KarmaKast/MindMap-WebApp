@@ -55,7 +55,7 @@ export default {
   },
   data: function () {
     return {
-      height: 20,
+      height: 25,
       padding: 2,
       showNextToggle: false,
     };
@@ -80,7 +80,10 @@ export default {
         gridTemplateColumns: `min-content auto min-content`,
         columnGap: "5px",
 
-        backgroundColor: `${this.colorsProcessed["background"]}`,
+        //backgroundColor: this.colorsProcessed["background"],
+        backgroundColor: `hsla(${this.colors["background"].h},${
+          this.colors["background"].s
+        }%,${this.colors["background"].l + 10}%,0.5)`,
         backdropFilter: "blur(3px)",
         backgroundImage: `repeating-linear-gradient(45deg,rgba(255, 255, 255, 0), ${this.colorsProcessed["theme_light"]} 1px, rgba(255, 255, 255, 0) 1px, rgba(255, 255, 255, 0) 6px), repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0), ${this.colorsProcessed["theme_light"]} 1px, rgba(255, 255, 255, 0) 1px, rgba(255, 255, 255, 0) 6px)`,
       };
@@ -107,9 +110,13 @@ export default {
         display: "grid",
         backgroundColor:
           this.toggleCurrent === "light"
-            ? "hsla(0,0%,100%,1)" // white
+            ? "hsla(0,0%,98%,1)" // white
             : "hsla(0,0%,10%,1)", // black
-        boxShadow: "0px 0px 3px 1px grey",
+        boxShadow: `0px 0px 1px 1px ${
+          this.toggleCurrent === "light"
+            ? "hsla(0,0%,10%,0.4)"
+            : "hsla(0,0%,85%,0.4)"
+        } `,
       };
     },
     lightDarkToggleNextStyle: function () {
@@ -124,7 +131,11 @@ export default {
           this.toggleCurrent === "light"
             ? "hsla(0,0%,10%,1)" // black
             : "hsla(0,0%,85%,1)", // white
-        boxShadow: "0px 0px 3px 1px grey",
+        boxShadow: `0px 0px 1px 1px ${
+          this.toggleCurrent === "light"
+            ? "hsla(0,0%,85%,0.4)"
+            : "hsla(0,0%,10%,0.4)"
+        }`,
         cursor: "pointer",
       };
     },
@@ -148,7 +159,9 @@ export default {
           ? "hsla(130, 100%, 40%, 0.95)" // green
           : "hsla(0, 100%, 60%, 0.95)", // red
         borderRadius: `${this.height}px`,
-        border: "1.2px dotted white",
+        border: `1.2px dotted hsla(${this.colors["background"].h},${
+          this.colors["background"].s
+        }%,${this.colors["background"].l - 20}%,1)`,
         boxShadow: "0px 0px 3px 1px hsla(0, 0%, 0%, 0.32)",
         boxSizing: "border-box",
       };
@@ -165,13 +178,13 @@ export default {
       //console.log(event);
       if (event.target !== this.$refs.next)
         if (event.type.startsWith("mouse")) {
-          console.log(event);
+          //console.log(event);
           this.showNextToggle
             ? (this.showNextToggle = false)
             : (this.showNextToggle = true);
         } else {
           // todo: for touch event toggle off showNext after a few seconds
-          console.log(event);
+          //console.log(event);
           this.showNextToggle
             ? (this.showNextToggle = false)
             : (this.showNextToggle = true);

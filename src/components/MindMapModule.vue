@@ -55,12 +55,14 @@
           <button-one
             :validity="this.apiValidity"
             :colors="colorsFinal"
+            :colorsProcessed="colorsProcessed"
             :style="{ order: 0 }"
           ></button-one>
           <button-two
             v-for="(button, index) in menuButtons"
             :key="index + 1"
             :colors="colorsFinal"
+            :colorsProcessed="colorsProcessed"
             :buttonText="button['text']"
             @takeAction="button['action'](...button['args'])"
             :style="{ order: index }"
@@ -68,7 +70,7 @@
         </div>
       </div>
       <status-bar
-        :colors="colors"
+        :colors="colorsFinal"
         :colorsProcessed="colorsProcessed"
         :apiUrl="apiUrl"
         :apiValidity="apiValidity"
@@ -83,8 +85,8 @@
       <about-page
         :colors="colorsFinal"
         :colorsProcessed="colorsProcessed"
-        :showPage="this.showAboutPage"
-        @closePage="this.aboutPageDisplay"
+        :showPage="showAboutPage"
+        @closePage="aboutPageDisplay"
       ></about-page>
     </div>
   </div>
@@ -143,12 +145,12 @@ export default {
       },
       MindMapColors: {
         theme_light: {
-          background: { h: 0, s: 0, l: 100, a: 0.5 },
+          background: { h: 0, s: 0, l: 90, a: 1 },
           theme: { h: 358, s: 97, l: 67, a: 1 },
           theme_light: { h: 0, s: 100, l: 84, a: 1 },
         },
         theme_dark: {
-          background: { h: 0, s: 0, l: 10, a: 0.5 },
+          background: { h: 0, s: 0, l: 15, a: 1 },
           theme: { h: 151, s: 70, l: 67, a: 1 },
           theme_light: { h: 151, s: 85, l: 32, a: 0.3 },
         },
