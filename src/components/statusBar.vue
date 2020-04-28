@@ -1,5 +1,21 @@
 <template>
   <div id="statusBar" :style="statusBarStyle">
+    <div
+      id="light-dark-toggle"
+      :style="lightDarkToggleContainerStyle"
+      @mouseenter="toggleShowNext"
+      @mouseleave="toggleShowNext"
+      v-touch:tap="toggleShowNext"
+    >
+      <div id="current" :style="lightDarkToggleCurrentStyle"></div>
+      <div
+        v-if="showNextToggle"
+        id="next"
+        ref="next"
+        :style="lightDarkToggleNextStyle"
+        v-touch:tap="toggleTheme"
+      ></div>
+    </div>
     <div></div>
     <div id="apiStatusContainer" :style="apiStatusContainerStyle">
       <div
@@ -18,7 +34,7 @@
           backgroundColor: 'rgba(255,255,255,0.5)',
           color: 'black',
           borderRadius: '5px',
-          boxShadow: `0px 0px 0 1px red`,
+          boxShadow: `0px 0px 0 1px ${colorsProcessed['theme_light']}`,
         }"
       >
         {{ apiUrl }}
@@ -35,11 +51,13 @@ export default {
     colorsProcessed: Object,
     apiUrl: String,
     apiValidity: Boolean,
+    toggleCurrent: String,
   },
   data: function () {
     return {
       height: 20,
       padding: 2,
+      showNextToggle: false,
     };
   },
   computed: {
@@ -57,13 +75,57 @@ export default {
         borderBottomRightRadius: "inherit",
 
         display: "grid",
+        pointerEvents: "all",
         placeItems: "center",
-        gridTemplateColumns: `auto min-content`,
+        gridTemplateColumns: `min-content auto min-content`,
         columnGap: "5px",
 
         backgroundColor: `${this.colorsProcessed["background"]}`,
         backdropFilter: "blur(3px)",
-        backgroundImage: `repeating-linear-gradient(45deg,rgba(255, 255, 255, 0), rgba(255, 173, 173, 0.49) 1px, rgba(255, 255, 255, 0) 1px, rgba(255, 255, 255, 0) 6px), repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0), rgba(255, 173, 173, 0.51) 1px, rgba(255, 255, 255, 0) 1px, rgba(255, 255, 255, 0) 6px)`,
+        backgroundImage: `repeating-linear-gradient(45deg,rgba(255, 255, 255, 0), ${this.colorsProcessed["theme_light"]} 1px, rgba(255, 255, 255, 0) 1px, rgba(255, 255, 255, 0) 6px), repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0), ${this.colorsProcessed["theme_light"]} 1px, rgba(255, 255, 255, 0) 1px, rgba(255, 255, 255, 0) 6px)`,
+      };
+    },
+    lightDarkToggleContainerStyle: function () {
+      return {
+        height: "95%",
+        minWidth: `${this.height}px`,
+        boxSizing: "border-box",
+        padding: "1px",
+        display: "grid",
+        gridTemplateColumns: "auto auto",
+        gridColumnGap: "3px",
+        pointerEvents: "all",
+      };
+    },
+    lightDarkToggleCurrentStyle: function () {
+      return {
+        height: "100%",
+        width: `${this.height}px`,
+        boxSizing: "border-box",
+        borderRadius: `${this.height}px`,
+        padding: "1px",
+        display: "grid",
+        backgroundColor:
+          this.toggleCurrent === "light"
+            ? "hsla(0,0%,100%,1)" // white
+            : "hsla(0,0%,10%,1)", // black
+        boxShadow: "0px 0px 3px 1px grey",
+      };
+    },
+    lightDarkToggleNextStyle: function () {
+      return {
+        height: "100%",
+        width: `${this.height}px`,
+        boxSizing: "border-box",
+        borderRadius: `${this.height}px`,
+        padding: "1px",
+        display: "grid",
+        backgroundColor:
+          this.toggleCurrent === "light"
+            ? "hsla(0,0%,10%,1)" // black
+            : "hsla(0,0%,85%,1)", // white
+        boxShadow: "0px 0px 3px 1px grey",
+        cursor: "pointer",
       };
     },
     apiStatusContainerStyle: function () {
@@ -83,13 +145,37 @@ export default {
         height: "100%",
         width: `${this.height * 1}px`,
         backgroundColor: this.apiValidity
-          ? "hsla(130, 100%, 40%, 0.95)"
-          : "hsla(0, 100%, 60%, 0.95)",
+          ? "hsla(130, 100%, 40%, 0.95)" // green
+          : "hsla(0, 100%, 60%, 0.95)", // red
         borderRadius: `${this.height}px`,
         border: "1.2px dotted white",
         boxShadow: "0px 0px 3px 1px hsla(0, 0%, 0%, 0.32)",
         boxSizing: "border-box",
       };
+    },
+  },
+  methods: {
+    toggleTheme: function () {
+      //this.showNextToggle = true;
+      //this.toggleCurrent = this.toggleCurrent === "light" ? "dark" : "light";
+      this.$emit("themeToggle");
+    },
+    toggleShowNext: function (event) {
+      event.preventDefault();
+      //console.log(event);
+      if (event.target !== this.$refs.next)
+        if (event.type.startsWith("mouse")) {
+          console.log(event);
+          this.showNextToggle
+            ? (this.showNextToggle = false)
+            : (this.showNextToggle = true);
+        } else {
+          // todo: for touch event toggle off showNext after a few seconds
+          console.log(event);
+          this.showNextToggle
+            ? (this.showNextToggle = false)
+            : (this.showNextToggle = true);
+        }
     },
   },
 };

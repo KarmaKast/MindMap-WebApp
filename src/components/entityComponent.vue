@@ -13,9 +13,9 @@
               v-for="(relClaim, index) in entityData.source.RelationClaims"
               :key="index"
               :config="{
-                points: targetRelationSpots[relClaim.To],
-                stroke: 'red',
-                strokeWidth: 1,
+                points: relationWirePoints[relClaim.To],
+                stroke: relWireColor,
+                strokeWidth: dragging.state || entitySelected ? 2 : 1,
                 lineCap: 'round',
                 lineJoin: 'round',
               }"
@@ -75,10 +75,11 @@
         "
       ></div>
       <div
+        id="startRelClaimBttn"
         :style="{
           position: 'absolute',
           top: '14px',
-          left: '140px',
+          left: `${relationSpots.right - relationSpots.left + 5}px`,
           height: '25px',
           width: '25px',
           backgroundColor: 'blue',
@@ -86,7 +87,6 @@
           pointerEvents: 'all',
         }"
         v-touch:start.self="startRelClaimMode"
-        v-touch:end="confirmRelClaimTarget"
       ></div>
     </div>
     <div
@@ -155,6 +155,10 @@ export default {
       type: Object,
     },
     targetRelSpots: Object,
+    updateEntityData: {
+      default: false,
+      type: Boolean,
+    },
   },
   data: function () {
     return {
@@ -178,6 +182,9 @@ export default {
     };
   },
   computed: {
+    relWireColor: function () {
+      return `hsla(${this.entityColor.h},${this.entityColor.s}%,${this.entityColor.l}%, ${this.entityColor.a})`;
+    },
     entityContainerStyle: function () {
       return {
         position: "absolute",
@@ -202,7 +209,7 @@ export default {
           this.editingLabel && this.entitySelected
             ? "white"
             : "hsla(0,0%,0%,0.01)",
-        border: `1px dotted hsla(${this.entityColor.h},${this.entityColor.s}%,${this.entityColor.l}%, 0.2)`,
+        /*border: `1px dotted hsla(${this.entityColor.h},${this.entityColor.s}%,${this.entityColor.l}%, 0.2)`,*/
         borderRadius:
           this.entitySize["height"] > this.entitySize["width"]
             ? `${this.entitySize["height"]}px`
@@ -210,7 +217,7 @@ export default {
         boxShadow: `${
           this.dragging.state
             ? "rgba(0, 0, 0, 0.2) 0px 0px 13px 4px"
-            : "rgba(0, 0, 0, 0.15) 0px 0px 3px 2px"
+            : "rgba(0, 0, 0, 0.05) 0px 0px 3px 2px"
         }, inset 0px 0px 0 4px hsla(${this.entityColor.h},
         ${this.entityColor.s}%,
         ${this.entityColor.l}%, 0.2)`,
@@ -227,6 +234,7 @@ export default {
         borderRadius: "inherit",
         border: `1px solid hsla(${this.entityColor.h},${this.entityColor.s}%, ${this.entityColor.l}%, 0.8)`,
         backdropFilter: "blur(2px)",
+        backgroundColor: "hsla(0,0%,100%,0.1)",
         pointerEvents: "all",
         display: "grid",
         placeItems: "center",
@@ -314,29 +322,101 @@ export default {
       //console.log(boundingBox);
       if (this.dragging.state && this.canvasLocation.x)
         boundingBox = this.$refs.entityContainer.getBoundingClientRect();
-      return [
+      /*return [
         boundingBox.left,
         boundingBox.right,
         boundingBox.top,
         boundingBox.bottom,
-      ];
+      ];*/
+      /*return [
+        this.entityBoundingBoxSize.left,
+        this.entityBoundingBoxSize.right,
+        this.entityBoundingBoxSize.top,
+        this.entityBoundingBoxSize.bottom,
+      ];*/
+      return {
+        left:
+          this.canvasLocation.x +
+          this.canvasSize.width / 2 +
+          this.entityLocation_.x -
+          this.entityBoundingBoxSize.width / 2,
+        right:
+          this.canvasLocation.x +
+          this.canvasSize.width / 2 +
+          this.entityLocation_.x +
+          this.entityBoundingBoxSize.width / 2,
+        top:
+          this.canvasLocation.y +
+          this.canvasSize.height / 2 +
+          this.entityLocation_.y -
+          this.entityBoundingBoxSize.height / 2,
+        bottom:
+          this.canvasLocation.y +
+          this.canvasSize.height / 2 +
+          this.entityLocation_.y +
+          this.entityBoundingBoxSize.height / 2,
+      };
     },
-    targetRelationSpots: function () {
+    relationWirePoints: function () {
       //console.log({ relClaim });
       //this.$emit("getTargetRelSpots", relClaim.To);
+      //const dist = Math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2);
 
       let res = {};
       for (const relClaim of this.entityData.source.RelationClaims) {
-        let spots = this.targetRelSpots
+        let targetSpots = this.targetRelSpots
           ? this.targetRelSpots[relClaim.To]
           : undefined;
         //console.log(this.targetRelSpots[relClaim.To]);
-        res[relClaim.To] = [
-          this.relationSpots[0],
-          (this.relationSpots[2] + this.relationSpots[3]) / 2,
-          spots ? spots[0] : 0,
-          spots ? (spots[2] + spots[3]) / 2 : 0,
-        ];
+        /*res[relClaim.To] = [
+          this.relationSpots.left,
+          (this.relationSpots.top + this.relationSpots.bottom) / 2,
+          targetSpots ? targetSpots.left : 0,
+          targetSpots ? (targetSpots.top + targetSpots.bottom) / 2 : 0,
+        ];*/
+
+        // todo: find closest set of points between this entity and target entity
+        function dist(p1, p2) {
+          return Math.sqrt((p1.x - p2.x) ** 2 + (p1.y - p2.y) ** 2);
+        }
+        const yMidSelf =
+          (this.relationSpots.top + this.relationSpots.bottom) / 2;
+        const xMidSelf =
+          (this.relationSpots.left + this.relationSpots.right) / 2;
+        const yMidTarget = (targetSpots.top + targetSpots.bottom) / 2;
+        const xMidTarget = (targetSpots.left + targetSpots.right) / 2;
+        targetSpots = {
+          left: { x: targetSpots.left, y: yMidTarget },
+          top: { x: xMidTarget, y: targetSpots.top },
+          right: { x: targetSpots.right, y: yMidTarget },
+          bottom: { x: xMidTarget, y: targetSpots.bottom },
+        };
+        let selfSpots = {
+          left: { x: this.relationSpots.left, y: yMidSelf },
+          top: { x: xMidSelf, y: this.relationSpots.top },
+          right: { x: this.relationSpots.right, y: yMidSelf },
+          bottom: { x: xMidSelf, y: this.relationSpots.bottom },
+        };
+        let minDistance;
+        let minDistanceKeys;
+        if (targetSpots) {
+          for (const targetKey in targetSpots) {
+            for (const selfKey in selfSpots) {
+              const distance = dist(targetSpots[targetKey], selfSpots[selfKey]);
+              if (minDistance === undefined || distance < minDistance) {
+                minDistance = distance;
+                minDistanceKeys = { target: targetKey, self: selfKey };
+              }
+            }
+          }
+          //console.log(minDistance, minDistanceKeys);
+          res[relClaim.To] = [
+            selfSpots[minDistanceKeys.self].x,
+            selfSpots[minDistanceKeys.self].y,
+            targetSpots[minDistanceKeys.target].x,
+            targetSpots[minDistanceKeys.target].y,
+          ];
+        } else res[relClaim.To] = [0, 0, 0, 0];
       }
       return res;
     },
@@ -378,7 +458,7 @@ export default {
         params: { entityID: this.entityID },
         paramsSerializer: qs.stringify,
       }).then((response) => {
-        //console.log(response.data);
+        //console.log(JSON.stringify(response.data));
         this.entityData.source = response.data[0];
         this.entityData.viz_props = response.data[1].Data;
         this.$emit("setSelfRelSpots", this.relationSpots);
@@ -411,10 +491,13 @@ export default {
       // doing: updating node's bounding box width and height
       setTimeout(() => {
         var boundingBox = this.$refs.entityContainer.getBoundingClientRect();
+
         this.entityBoundingBoxSize = {
           width: boundingBox.width,
           height: boundingBox.height,
         };
+        //console.log(boundingBox);
+        //this.entityBoundingBoxSize = boundingBox;
       }, time);
     },
     editentityLabel(event) {
@@ -433,6 +516,7 @@ export default {
       console.log("starting relclaim mode on node : ", this.entityID);
     },
     confirmRelClaimTarget(event) {
+      event.preventDefault();
       if (!this.relClaimMode.mode && this.$store.state.relClaimMode.mode) {
         console.log(event);
         if (event.type === "mouseup") {
@@ -441,7 +525,11 @@ export default {
             targetID: this.entityID,
           });
         } else {
-          console.log("touch mode not implimented yet");
+          this.$store.commit("update_relClaimMode", {
+            mode: true,
+            targetID: this.entityID,
+          });
+          //alert("touch mode for adding relclaim not implimented yet");
         }
       }
     },
@@ -457,20 +545,17 @@ export default {
       }).then((response) => {
         this.relClaimMode.mode = false;
         this.relClaimMode.targetID = null;
+        this.$store.commit("update_relClaimMode", this.relClaimMode);
         console.log(JSON.parse(response.data.relClaim));
-        this.entityData.source.RelationClaims.push(
+        /*this.entityData.source.RelationClaims.push(
           JSON.parse(response.data.relClaim)
-        );
+        );*/
+        //const relClaims = this.entityData.source.RelationClaims;
+        const temp = this.entityData;
+        temp.source.RelationClaims.push(JSON.parse(response.data.relClaim));
+        this.entityData = Object.assign({}, temp);
+        this.$emit("getTargetRelSpots", JSON.parse(response.data.relClaim).To);
       });
-    },
-    getRelWirePoints(relClaim) {
-      //console.log({ relClaim });
-      this.$emit("getTargetRelSpots", relClaim.To);
-      let spots = this.targetRelSpots
-        ? this.targetRelSpots[relClaim.to]
-        : undefined;
-      console.log(spots);
-      return [0, 25, spots ? spots[0] : 200, 25];
     },
   },
   watch: {
@@ -480,9 +565,16 @@ export default {
       }
     },
     apiValidity() {},
+    canvasLocation: {
+      handler() {
+        this.$emit("setSelfRelSpots", this.relationSpots);
+      },
+      deep: true,
+    },
 
     entityLocation_() {
       // todo: save node location to database on drag end
+      this.$emit("setSelfRelSpots", this.relationSpots);
       if (!this.dragging.state) {
         if (this.apiValidity) {
           //var msg = `updated location from {x:${this.entityData.viz_props.location[0]},y: ${this.entityData.viz_props.location[1]}} to
@@ -491,7 +583,8 @@ export default {
           // todo: WIP
           //console.log([this.entityLocation_.x, this.entityLocation_.y, 0]);
           this.savePropToAPI("location", this.entityLocation_);
-          this.$emit("setSelfRelSpots", this.relationSpots);
+          //this.entityData.viz_props.location = this.entityLocation_;
+          //this.getEntityData();
         }
       }
     },
@@ -506,6 +599,7 @@ export default {
     entityLabel() {
       // doing: updating node's bounding box width and height
       this.updateEntityBoundaryBox();
+      this.$emit("setSelfRelSpots", this.relationSpots);
       // todo: save node Label to API
       if (this.apiValidity) {
         // todo: also set it to true when api disconnects
@@ -518,6 +612,8 @@ export default {
           paramsSerializer: qs.stringify,
           data: qs.stringify({ Label: this.entityLabel }),
         }).then(() => {
+          this.entityData.source.Label = this.entityLabel;
+          //this.getEntityData();
           if (this.autoSave) {
             // doing: ask server save state to file
             this.$axios.post(this.apiUrl + "/collection/save");
@@ -525,11 +621,24 @@ export default {
         });
       }
     },
-    entityColor() {
-      this.savePropToAPI("color", this.entityColor);
-      if (this.autoSave) {
-        // doing: ask server save state to file
-        this.$axios.post(this.apiUrl + "/collection/save");
+    entityColor: {
+      handler() {
+        //if (this.entityColor != this.entityData.viz_props.color) {
+        console.log("color should have updated in the backend");
+        this.savePropToAPI("color", this.entityColor);
+        //this.entityData.viz_props.color = this.entityColor;
+        //this.getEntityData();
+        if (this.autoSave) {
+          // doing: ask server save state to file
+          this.$axios.post(this.apiUrl + "/collection/save");
+        }
+        //}
+      },
+      deep: true,
+    },
+    updateEntityData() {
+      if (this.updateEntityData) {
+        this.getEntityData();
       }
     },
   },

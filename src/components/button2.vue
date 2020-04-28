@@ -42,7 +42,7 @@ export default {
         var color_ = this.colors[key];
         colors_[
           key
-        ] = `hsla(${color_[0]},${color_[1]}%,${color_[2]}%,${color_[3]})`;
+        ] = `hsla(${color_.h},${color_.s}%,${color_.l}%,${color_.a})`;
       }
       return colors_;
     },

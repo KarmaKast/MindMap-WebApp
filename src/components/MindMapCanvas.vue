@@ -39,6 +39,7 @@
         :entityLocationDef="value.entityLocationDef"
         :grid="grid"
         :targetRelSpots="value.targetRelSpots"
+        :updateEntityData="value.updateEntityData"
         @removeEntity="removeEntity"
         @entityActivated="entityActivated"
         @setSelfRelSpots="
@@ -132,6 +133,7 @@ export default {
       width: 0,
       relClaimTargetSpots: {},
       relClaimSpots: {},
+      entitiesToUpdate: [],
     };
   },
   computed: {
@@ -163,7 +165,16 @@ export default {
                 ? { x: 0, y: 0 }
                 : this.entities[index]["entityLocationDef"],
             targetRelSpots: this.relClaimTargetSpots[value.ID],
+            updateEntityData: this.entitiesToUpdate.includes(value.ID),
           };
+
+          if (this.entitiesToUpdate.includes(value.ID)) {
+            const index = this.entitiesToUpdate.indexOf(value.ID);
+            let temp = this.entitiesToUpdate.slice(0, index);
+            if (!(index + 1 > this.entitiesToUpdate.length))
+              temp.push(...this.entitiesToUpdate.slice(index + 1));
+            this.entitiesToUpdate = temp;
+          }
         }
       });
       return processedEntities;
@@ -187,7 +198,7 @@ export default {
     },
     gridStyle: function () {
       // todo: move color processing functionality to vuex store
-      var processedColor = `hsla(${this.colors["theme_light"][0]}, ${this.colors["theme_light"][1]}%, ${this.colors["theme_light"][2]}%, ${this.grid.opacity})`;
+      var processedColor = `hsla(${this.colors["theme_light"].h}, ${this.colors["theme_light"].s}%, ${this.colors["theme_light"].l}%, ${this.grid.opacity})`;
       var size_ = this.grid.size * 2;
       return {
         height: "200%",
@@ -217,11 +228,11 @@ export default {
         left: `${
           ((this.width / 2 + this.canvasLocation["x"]) % size_x) - size_x
         }px`,
-        backgroundImage: `repeating-linear-gradient(rgba(255, 255, 255, 0), hsla(222, 100%, 50%, ${
+        backgroundImage: `repeating-linear-gradient(rgba(255, 255, 255, 0), hsla(19, 100%, 50%, ${
           this.grid.opacity * 2
         }) ${this.grid.width}px, rgba(255, 255, 255, 0) ${
           this.grid.width
-        }px, rgba(255, 255, 255, 0) ${size_y}px), repeating-linear-gradient(90deg, rgba(255, 255, 255, 0), hsla(177, 73%, 47%, ${
+        }px, rgba(255, 255, 255, 0) ${size_y}px), repeating-linear-gradient(90deg, rgba(255, 255, 255, 0), hsla(183, 91%, 32%, ${
           this.grid.opacity * 2
         }) ${this.grid.width}px, rgba(255, 255, 255, 0) ${
           this.grid.width
@@ -328,6 +339,7 @@ export default {
       }
     },
     setCanvasDragging(event) {
+      //event.preventDefault();
       if (
         event.which === 2 ||
         ["touchend", "touchstart"].includes(event.type)
@@ -447,7 +459,7 @@ export default {
       };
       this.relClaimTargetSpots = Object.assign({}, this.relClaimTargetSpots, {
         [claimantID]: this.relClaimTargetSpots[claimantID]
-          ? Object.assign(this.relClaimTargetSpots[claimantID], value)
+          ? Object.assign({}, this.relClaimTargetSpots[claimantID], value)
           : value,
       });
 
@@ -463,7 +475,9 @@ export default {
     },
     setSelfRelSpots(entityID, relSpots) {
       //console.log(claimantID, targetID);
-      this.relClaimSpots[entityID] = relSpots;
+      this.relClaimSpots = Object.assign({}, this.relClaimSpots, {
+        [entityID]: relSpots,
+      });
       for (const claimantID in this.relClaimTargetSpots) {
         for (const targetID in this.relClaimTargetSpots[claimantID]) {
           if (targetID === entityID) {
@@ -519,8 +533,11 @@ export default {
         url: url_ + "/entity/remove",
         data: qs.stringify({ entityID: entityID }),
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      }).then(() => {
-        this.$emit("dropEntity", entityID);
+      }).then((response) => {
+        //console.log(response.data.claimantIDs);
+        this.$emit("dropEntity", entityID, response.data.claimantIDs);
+        // for all entities with claimantIDs, update node_data
+        this.entitiesToUpdate = response.data.claimantIDs;
       });
     },
   },
