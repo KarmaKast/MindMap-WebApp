@@ -17,7 +17,7 @@
     ></div>
     <div
       v-if="grid.show && grid.opacity > 0 && grid.size > 1 && grid.width > 0"
-      id="grid"
+      id="gridCenter"
       :style="gridCenterStyle"
     ></div>
     <div id="entities">

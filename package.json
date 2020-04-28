@@ -1,24 +1,24 @@
 {
   "name": "map-thy-mind",
-  "productName": "MapThyMind",
-  "version": "0.5.4",
+  "version": "0.5.5",
   "private": true,
   "author": {
     "name": "Sree Chandan",
     "email": "sreechandan98@gmail.com"
   },
-  "license": "Apache-2.0",
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
+    "build:serve": "serve ./dist",
+    "build:deploy":"bash deploy.sh",
     "test:e2e": "vue-cli-service test:e2e",
     "lint": "vue-cli-service lint",
     "electron:build": "vue-cli-service electron:build",
     "electron:serve": "vue-cli-service electron:serve",
     "postinstall": "electron-builder install-app-deps",
     "postuninstall": "electron-builder install-app-deps",
-    "versionBump:patch": "npm version patch --no-git-tag-version",
-    "versionBump:minor": "npm version minor --no-git-tag-version"
+    "versionBump:minor": "npm version minor --no-git-tag-version",
+    "versionBump:patch": "npm version patch --no-git-tag-version"
   },
   "main": "background.js",
   "dependencies": {
@@ -27,6 +27,7 @@
     "color-convert": "^2.0.1",
     "core-js": "^3.6.5",
     "konva": "^4.x",
+    "register-service-worker": "^1.7.1",
     "uuid": "^7.0.3",
     "vue": "^2.6.10",
     "vue-konva": "^2.1.1",
@@ -37,6 +38,7 @@
     "@vue/cli-plugin-babel": "^4.3.1",
     "@vue/cli-plugin-e2e-cypress": "^4.3.1",
     "@vue/cli-plugin-eslint": "^4.3.1",
+    "@vue/cli-plugin-pwa": "^4.3.1",
     "@vue/cli-plugin-vuex": "^4.3.1",
     "@vue/cli-service": "^4.3.1",
     "@vue/eslint-config-prettier": "^6.0.0",
@@ -54,5 +56,7 @@
   "browserslist": [
     "> 1%",
     "last 2 versions"
-  ]
+  ],
+  "license": "Apache-2.0",
+  "productName": "MapThyMind"
 }

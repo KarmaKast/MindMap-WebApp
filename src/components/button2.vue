@@ -1,6 +1,6 @@
 <template>
-  <div id="container" :style="this.containerStyle">
-    <div id="background" :style="this.backgroundStyle"></div>
+  <div class="container" :style="this.containerStyle">
+    <div class="background" :style="this.backgroundStyle"></div>
     <p :style="this.buttonTextStyle">
       {{ this.buttonText }}
     </p>

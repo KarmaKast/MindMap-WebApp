@@ -1,6 +1,6 @@
 <template>
   <div ref="entityContainer" :style="entityContainerStyle">
-    <div id="relationWires" :style="relationWiresStyle">
+    <div class="relationWires" :style="relationWiresStyle">
       <v-stage
         :config="{
           width: this.relStageSize.width,
@@ -26,14 +26,14 @@
     </div>
     <div
       v-if="entitySelected"
-      id="entityUI"
+      class="entityUI"
       :style="{
         position: 'absolute',
         display: 'grid',
       }"
     >
       <div
-        id="editLabelBttn"
+        class="editLabelBttn"
         :style="{
           position: 'absolute',
           bottom: '5px',
@@ -57,7 +57,7 @@
       </div>
       <color-picker v-if="false"></color-picker>
       <div
-        id="removeEntityBttn"
+        class="removeEntityBttn"
         :style="{
           position: 'absolute',
           left: '30px',
@@ -75,7 +75,7 @@
         "
       ></div>
       <div
-        id="startRelClaimBttn"
+        class="startRelClaimBttn"
         :style="{
           position: 'absolute',
           top: '14px',
@@ -90,7 +90,7 @@
       ></div>
     </div>
     <div
-      id="entity"
+      class="entity"
       :style="entityStyle"
       v-touch:start.self="startdrag"
       v-touch:end="confirmRelClaimTarget"

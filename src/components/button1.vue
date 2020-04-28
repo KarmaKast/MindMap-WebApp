@@ -1,11 +1,11 @@
 <template>
-  <div id="container" :style="containerStyle">
-    <div id="background" :style="backgroundStyle"></div>
+  <div class="container" :style="containerStyle">
+    <div class="background" :style="backgroundStyle"></div>
     <p :style="buttonTextStyle">
       {{ buttonText }}
     </p>
     <button
-      id="primary-button"
+      class="primary-button"
       :style="buttonStyle"
       @mousedown="clickStarted = true"
       @mouseup="clickStarted = false"
@@ -18,7 +18,7 @@
     ></button>
     <input
       v-model="urlInField"
-      id="input-field"
+      class="input-field"
       ref="inputField"
       placeholder="Connect to API"
       :style="inputFieldStyle"
@@ -26,7 +26,7 @@
       @keyup.esc="setNotActive"
     />
     <button
-      id="secondary-button"
+      class="secondary-button"
       :style="testButtonStyle"
       @click.left="testAPI"
       @mouseover="setButtonHovered('test')"
