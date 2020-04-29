@@ -45,11 +45,9 @@
           :style="burgerTimeButtonStyle"
           @click.left="toggleMenu"
         >
-          <img
-            src="../assets/ic_more_vert_18px.svg"
-            alt="Menu"
-            :style="{ color: 'rgb(255, 164, 164)', userSelect: 'none' }"
-          />
+          <icon-base :iconColor="colorsProcessed['theme']"
+            ><icon-hamburger1
+          /></icon-base>
         </button>
         <div id="menuItems" :style="this.menuItemsStyle">
           <button-one
@@ -105,6 +103,10 @@ import axios from "axios";
 import qs from "querystring";
 //import * as morphCore from "@karmakast/morph-dbms-core";
 
+//import icon1 from "../assets/ic_more_vert_18px.svg";
+import iconBase from "./icons/iconBase";
+import IconHamburger1 from "./icons/IconHamburger1";
+
 export default {
   name: "MindMapModule",
   components: {
@@ -114,6 +116,9 @@ export default {
 
     buttonOne,
     buttonTwo,
+
+    iconBase,
+    IconHamburger1,
   },
   props: {
     // locationHor: {'left':value} or {'right':value}
@@ -145,13 +150,13 @@ export default {
       },
       MindMapColors: {
         theme_light: {
-          background: { h: 0, s: 0, l: 90, a: 1 },
-          theme: { h: 358, s: 97, l: 67, a: 1 },
+          background: { h: 0, s: 0, l: 95, a: 1 },
+          theme: { h: 358, s: 97, l: 50, a: 1 },
           theme_light: { h: 0, s: 100, l: 84, a: 1 },
         },
         theme_dark: {
           background: { h: 0, s: 0, l: 15, a: 1 },
-          theme: { h: 151, s: 70, l: 67, a: 1 },
+          theme: { h: 151, s: 70, l: 50, a: 1 },
           theme_light: { h: 151, s: 85, l: 32, a: 0.3 },
         },
       },
@@ -273,10 +278,11 @@ export default {
         top: "0px",
         left: "60px",
         padding: "10px",
+        pointerEvents: "all",
 
         background: `hsla(${this.colorsFinal["background"].h}, ${
           this.colorsFinal["background"].s
-        }%, ${this.colorsFinal["background"].l + 50}%, ${0.38}`,
+        }%, ${this.colorsFinal["background"].l + 20}%, ${0.38}`,
         border: `0.5px dashed ${this.colorsProcessed["theme"]}`,
         boxSizing: "border-box",
         backdropFilter: "blur(4px)",
@@ -293,8 +299,8 @@ export default {
         width: "48px",
         background: `hsla(${this.colorsFinal["background"].h}, ${
           this.colorsFinal["background"].s
-        }%, ${this.colorsFinal["background"].l + 50}%, ${0.38}`,
-        border: `1px solid ${this.colorsProcessed["theme"]}`,
+        }%, ${this.colorsFinal["background"].l + 20}%, ${0.38}`,
+        border: `1px solid hsla(${this.colorsFinal["theme"].h}, ${this.colorsFinal["theme"].s}%, ${this.colorsFinal["theme"].l}%, 0.4)`,
         backdropFilter: "blur(4px)",
         borderRadius: "12px",
         padding: "0px",

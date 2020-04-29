@@ -340,10 +340,21 @@ export default {
     },
     setCanvasDragging(event) {
       //event.preventDefault();
+      /*
+      if (event.type is touch or a middle mouse bttn) but not if (this.canvas.dragging.state is false and event.type is touchend or mouseup)
+      */
+      /*
+      event.which === 2 is for middle click
+       */
       if (
-        event.which === 2 ||
-        ["touchend", "touchstart"].includes(event.type)
+        ((event.which === 2 && event.type.startsWith("mouse")) ||
+          ["touchend", "touchstart"].includes(event.type)) &&
+        !(
+          this.canvas.dragging.state === false &&
+          ["mouseup", "touchend"].includes(event.type)
+        )
       ) {
+        console.log("drag event : ", event);
         //console.log("from setcanvas.dragging func");
         //console.log(event);
         //event.preventDefault();
@@ -367,7 +378,7 @@ export default {
 
             clientPos.x = event.clientX;
             clientPos.y = event.clientY;
-          } else {
+          } else if (event.type.startsWith("touch")) {
             // todo: check for double tap
 
             this.canvas.dragging.state = true;

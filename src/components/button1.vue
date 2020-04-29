@@ -87,7 +87,7 @@ export default {
         height: `100%`,
         width: `100%`,
         border: this.mainButtonIsHovered
-          ? `0.5px dashed ${this.colorsProcessed["theme"]}`
+          ? `1px dashed hsla(${this.colors["theme"].h}, ${this.colors["theme"].s}%, ${this.colors["theme"].l}%, 0.4)`
           : "none",
         boxSizing: "border-box",
         boxShadow: this.mainButtonIsHovered

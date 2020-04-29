@@ -9,7 +9,7 @@
     ></div>
     <div id="mindMapContainer" :style="mindMapContainerStyle">
       <!-- <MindMapModule :colors="MindMapColors" :entityLimit="entityLimit" />-->
-      <MindMapModule :entityLimit="entityLimit" />
+      <mind-map-module :entityLimit="entityLimit" />
     </div>
   </div>
 </template>
