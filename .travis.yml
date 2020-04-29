@@ -5,14 +5,21 @@ cache:
   directories:
     - node_modules
 
+git:
+  depth: 3
+
+branches:
+  only:
+    - master
+
 install:
   - npm ci
 
 script:
   - npm run build
 
+
 deploy:
-  if: branch = master
   edge: true
   provider: pages
   strategy: git
