@@ -20,7 +20,7 @@
             href="https://github.com/KarmaKast/MindMap-WebApp"
             :style="{ pointerEvents: 'initial' }"
             target="_blank"
-            >{{ productName }}</a
+            >{{ appName }}</a
           >
           - v{{ version }}</span
         >
@@ -49,8 +49,6 @@
   </div>
 </template>
 <script>
-import { version, productName, name } from "../../package.json";
-
 export default {
   name: "aboutPage",
   props: {
@@ -61,8 +59,8 @@ export default {
   data: function () {
     return {
       isHovered: false,
-      version,
-      productName: productName ? productName : name,
+      version: process.env.VUE_APP_VERSION,
+      appName: process.env.VUE_APP_NAME,
     };
   },
   computed: {

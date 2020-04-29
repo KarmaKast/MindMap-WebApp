@@ -28,4 +28,4 @@ git commit -m 'deploy'
 # deploy
 git push -f https://github.com/KarmaKast/MindMap-WebApp.git master:gh-pages
 
-cd -
+cd ..

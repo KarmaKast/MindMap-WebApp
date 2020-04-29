@@ -107,6 +107,7 @@ import ColorPicker from "./general/ColorPicker.vue";
 //import {uuidv1} from 'uuid/v1';
 import axios from "axios";
 import qs from "querystring";
+import lodash from "lodash";
 //import * as morphCore from "@karmakast/morph-dbms-core";
 
 export default {
@@ -481,6 +482,7 @@ export default {
           }),
         }),
       }).then(() => {
+        this.entityData.viz_props[propName] = Object.assign({}, data);
         if (this.autoSave) {
           // doing: ask server save state to file
           axios.post(this.apiUrl + "/collection/save");
@@ -546,11 +548,8 @@ export default {
         this.relClaimMode.mode = false;
         this.relClaimMode.targetID = null;
         this.$store.commit("update_relClaimMode", this.relClaimMode);
-        console.log(JSON.parse(response.data.relClaim));
-        /*this.entityData.source.RelationClaims.push(
-          JSON.parse(response.data.relClaim)
-        );*/
-        //const relClaims = this.entityData.source.RelationClaims;
+        //console.log(JSON.parse(response.data.relClaim));
+
         const temp = this.entityData;
         temp.source.RelationClaims.push(JSON.parse(response.data.relClaim));
         this.entityData = Object.assign({}, temp);
@@ -577,21 +576,41 @@ export default {
       this.$emit("setSelfRelSpots", this.relationSpots);
       if (!this.dragging.state) {
         if (this.apiValidity) {
-          //var msg = `updated location from {x:${this.entityData.viz_props.location[0]},y: ${this.entityData.viz_props.location[1]}} to
-          //  {x:${this.entityLocation_.x},y:${this.entityLocation_.y}}`;
-          //console.log(msg);
-          // todo: WIP
-          //console.log([this.entityLocation_.x, this.entityLocation_.y, 0]);
-          this.savePropToAPI("location", this.entityLocation_);
-          //this.entityData.viz_props.location = this.entityLocation_;
-          //this.getEntityData();
+          if (
+            !lodash.isEqual(
+              this.entityLocation_,
+              this.entityData.viz_props.location
+            ) &&
+            (!lodash.isEqual(this.entityLocation_, this.entityLocationDef) ||
+              lodash.isEqual(
+                this.entityLocationDef,
+                this.entityData.viz_props.location
+              ))
+          ) {
+            console.log(
+              `should be different: \n${JSON.stringify(
+                this.entityLocation_
+              )}\n${JSON.stringify(this.entityData.viz_props.location)}`
+            );
+            this.savePropToAPI("location", this.entityLocation_);
+          }
         }
       }
     },
     "entityData.viz_props"() {
-      this.entityLocation.x = this.entityData.viz_props.location.x;
-      this.entityLocation.y = this.entityData.viz_props.location.y;
-      this.entityColor = this.entityData.viz_props.color;
+      if (
+        !lodash.isEqual(
+          this.entityLocation_,
+          this.entityData.viz_props.location
+        )
+      ) {
+        this.entityLocation = Object.assign(
+          {},
+          this.entityData.viz_props.location
+        );
+      }
+      if (!lodash.isEqual(this.entityColor, this.entityData.viz_props.color))
+        this.entityColor = Object.assign({}, this.entityData.viz_props.color);
     },
     "entityData.source"() {
       this.entityLabel = this.entityData.source.Label;
@@ -623,14 +642,10 @@ export default {
     },
     entityColor: {
       handler() {
-        //if (this.entityColor != this.entityData.viz_props.color) {
-        console.log("color should have updated in the backend");
-        this.savePropToAPI("color", this.entityColor);
-        //this.entityData.viz_props.color = this.entityColor;
-        //this.getEntityData();
-        if (this.autoSave) {
-          // doing: ask server save state to file
-          this.$axios.post(this.apiUrl + "/collection/save");
+        if (
+          !lodash.isEqual(this.entityColor, this.entityData.viz_props.color)
+        ) {
+          this.savePropToAPI("color", this.entityColor);
         }
         //}
       },

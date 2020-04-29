@@ -40,6 +40,7 @@ export default {
   name: "buttonOne",
   props: {
     colors: Object,
+    colorsProcessed: Object,
     validity: Boolean,
     index: {
       default: 1,
@@ -58,17 +59,6 @@ export default {
     };
   },
   computed: {
-    colorsProcessed: function () {
-      var colors_ = {};
-      for (var key in this.colors) {
-        //var color = `hsla($(this.colors[]))`;
-        var color_ = this.colors[key];
-        colors_[
-          key
-        ] = `hsla(${color_.h},${color_.s}%,${color_.l}%,${color_.a})`;
-      }
-      return colors_;
-    },
     containerStyle: function () {
       var templateC = `auto ${this.size[0]}px`;
       return {
@@ -86,8 +76,12 @@ export default {
     backgroundStyle: function () {
       return {
         background: this.mainButtonIsHovered
-          ? "hsla(3, 100%, 87%, 0.16)"
-          : "rgba(255, 255, 255, 0.3)",
+          ? `hsla(${this.colors["theme"].h},${this.colors["theme"].s}%,${
+              this.colors["theme"].l + 20
+            }%,0.3)`
+          : `hsla(${this.colors["background"].h},${
+              this.colors["background"].s
+            }%,${this.colors["background"].l + 30}%,0.5)`,
         position: "absolute",
         top: "0px",
         height: `100%`,
