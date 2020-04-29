@@ -12,9 +12,12 @@ script:
   - npm run build
 
 deploy:
+  if: branch = master
+  edge: true
   provider: pages
-  skip-cleanup: true
-  github-token: $GITHUB_TOKEN
+  strategy: git
+  token: $GITHUB_TOKEN
+  target_branch: gh-pages
   local_dir: dist
   on:
     branch: master
