@@ -282,7 +282,9 @@ export default {
 
         background: `hsla(${this.colorsFinal["background"].h}, ${
           this.colorsFinal["background"].s
-        }%, ${this.colorsFinal["background"].l + 20}%, ${0.38}`,
+        }%, ${this.colorsFinal["background"].l + 20}%, ${
+          CSS.supports("backdrop-filter: blur(3px)") ? 0.38 : 1
+        }`,
         border: `0.5px dashed ${this.colorsProcessed["theme"]}`,
         boxSizing: "border-box",
         backdropFilter: "blur(4px)",
@@ -299,8 +301,10 @@ export default {
         width: "48px",
         background: `hsla(${this.colorsFinal["background"].h}, ${
           this.colorsFinal["background"].s
-        }%, ${this.colorsFinal["background"].l + 20}%, ${0.38}`,
-        border: `1px solid hsla(${this.colorsFinal["theme"].h}, ${this.colorsFinal["theme"].s}%, ${this.colorsFinal["theme"].l}%, 0.4)`,
+        }%, ${this.colorsFinal["background"].l + 20}%, ${
+          CSS.supports("backdrop-filter: blur(3px)") ? 0.38 : 1
+        }`,
+        border: `1px solid hsla(${this.colorsFinal["theme"].h}, ${this.colorsFinal["theme"].s}%, ${this.colorsFinal["theme"].l}%, 0.4 )`,
         backdropFilter: "blur(4px)",
         borderRadius: "12px",
         padding: "0px",

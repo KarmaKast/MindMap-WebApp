@@ -116,6 +116,7 @@ export default {
     ColorPicker,
   },
   props: {
+    colors: Object,
     entityID: String,
     apiUrl: String,
     apiValidity: Boolean,
@@ -235,7 +236,9 @@ export default {
         borderRadius: "inherit",
         border: `1px solid hsla(${this.entityColor.h},${this.entityColor.s}%, ${this.entityColor.l}%, 0.8)`,
         backdropFilter: "blur(2px)",
-        backgroundColor: "hsla(0,0%,100%,0.1)",
+        backgroundColor: CSS.supports("backdrop-filter: blur(3px)")
+          ? `hsla(0,0%,${this.colors["background"].l + 5}%,0.2)`
+          : `hsla(0,0%,${this.colors["background"].l + 5}%,1)`,
         pointerEvents: "all",
         display: "grid",
         placeItems: "center",

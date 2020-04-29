@@ -24,6 +24,7 @@
       <entityComponent
         v-for="(value, key_) in processedEntities"
         :key="key_"
+        :colors="colors"
         :entityID="key_"
         :apiUrl="apiUrl"
         :autoSave="false"
