@@ -587,11 +587,6 @@ export default {
                 this.entityData.viz_props.location
               ))
           ) {
-            console.log(
-              `should be different: \n${JSON.stringify(
-                this.entityLocation_
-              )}\n${JSON.stringify(this.entityData.viz_props.location)}`
-            );
             this.savePropToAPI("location", this.entityLocation_);
           }
         }

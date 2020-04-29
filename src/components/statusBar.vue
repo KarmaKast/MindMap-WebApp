@@ -22,6 +22,7 @@
         v-if="apiValidity"
         id="api-url"
         :style="{
+          position: 'relative',
           height: '100%',
           maxWidth: `${height * 5}px`,
           width: `${height * 5}px`,
@@ -37,7 +38,17 @@
           boxShadow: `0px 0px 0 1px ${colorsProcessed['theme_light']}`,
         }"
       >
-        {{ apiUrl }}
+        <p
+          :style="{
+            margin: '0px',
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+          }"
+        >
+          {{ apiUrl }}
+        </p>
       </div>
       <div id="api-status-indicator" :style="apiStatusStyle"></div>
     </div>
