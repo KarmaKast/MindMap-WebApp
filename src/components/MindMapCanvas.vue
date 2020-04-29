@@ -48,9 +48,9 @@
             setSelfRelSpots(key_, relSpots);
           }
         "
-        @getTargetRelSpots="
+        @assignTargetRelSpots="
           (targetID) => {
-            getTargetRelSpots(key_, targetID);
+            assignTargetRelSpots(key_, targetID);
           }
         "
       >
@@ -454,7 +454,7 @@ export default {
       }
       //console.log([this.canvasMousePos.x, this.canvasMousePos.y]);
     },
-    getTargetRelSpots(claimantID, targetID) {
+    assignTargetRelSpots(claimantID, targetID) {
       //console.log(claimantID, targetID);
       /*
       const value = {
@@ -466,19 +466,25 @@ export default {
         ? Object.assign(this.relClaimTargetSpots[claimantID], value)
         : value;*/
 
-      const value = {
+      /*const value = {
         [targetID]: this.relClaimSpots[targetID],
       };
       this.relClaimTargetSpots = Object.assign({}, this.relClaimTargetSpots, {
         [claimantID]: this.relClaimTargetSpots[claimantID]
           ? Object.assign({}, this.relClaimTargetSpots[claimantID], value)
           : value,
-      });
-
-      /*
-      Vue.set(this.relClaimTargetSpots, claimantID, {
-        [targetID]: this.relClaimSpots[claimantID],
       });*/
+
+      if (this.relClaimTargetSpots[claimantID])
+        Vue.set(
+          this.relClaimTargetSpots[claimantID],
+          targetID,
+          this.relClaimSpots[targetID]
+        );
+      else
+        Vue.set(this.relClaimTargetSpots, claimantID, {
+          [targetID]: this.relClaimSpots[targetID],
+        });
 
       /*
       this.relClaimTargetSpots = Object.assign({}, this.relClaimTargetSpots, {
@@ -493,50 +499,15 @@ export default {
       for (const claimantID in this.relClaimTargetSpots) {
         for (const targetID in this.relClaimTargetSpots[claimantID]) {
           if (targetID === entityID) {
-            const value = {
-              [targetID]: relSpots,
-            };
-
-            this.relClaimTargetSpots[claimantID] = this.relClaimTargetSpots[
-              claimantID
-            ]
-              ? Object.assign(this.relClaimTargetSpots[claimantID], value)
-              : value;
-
-            /*this.relClaimTargetSpots = Object.assign(
-              {},
-              this.relClaimTargetSpots,
-              {
-                [claimantID]: this.relClaimTargetSpots[claimantID]
-                  ? Object.assign(this.relClaimTargetSpots[claimantID], value)
-                  : value,
-              }
-            );*/
-            //this.relClaimTargetSpots[claimantID] = { [targetID]: relSpots };
-            //console.log("this should be happening", claimantID);
+            if (this.relClaimTargetSpots[claimantID])
+              Vue.set(this.relClaimTargetSpots[claimantID], targetID, relSpots);
+            else
+              Vue.set(this.relClaimTargetSpots, claimantID, {
+                [targetID]: relSpots,
+              });
           }
         }
       }
-      /*
-      this.relClaimSpots = Object.assign({}, this.relClaimSpots, {
-        [entityID]: relSpots,
-      });
-      for (const claimantID in this.relClaimTargetSpots) {
-        for (const targetID in this.relClaimTargetSpots[claimantID]) {
-          if (targetID === entityID) {
-            this.relClaimTargetSpots = Object.assign(
-              {},
-              this.relClaimTargetSpots,
-              {
-                [claimantID]: {
-                  [targetID]: relSpots,
-                },
-              }
-            );
-            //console.log("this should be happening", claimantID);
-          }
-        }
-      }*/
     },
     removeEntity(entityID) {
       var url_ = this.apiUrl;

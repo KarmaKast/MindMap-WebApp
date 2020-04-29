@@ -363,7 +363,7 @@ export default {
     },
     relationWirePoints: function () {
       //console.log({ relClaim });
-      //this.$emit("getTargetRelSpots", relClaim.To);
+      //this.$emit("assignTargetRelSpots", relClaim.To);
       //const dist = Math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2);
 
       let res = {};
@@ -467,7 +467,7 @@ export default {
         this.entityData.viz_props = response.data[1].Data;
         this.$emit("setSelfRelSpots", this.relationSpots);
         for (const relClaim of this.entityData.source.RelationClaims)
-          this.$emit("getTargetRelSpots", relClaim.To);
+          this.$emit("assignTargetRelSpots", relClaim.To);
       });
     },
     savePropToAPI(propName, data) {
@@ -501,6 +501,7 @@ export default {
           width: boundingBox.width,
           height: boundingBox.height,
         };
+        this.$emit("setSelfRelSpots", this.relationSpots);
         //console.log(boundingBox);
         //this.entityBoundingBoxSize = boundingBox;
       }, time);
@@ -556,7 +557,10 @@ export default {
         const temp = this.entityData;
         temp.source.RelationClaims.push(JSON.parse(response.data.relClaim));
         this.entityData = Object.assign({}, temp);
-        this.$emit("getTargetRelSpots", JSON.parse(response.data.relClaim).To);
+        this.$emit(
+          "assignTargetRelSpots",
+          JSON.parse(response.data.relClaim).To
+        );
       });
     },
   },
