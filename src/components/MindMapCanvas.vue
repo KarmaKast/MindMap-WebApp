@@ -36,7 +36,7 @@
         :defaultColors="colors"
         :dragging="value.dragging"
         :pressed="value.pressed"
-        :entitySelectedDef="value.entitySelected"
+        :entitySelected="value.entitySelected"
         :entityLocationDef="value.entityLocationDef"
         :grid="grid"
         :targetRelSpots="value.targetRelSpots"

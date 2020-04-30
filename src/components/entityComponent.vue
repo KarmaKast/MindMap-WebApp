@@ -15,7 +15,7 @@
               :config="{
                 points: relationWirePoints[relClaim.To],
                 stroke: relWireColor,
-                strokeWidth: dragging.state || entitySelected ? 2 : 1,
+                strokeWidth: dragging.state || entitySelectedFinal ? 2 : 1,
                 lineCap: 'round',
                 lineJoin: 'round',
               }"
@@ -25,7 +25,7 @@
       </v-stage>
     </div>
     <div
-      v-if="entitySelected"
+      v-if="entitySelectedFinal"
       class="entityUI"
       :style="{
         position: 'absolute',
@@ -147,8 +147,8 @@ export default {
       },
       type: Object,
     },
-    entitySelectedDef: {
-      default: false,
+    entitySelected: {
+      default: undefined,
       type: Boolean,
     },
     entityLocationDef: {
@@ -170,7 +170,7 @@ export default {
       entityLocation: this.entityLocationDef,
       entityLocationProcessed: {},
       entityLabel: "",
-      entitySelected: this.entitySelectedDef,
+      entitySelectedFinal: this.entitySelected,
       entityColor: { h: 0, s: 0, l: 0, a: 1 },
       entityData: {
         source: { Label: "", RelationClaims: [] },
@@ -215,7 +215,7 @@ export default {
         )`,
 
         backgroundColor:
-          this.editingLabel && this.entitySelected
+          this.editingLabel && this.entitySelectedFinal
             ? "white"
             : "hsla(0,0%,0%,0.01)",
         /*border: `1px dotted hsla(${this.entityColor.h},${this.entityColor.s}%,${this.entityColor.l}%, 0.2)`,*/
@@ -554,18 +554,21 @@ export default {
       },
       deep: true,
     },
-    entitySelectedDef() {
-      this.entitySelected = this.entitySelectedDef;
+    entitySelected: {
+      handler() {
+        //this.entitySelectedFinal = this.entitySelected;
+      },
+      deep: true,
     },
-    entitySelected() {
+    entitySelectedFinal() {
       if (this.apiValidity) {
         if (
           !lodash.isEqual(
-            this.entitySelected,
+            this.entitySelectedFinal,
             this.entityData.viz_props.selected
           )
         ) {
-          this.savePropToAPI("selected", this.entitySelected);
+          this.savePropToAPI("selected", this.entitySelectedFinal);
         }
       }
     },
@@ -605,8 +608,8 @@ export default {
           this.entityData.viz_props.location
         );
       }
-      if (this.entityData.viz_props.selected !== this.entitySelected)
-        this.entitySelected = this.entityData.viz_props.selected;
+      if (this.entityData.viz_props.selected !== this.entitySelectedFinal)
+        this.entitySelectedFinal = this.entityData.viz_props.selected;
       if (!lodash.isEqual(this.entityColor, this.entityData.viz_props.color))
         this.entityColor = Object.assign({}, this.entityData.viz_props.color);
     },
@@ -653,6 +656,13 @@ export default {
       if (this.updateEntityData) {
         this.getEntityData();
       }
+    },
+    pressed: {
+      handler() {
+        //if (this.pressed.state)
+        this.entitySelectedFinal = this.entitySelected;
+      },
+      deep: true,
     },
   },
   created: function () {},
