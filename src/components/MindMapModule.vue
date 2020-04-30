@@ -74,11 +74,7 @@
         :apiValidity="apiValidity"
         :showThemeToggle="!lockTheming"
         :toggleCurrent="CurrentTheme === 'theme_light' ? 'light' : 'dark'"
-        @themeToggle="
-          CurrentTheme === 'theme_light'
-            ? (CurrentTheme = 'theme_dark')
-            : (CurrentTheme = 'theme_light')
-        "
+        @themeToggle="themeToggle"
       ></status-bar>
       <about-page
         :colors="colorsFinal"
@@ -160,7 +156,9 @@ export default {
           theme_light: { h: 151, s: 85, l: 32, a: 0.3 },
         },
       },
-      CurrentTheme: "theme_light",
+      CurrentTheme: localStorage.getItem("theme")
+        ? localStorage.getItem("theme")
+        : "theme_light",
     };
   },
   computed: {
@@ -441,6 +439,12 @@ export default {
     },
     aboutPageDisplay(showOrHide) {
       this.showAboutPage = showOrHide;
+    },
+    themeToggle() {
+      this.CurrentTheme === "theme_light"
+        ? (this.CurrentTheme = "theme_dark")
+        : (this.CurrentTheme = "theme_light");
+      localStorage.setItem("theme", this.CurrentTheme);
     },
   },
   watch: {
