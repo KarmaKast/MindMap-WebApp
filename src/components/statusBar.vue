@@ -22,9 +22,10 @@
         v-if="apiValidity"
         id="api-url"
         :style="{
+          position: 'relative',
           height: '100%',
-          maxWidth: `${height * 5}px`,
-          width: `${height * 5}px`,
+          //maxWidth: `${height * 6}px`,
+          minWidth: `${height * 6}px`,
           boxSizing: 'border-box',
           fontSize: '10px',
           whiteSpace: 'nowrap',
@@ -37,7 +38,18 @@
           boxShadow: `0px 0px 0 1px ${colorsProcessed['theme_light']}`,
         }"
       >
-        {{ apiUrl }}
+        <p
+          :style="{
+            margin: '0px',
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            fontFamily: 'monospace',
+          }"
+        >
+          {{ apiUrl }}
+        </p>
       </div>
       <div id="api-status-indicator" :style="apiStatusStyle"></div>
     </div>
@@ -83,14 +95,16 @@ export default {
         //backgroundColor: this.colorsProcessed["background"],
         backgroundColor: `hsla(${this.colors["background"].h},${
           this.colors["background"].s
-        }%,${this.colors["background"].l + 10}%,0.5)`,
+        }%,${this.colors["background"].l + 10}%,${
+          CSS.supports("backdrop-filter: blur(3px)") ? 0.5 : 0.8
+        })`,
         backdropFilter: "blur(3px)",
         backgroundImage: `repeating-linear-gradient(45deg,rgba(255, 255, 255, 0), ${this.colorsProcessed["theme_light"]} 1px, rgba(255, 255, 255, 0) 1px, rgba(255, 255, 255, 0) 6px), repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0), ${this.colorsProcessed["theme_light"]} 1px, rgba(255, 255, 255, 0) 1px, rgba(255, 255, 255, 0) 6px)`,
       };
     },
     lightDarkToggleContainerStyle: function () {
       return {
-        height: "95%",
+        height: "90%",
         minWidth: `${this.height}px`,
         boxSizing: "border-box",
         padding: "1px",

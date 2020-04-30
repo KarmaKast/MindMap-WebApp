@@ -116,6 +116,7 @@ export default {
     ColorPicker,
   },
   props: {
+    colors: Object,
     entityID: String,
     apiUrl: String,
     apiValidity: Boolean,
@@ -166,6 +167,7 @@ export default {
       minHeight: 60,
       minWidth: 120,
       entityLocation: this.entityLocationDef,
+      entityLocationProcessed: {},
       entityLabel: "",
       entityColor: { h: 0, s: 0, l: 0, a: 1 },
       entityData: {
@@ -235,7 +237,9 @@ export default {
         borderRadius: "inherit",
         border: `1px solid hsla(${this.entityColor.h},${this.entityColor.s}%, ${this.entityColor.l}%, 0.8)`,
         backdropFilter: "blur(2px)",
-        backgroundColor: "hsla(0,0%,100%,0.1)",
+        backgroundColor: CSS.supports("backdrop-filter: blur(3px)")
+          ? `hsla(0,0%,${this.colors["background"].l + 5}%,0.2)`
+          : `hsla(0,0%,${this.colors["background"].l + 5}%,1)`,
         pointerEvents: "all",
         display: "grid",
         placeItems: "center",
@@ -265,10 +269,11 @@ export default {
       };
     },
     entityLocation_: function () {
-      var entityLoc = this.entityLocation;
+      var entityLoc = Object.assign({}, this.entityLocation);
+      console.log("entityLocation_() is called from entity: ", this.entityID);
       if (this.dragging.state) {
         // todo: this is working as intended. Just need to detect drag differently from simply clicking in.
-
+        //console.log("entityLocation_() is called from entity: ", this.entityID);
         entityLoc.x =
           this.canvasMousePos.x -
           this.canvasSize.width / 2 -
@@ -289,10 +294,6 @@ export default {
             (Math.floor((entityLoc.y - this.grid.size / 2) / this.grid.size) +
               1) *
             this.grid.size;
-        } else {
-          var boundingBox = this.$refs.entityContainer.getBoundingClientRect();
-          entityLoc.x += boundingBox.width / 2 - this.draggingDeltas.x;
-          entityLoc.y += boundingBox.height / 2 - this.draggingDeltas.y;
         }
       }
       return entityLoc;
@@ -360,7 +361,7 @@ export default {
     },
     relationWirePoints: function () {
       //console.log({ relClaim });
-      //this.$emit("getTargetRelSpots", relClaim.To);
+      //this.$emit("assignTargetRelSpots", relClaim.To);
       //const dist = Math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2);
 
       let res = {};
@@ -464,7 +465,7 @@ export default {
         this.entityData.viz_props = response.data[1].Data;
         this.$emit("setSelfRelSpots", this.relationSpots);
         for (const relClaim of this.entityData.source.RelationClaims)
-          this.$emit("getTargetRelSpots", relClaim.To);
+          this.$emit("assignTargetRelSpots", relClaim.To);
       });
     },
     savePropToAPI(propName, data) {
@@ -498,6 +499,7 @@ export default {
           width: boundingBox.width,
           height: boundingBox.height,
         };
+        this.$emit("setSelfRelSpots", this.relationSpots);
         //console.log(boundingBox);
         //this.entityBoundingBoxSize = boundingBox;
       }, time);
@@ -553,7 +555,10 @@ export default {
         const temp = this.entityData;
         temp.source.RelationClaims.push(JSON.parse(response.data.relClaim));
         this.entityData = Object.assign({}, temp);
-        this.$emit("getTargetRelSpots", JSON.parse(response.data.relClaim).To);
+        this.$emit(
+          "assignTargetRelSpots",
+          JSON.parse(response.data.relClaim).To
+        );
       });
     },
   },
@@ -587,11 +592,6 @@ export default {
                 this.entityData.viz_props.location
               ))
           ) {
-            console.log(
-              `should be different: \n${JSON.stringify(
-                this.entityLocation_
-              )}\n${JSON.stringify(this.entityData.viz_props.location)}`
-            );
             this.savePropToAPI("location", this.entityLocation_);
           }
         }
