@@ -269,31 +269,33 @@ export default {
       };
     },
     entityLocation_: function () {
-      var entityLoc = Object.assign({}, this.entityLocation);
-      console.log("entityLocation_() is called from entity: ", this.entityID);
+      let entityLoc = Object.assign({}, this.entityLocation);
+      //console.log("entityLocation_() is called from entity: ", this.entityID);
       if (this.dragging.state) {
         // todo: this is working as intended. Just need to detect drag differently from simply clicking in.
         //console.log("entityLocation_() is called from entity: ", this.entityID);
-        entityLoc.x =
-          this.canvasMousePos.x -
-          this.canvasSize.width / 2 -
-          this.canvasLocation.x;
-
-        entityLoc.y =
-          this.canvasMousePos.y -
-          this.canvasSize.height / 2 -
-          this.canvasLocation.y;
-
-        if (this.grid.snap) {
+        if (this.canvasMousePos) {
           entityLoc.x =
-            (Math.floor((entityLoc.x - this.grid.size / 2) / this.grid.size) +
-              1) *
-            this.grid.size;
+            this.canvasMousePos.x -
+            this.canvasSize.width / 2 -
+            this.canvasLocation.x;
 
           entityLoc.y =
-            (Math.floor((entityLoc.y - this.grid.size / 2) / this.grid.size) +
-              1) *
-            this.grid.size;
+            this.canvasMousePos.y -
+            this.canvasSize.height / 2 -
+            this.canvasLocation.y;
+
+          if (this.grid.snap) {
+            entityLoc.x =
+              (Math.floor((entityLoc.x - this.grid.size / 2) / this.grid.size) +
+                1) *
+              this.grid.size;
+
+            entityLoc.y =
+              (Math.floor((entityLoc.y - this.grid.size / 2) / this.grid.size) +
+                1) *
+              this.grid.size;
+          }
         }
       }
       return entityLoc;

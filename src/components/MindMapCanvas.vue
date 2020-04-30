@@ -416,26 +416,6 @@ export default {
       //console.log([this.canvasMousePos.x, this.canvasMousePos.y]);
     },
     assignTargetRelSpots(claimantID, targetID) {
-      //console.log(claimantID, targetID);
-      /*
-      const value = {
-        [targetID]: this.relClaimSpots[targetID],
-      };
-      this.relClaimTargetSpots[claimantID] = this.relClaimTargetSpots[
-        claimantID
-      ]
-        ? Object.assign(this.relClaimTargetSpots[claimantID], value)
-        : value;*/
-
-      /*const value = {
-        [targetID]: this.relClaimSpots[targetID],
-      };
-      this.relClaimTargetSpots = Object.assign({}, this.relClaimTargetSpots, {
-        [claimantID]: this.relClaimTargetSpots[claimantID]
-          ? Object.assign({}, this.relClaimTargetSpots[claimantID], value)
-          : value,
-      });*/
-
       if (this.relClaimTargetSpots[claimantID])
         Vue.set(
           this.relClaimTargetSpots[claimantID],
@@ -446,11 +426,6 @@ export default {
         Vue.set(this.relClaimTargetSpots, claimantID, {
           [targetID]: this.relClaimSpots[targetID],
         });
-
-      /*
-      this.relClaimTargetSpots = Object.assign({}, this.relClaimTargetSpots, {
-        [claimantID]: { [targetID]: this.relClaimSpots[claimantID] },
-      });*/
     },
     setSelfRelSpots(entityID, relSpots) {
       //console.log(claimantID, targetID);
@@ -597,7 +572,7 @@ export default {
             Vue.set(
               this.processedEntitiesBetter[this.activeEntity.entityID],
               "pressed",
-              this.activeEntity.pressed
+              { state: this.activeEntity.pressed.state }
             );
           if (
             this.activeEntity.selected !==
@@ -617,7 +592,7 @@ export default {
             Vue.set(
               this.processedEntitiesBetter[this.activeEntity.entityID],
               "dragging",
-              this.activeEntity.dragging
+              { state: this.activeEntity.dragging.state }
             );
             if (this.activeEntity.dragging.state)
               Vue.set(
