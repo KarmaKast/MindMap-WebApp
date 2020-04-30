@@ -615,12 +615,6 @@ export default {
               "dragging",
               { state: this.activeEntity.dragging.state }
             );
-            if (this.activeEntity.dragging.state)
-              Vue.set(
-                this.processedEntitiesBetter[this.activeEntity.entityID],
-                "canvasMousePos",
-                this.canvasMousePos
-              );
           }
         } else if (
           Object.keys(this.processedEntitiesBetter).includes(
@@ -644,6 +638,20 @@ export default {
             undefined
           );
         }
+      },
+      deep: true,
+    },
+    canvasMousePos: {
+      handler() {
+        if (this.activeEntity.entityID && this.activeEntity.dragging.state)
+          Vue.set(
+            this.processedEntitiesBetter[this.activeEntity.entityID],
+            "canvasMousePos",
+            {
+              x: this.canvasMousePos.x - this.canvasLocation.x,
+              y: this.canvasMousePos.y - this.canvasLocation.y,
+            }
+          );
       },
       deep: true,
     },
