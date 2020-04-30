@@ -272,7 +272,7 @@ export default {
       }
     },
     getMousePos(event) {
-      if (this.activeEntity.dragging.state === true) {
+      /*if (this.activeEntity.dragging.state === true) {
         // todo: if dragging pass canvasMousePos to nodes else pass undefined
       }
       if (this.activeEntity.dragging.state || this.canvas.dragging.state) {
@@ -297,6 +297,54 @@ export default {
             this.canvasMousePos.y -
             this.height / 2 -
             this.canvas.dragging.deltas.y;
+        }
+      }*/
+
+      if (this.activeEntity.dragging.state === true) {
+        // todo: if dragging pass canvasMousePos to nodes else pass undefined
+      }
+      if (this.activeEntity.dragging.state || this.canvas.dragging.state) {
+        if (event.type === "mousemove") {
+          //console.log(event);
+          Vue.set(
+            this.canvasMousePos,
+            "x",
+            event.clientX - this.canvasContainerBoxLoc.x
+          );
+          Vue.set(
+            this.canvasMousePos,
+            "y",
+            event.clientY - this.canvasContainerBoxLoc.y
+          );
+        } else if (event.type === "touchmove") {
+          //console.log(event);
+          Vue.set(
+            this.canvasMousePos,
+            "x",
+            event.touches[0].clientX - this.canvasContainerBoxLoc.x
+          );
+          Vue.set(
+            this.canvasMousePos,
+            "y",
+            event.touches[0].clientY - this.canvasContainerBoxLoc.y
+          );
+        }
+
+        if (this.canvas.dragging.state) {
+          Vue.set(
+            this.canvasLocation,
+            "x",
+            this.canvasMousePos.x -
+              this.width / 2 -
+              this.canvas.dragging.deltas.x
+          );
+          Vue.set(
+            this.canvasLocation,
+            "y",
+            this.canvasMousePos.y -
+              this.height / 2 -
+              this.canvas.dragging.deltas.y
+          );
         }
       }
     },
@@ -492,14 +540,20 @@ export default {
                   : false,
               canvasMousePos: this.activeEntity.dragging
                 ? this.activeEntity.entityID === value.ID
-                  ? this.canvasMousePos
+                  ? Object.assign({}, this.canvasMousePos)
                   : undefined
                 : undefined,
               entityLocationDef:
                 this.entities[index]["entityLocationDef"] === undefined
                   ? { x: 0, y: 0 }
-                  : this.entities[index]["entityLocationDef"],
-              targetRelSpots: this.relClaimTargetSpots[value.ID],
+                  : Object.assign(
+                      {},
+                      this.entities[index]["entityLocationDef"]
+                    ),
+              targetRelSpots: Object.assign(
+                {},
+                this.relClaimTargetSpots[value.ID]
+              ),
               updateEntityData: this.entitiesToUpdate.includes(value.ID),
             });
         });

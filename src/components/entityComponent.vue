@@ -192,13 +192,13 @@ export default {
       return {
         position: "absolute",
         top: `${
-          this.canvasLocation["y"] +
+          /*this.canvasLocation["y"] +*/
           this.canvasSize.height / 2 +
           this.entityLocation_.y -
           this.entityBoundingBoxSize.height / 2
         }px`,
         left: `${
-          this.canvasLocation["x"] +
+          /*this.canvasLocation["x"] +*/
           this.canvasSize.width / 2 +
           this.entityLocation_.x -
           this.entityBoundingBoxSize.width / 2
@@ -207,6 +207,10 @@ export default {
         minHeight: `${this.entityLabel === "" ? this.minHeight : 0}px`,
         cursor: this.dragging.state ? "grabbing" : "grab",
         zIndex: this.dragging.state ? "5000" : "unset",
+        transform: `translate(
+          ${this.canvasLocation.x + "px"},
+          ${this.canvasLocation.y + "px"}
+        )`,
 
         backgroundColor:
           this.editingLabel && this.entitySelected
@@ -269,34 +273,26 @@ export default {
       };
     },
     entityLocation_: function () {
-      let entityLoc = Object.assign({}, this.entityLocation);
+      let entityLoc = {};
       //console.log("entityLocation_() is called from entity: ", this.entityID);
-      if (this.dragging.state) {
-        // todo: this is working as intended. Just need to detect drag differently from simply clicking in.
-        //console.log("entityLocation_() is called from entity: ", this.entityID);
-        if (this.canvasMousePos) {
+      if (this.canvasMousePos && this.pressed.state) {
+        entityLoc.x = this.canvasMousePos.x - this.canvasSize.width / 2;
+
+        entityLoc.y = this.canvasMousePos.y - this.canvasSize.height / 2;
+
+        if (this.grid.snap) {
           entityLoc.x =
-            this.canvasMousePos.x -
-            this.canvasSize.width / 2 -
-            this.canvasLocation.x;
+            (Math.floor((entityLoc.x - this.grid.size / 2) / this.grid.size) +
+              1) *
+            this.grid.size;
 
           entityLoc.y =
-            this.canvasMousePos.y -
-            this.canvasSize.height / 2 -
-            this.canvasLocation.y;
-
-          if (this.grid.snap) {
-            entityLoc.x =
-              (Math.floor((entityLoc.x - this.grid.size / 2) / this.grid.size) +
-                1) *
-              this.grid.size;
-
-            entityLoc.y =
-              (Math.floor((entityLoc.y - this.grid.size / 2) / this.grid.size) +
-                1) *
-              this.grid.size;
-          }
+            (Math.floor((entityLoc.y - this.grid.size / 2) / this.grid.size) +
+              1) *
+            this.grid.size;
         }
+      } else {
+        entityLoc = Object.assign({}, this.entityLocation);
       }
       return entityLoc;
     },
@@ -326,18 +322,7 @@ export default {
       //console.log(boundingBox);
       if (this.dragging.state && this.canvasLocation.x)
         boundingBox = this.$refs.entityContainer.getBoundingClientRect();
-      /*return [
-        boundingBox.left,
-        boundingBox.right,
-        boundingBox.top,
-        boundingBox.bottom,
-      ];*/
-      /*return [
-        this.entityBoundingBoxSize.left,
-        this.entityBoundingBoxSize.right,
-        this.entityBoundingBoxSize.top,
-        this.entityBoundingBoxSize.bottom,
-      ];*/
+
       return {
         left:
           this.canvasLocation.x +
@@ -362,22 +347,11 @@ export default {
       };
     },
     relationWirePoints: function () {
-      //console.log({ relClaim });
-      //this.$emit("assignTargetRelSpots", relClaim.To);
-      //const dist = Math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2);
-
       let res = {};
       for (const relClaim of this.entityData.source.RelationClaims) {
         let targetSpots = this.targetRelSpots
           ? this.targetRelSpots[relClaim.To]
           : undefined;
-        //console.log(this.targetRelSpots[relClaim.To]);
-        /*res[relClaim.To] = [
-          this.relationSpots.left,
-          (this.relationSpots.top + this.relationSpots.bottom) / 2,
-          targetSpots ? targetSpots.left : 0,
-          targetSpots ? (targetSpots.top + targetSpots.bottom) / 2 : 0,
-        ];*/
 
         // todo: find closest set of points between this entity and target entity
         function dist(p1, p2) {
@@ -439,14 +413,16 @@ export default {
 
           if (event.type === "mousedown") {
             this.draggingDeltas["x"] =
-              event.clientX - boundingBox.x + this.canvasLocation.x;
+              event.clientX - boundingBox.x - this.canvasLocation.x;
             this.draggingDeltas["y"] =
-              event.clientY - boundingBox.y + this.canvasLocation.y;
+              event.clientY - boundingBox.y - this.canvasLocation.y;
           } else if (event.type == "touchstart") {
             this.draggingDeltas["x"] =
-              event.touches[0].clientX - boundingBox.x + this.canvasLocation.x;
+              event.touches[0].clientX -
+              boundingBox.x /*+ this.canvasLocation.x*/;
             this.draggingDeltas["y"] =
-              event.touches[0].clientY - boundingBox.y + this.canvasLocation.y;
+              event.touches[0].clientY -
+              boundingBox.y /*+ this.canvasLocation.y*/;
           }
           this.$emit("setStartingCanvasMousePos", event);
           this.$emit("entityActivated", event, this.entityID);
@@ -567,7 +543,6 @@ export default {
   watch: {
     "dragging.state"() {
       if (!this.dragging.state) {
-        this.entityLocation = this.entityLocation_;
       }
     },
     apiValidity() {},
@@ -580,6 +555,7 @@ export default {
 
     entityLocation_() {
       // todo: save node location to database on drag end
+
       this.$emit("setSelfRelSpots", this.relationSpots);
       if (!this.dragging.state) {
         if (this.apiValidity) {
@@ -597,6 +573,8 @@ export default {
             this.savePropToAPI("location", this.entityLocation_);
           }
         }
+      } else {
+        this.entityLocation = Object.assign({}, this.entityLocation_);
       }
     },
     "entityData.viz_props"() {
