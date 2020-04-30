@@ -36,7 +36,7 @@
         :defaultColors="colors"
         :dragging="value.dragging"
         :pressed="value.pressed"
-        :entitySelected="value.entitySelected"
+        :entitySelectedDef="value.entitySelected"
         :entityLocationDef="value.entityLocationDef"
         :grid="grid"
         :targetRelSpots="value.targetRelSpots"
@@ -272,34 +272,6 @@ export default {
       }
     },
     getMousePos(event) {
-      /*if (this.activeEntity.dragging.state === true) {
-        // todo: if dragging pass canvasMousePos to nodes else pass undefined
-      }
-      if (this.activeEntity.dragging.state || this.canvas.dragging.state) {
-        if (event.type === "mousemove") {
-          //console.log(event);
-          this.canvasMousePos.x = event.clientX - this.canvasContainerBoxLoc.x;
-          this.canvasMousePos.y = event.clientY - this.canvasContainerBoxLoc.y;
-        } else if (event.type === "touchmove") {
-          //console.log(event);
-          this.canvasMousePos.x =
-            event.touches[0].clientX - this.canvasContainerBoxLoc.x;
-          this.canvasMousePos.y =
-            event.touches[0].clientY - this.canvasContainerBoxLoc.y;
-        }
-
-        if (this.canvas.dragging.state) {
-          this.canvasLocation.x =
-            this.canvasMousePos.x -
-            this.width / 2 -
-            this.canvas.dragging.deltas.x;
-          this.canvasLocation.y =
-            this.canvasMousePos.y -
-            this.height / 2 -
-            this.canvas.dragging.deltas.y;
-        }
-      }*/
-
       if (this.activeEntity.dragging.state === true) {
         // todo: if dragging pass canvasMousePos to nodes else pass undefined
       }
@@ -507,57 +479,52 @@ export default {
         this.entitiesToUpdate = response.data.claimantIDs;
       });
     },
+    initiateProcessedEntities() {
+      Object.keys(this.processedEntitiesBetter).forEach((entityID, index) => {
+        if (!this.entities.some((x) => x.ID === entityID)) {
+          //console.log("to delete : ", entityID);
+          Vue.delete(this.processedEntitiesBetter, entityID);
+          Vue.delete(this.relClaimTargetSpots, entityID);
+        }
+      });
+      this.entities.forEach((value, index) => {
+        if (!Object.keys(this.processedEntitiesBetter).includes(value.ID))
+          Vue.set(this.processedEntitiesBetter, value.ID, {
+            dragging: {
+              state:
+                value.ID === this.activeEntity.entityID
+                  ? this.activeEntity.dragging.state
+                  : false,
+            },
+            pressed: {
+              state:
+                value.ID === this.activeEntity.entityID
+                  ? this.activeEntity.pressed.state
+                  : undefined,
+            },
+            entitySelected: undefined,
+            canvasMousePos: this.activeEntity.dragging
+              ? this.activeEntity.entityID === value.ID
+                ? Object.assign({}, this.canvasMousePos)
+                : undefined
+              : undefined,
+            entityLocationDef:
+              this.entities[index]["entityLocationDef"] === undefined
+                ? { x: 0, y: 0 }
+                : Object.assign({}, this.entities[index]["entityLocationDef"]),
+            targetRelSpots: Object.assign(
+              {},
+              this.relClaimTargetSpots[value.ID]
+            ),
+            updateEntityData: this.entitiesToUpdate.includes(value.ID),
+          });
+      });
+    },
   },
   watch: {
     entities: {
       handler() {
-        // doing: initializing processedEntitiesBetter
-        Object.keys(this.processedEntitiesBetter).forEach((entityID, index) => {
-          if (!this.entities.some((x) => x.ID === entityID)) {
-            //console.log("to delete : ", entityID);
-            Vue.delete(this.processedEntitiesBetter, entityID);
-            Vue.delete(this.relClaimTargetSpots, entityID);
-          }
-        });
-        this.entities.forEach((value, index) => {
-          if (!Object.keys(this.processedEntitiesBetter).includes(value.ID))
-            Vue.set(this.processedEntitiesBetter, value.ID, {
-              dragging: {
-                state:
-                  value.ID === this.activeEntity.entityID
-                    ? this.activeEntity.dragging.state
-                    : false,
-              },
-              pressed: {
-                state:
-                  value.ID === this.activeEntity.entityID
-                    ? this.activeEntity.pressed.state
-                    : undefined,
-              },
-              entitySelected:
-                value.ID === this.activeEntity.entityID
-                  ? this.activeEntity.selected
-                  : false,
-              canvasMousePos: this.activeEntity.dragging
-                ? this.activeEntity.entityID === value.ID
-                  ? Object.assign({}, this.canvasMousePos)
-                  : undefined
-                : undefined,
-              entityLocationDef:
-                this.entities[index]["entityLocationDef"] === undefined
-                  ? { x: 0, y: 0 }
-                  : Object.assign(
-                      {},
-                      this.entities[index]["entityLocationDef"]
-                    ),
-              targetRelSpots: Object.assign(
-                {},
-                this.relClaimTargetSpots[value.ID]
-              ),
-              updateEntityData: this.entitiesToUpdate.includes(value.ID),
-            });
-        });
-
+        this.initiateProcessedEntities();
         //console.log("i should appear when creating new node");
       },
       deep: true,
@@ -628,16 +595,16 @@ export default {
               "pressed",
               { state: this.activeEntity.pressed.state }
             );
-          if (
+          /*if (
             this.activeEntity.selected !==
             this.processedEntitiesBetter[this.activeEntity.entityID]
               .entitySelected
-          )
-            Vue.set(
-              this.processedEntitiesBetter[this.activeEntity.entityID],
-              "entitySelected",
-              this.activeEntity.selected
-            );
+          )*/
+          Vue.set(
+            this.processedEntitiesBetter[this.activeEntity.entityID],
+            "entitySelected",
+            this.activeEntity.selected
+          );
           if (
             this.activeEntity.dragging.state !==
             this.processedEntitiesBetter[this.activeEntity.entityID].dragging
@@ -718,6 +685,7 @@ export default {
     //console.log(box);
     this.height = box.height;
     this.width = box.width;
+    this.initiateProcessedEntities();
   },
   beforeUpdate: function () {
     //console.log("before update called");

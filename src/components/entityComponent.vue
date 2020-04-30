@@ -102,6 +102,7 @@
 </template>
 
 <script>
+import Vue from "vue";
 import ColorPicker from "./general/ColorPicker.vue";
 
 //import {uuidv1} from 'uuid/v1';
@@ -146,7 +147,7 @@ export default {
       },
       type: Object,
     },
-    entitySelected: {
+    entitySelectedDef: {
       default: false,
       type: Boolean,
     },
@@ -169,6 +170,7 @@ export default {
       entityLocation: this.entityLocationDef,
       entityLocationProcessed: {},
       entityLabel: "",
+      entitySelected: this.entitySelectedDef,
       entityColor: { h: 0, s: 0, l: 0, a: 1 },
       entityData: {
         source: { Label: "", RelationClaims: [] },
@@ -552,7 +554,21 @@ export default {
       },
       deep: true,
     },
-
+    entitySelectedDef() {
+      this.entitySelected = this.entitySelectedDef;
+    },
+    entitySelected() {
+      if (this.apiValidity) {
+        if (
+          !lodash.isEqual(
+            this.entitySelected,
+            this.entityData.viz_props.selected
+          )
+        ) {
+          this.savePropToAPI("selected", this.entitySelected);
+        }
+      }
+    },
     entityLocation_() {
       // todo: save node location to database on drag end
 
@@ -589,6 +605,8 @@ export default {
           this.entityData.viz_props.location
         );
       }
+      if (this.entityData.viz_props.selected !== this.entitySelected)
+        this.entitySelected = this.entityData.viz_props.selected;
       if (!lodash.isEqual(this.entityColor, this.entityData.viz_props.color))
         this.entityColor = Object.assign({}, this.entityData.viz_props.color);
     },
@@ -611,7 +629,7 @@ export default {
           paramsSerializer: qs.stringify,
           data: qs.stringify({ Label: this.entityLabel }),
         }).then(() => {
-          this.entityData.source.Label = this.entityLabel;
+          Vue.set(this.entityData.source, "Label", this.entityLabel);
           //this.getEntityData();
           if (this.autoSave) {
             // doing: ask server save state to file

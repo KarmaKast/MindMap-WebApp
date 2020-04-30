@@ -1,6 +1,7 @@
 <template>
   <div class="MindMapModule" :style="this.containerStyle">
     <mind-map-canvas
+      v-if="!canvasForceUpdate"
       :colors="this.colorsFinal"
       :colorsProcessed="colorsProcessed"
       :apiUrl="this.apiUrl"
@@ -159,6 +160,7 @@ export default {
       CurrentTheme: localStorage.getItem("theme")
         ? localStorage.getItem("theme")
         : "theme_light",
+      canvasForceUpdate: false,
     };
   },
   computed: {
@@ -350,6 +352,10 @@ export default {
           this.collection = response["data"];
           this.entities = response.data.Entities.map((ID) => {
             return { ID: ID };
+          });
+          this.canvasForceUpdate = true;
+          this.$nextTick(() => {
+            this.canvasForceUpdate = false;
           });
           if (
             !(
