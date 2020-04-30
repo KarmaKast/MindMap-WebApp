@@ -353,6 +353,13 @@ export default {
           this.entities = response.data.Entities.map((ID) => {
             return { ID: ID };
           });
+          if (
+            !(
+              localStorage.getItem("apiUrl") &&
+              localStorage.getItem("apiUrl") === url_
+            )
+          )
+            localStorage.setItem("apiUrl", url_);
         })
         .catch((err) => this.loadCollection());
     },
@@ -433,28 +440,17 @@ export default {
       }
     },
     aboutPageDisplay(showOrHide) {
-      //var win = window.open('https://github.com/KarmaKast/MindMap-WebApp/tree/develop', '_blank');
-      //win.focus();
       this.showAboutPage = showOrHide;
     },
   },
   watch: {
-    apiValidity() {
+    apiUrl() {
       if (this.apiValidity) {
         this.getCollection();
       }
     },
   },
   created: function () {
-    //this.testAPI();
-
-    //this.$store.subscribeAction((action) => {
-    //  if (action.type === "update_apiUrl") {
-    //    //console.log(`updating validity ${state.apiUrl}`);
-    //    this.apiurl = this.$store.state.apiUrl[0];
-    //    this.apiValidity = this.$store.state.apiUrl[1];
-    //  }
-    //});
     this.$store.subscribeAction({
       after: (action, state) => {
         if (action.type === "update_apiUrl") {
@@ -464,7 +460,12 @@ export default {
       },
     });
   },
-  mounted: function () {},
+  mounted: function () {
+    if (localStorage.getItem("apiUrl")) {
+      this.apiUrl = localStorage.getItem("apiUrl");
+      this.apiValidity = true;
+    }
+  },
   updated: function () {},
 };
 </script>
