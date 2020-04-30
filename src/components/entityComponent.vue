@@ -167,6 +167,7 @@ export default {
       minHeight: 60,
       minWidth: 120,
       entityLocation: this.entityLocationDef,
+      entityLocationProcessed: {},
       entityLabel: "",
       entityColor: { h: 0, s: 0, l: 0, a: 1 },
       entityData: {
@@ -268,10 +269,11 @@ export default {
       };
     },
     entityLocation_: function () {
-      var entityLoc = this.entityLocation;
+      var entityLoc = Object.assign({}, this.entityLocation);
+      console.log("entityLocation_() is called from entity: ", this.entityID);
       if (this.dragging.state) {
         // todo: this is working as intended. Just need to detect drag differently from simply clicking in.
-
+        //console.log("entityLocation_() is called from entity: ", this.entityID);
         entityLoc.x =
           this.canvasMousePos.x -
           this.canvasSize.width / 2 -
@@ -292,10 +294,6 @@ export default {
             (Math.floor((entityLoc.y - this.grid.size / 2) / this.grid.size) +
               1) *
             this.grid.size;
-        } else {
-          var boundingBox = this.$refs.entityContainer.getBoundingClientRect();
-          entityLoc.x += boundingBox.width / 2 - this.draggingDeltas.x;
-          entityLoc.y += boundingBox.height / 2 - this.draggingDeltas.y;
         }
       }
       return entityLoc;

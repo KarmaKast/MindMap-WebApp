@@ -22,7 +22,7 @@
     ></div>
     <div id="entities">
       <entityComponent
-        v-for="(value, key_) in processedEntities"
+        v-for="(value, key_) in processedEntitiesBetter"
         :key="key_"
         :colors="colors"
         :entityID="key_"
@@ -64,6 +64,7 @@ import entityComponent from "./entityComponent";
 
 import axios from "axios";
 import qs from "querystring";
+import lodash from "lodash";
 
 export default {
   name: "MindMapCanvas",
@@ -112,6 +113,7 @@ export default {
       canvasLocation: { x: 0, y: 0 },
       canvasMousePos: { x: 0, y: 0 },
       canvasContainerBoxLoc: { x: 0, y: 0 },
+      prevActiveEntityID: undefined,
       activeEntity: {
         entityID: undefined,
         dragging: { state: false },
@@ -135,51 +137,10 @@ export default {
       relClaimTargetSpots: {},
       relClaimSpots: {},
       entitiesToUpdate: [],
+      processedEntitiesBetter: {}, // better optimized updates
     };
   },
   computed: {
-    processedEntities: function () {
-      var processedEntities = {};
-      this.entities.forEach((value, index) => {
-        //console.log({ value, index });
-        if (index < this.entityLimit) {
-          processedEntities[value.ID] = {
-            dragging: {
-              state:
-                value.ID === this.activeEntity.entityID
-                  ? this.activeEntity.dragging.state
-                  : false,
-            },
-            pressed: {
-              state:
-                value.ID === this.activeEntity.entityID
-                  ? this.activeEntity.pressed.state
-                  : undefined,
-            },
-            entitySelected:
-              value.ID === this.activeEntity.entityID
-                ? this.activeEntity.selected
-                : false,
-            canvasMousePos: this.canvasMousePos,
-            entityLocationDef:
-              this.entities[index]["entityLocationDef"] === undefined
-                ? { x: 0, y: 0 }
-                : this.entities[index]["entityLocationDef"],
-            targetRelSpots: this.relClaimTargetSpots[value.ID],
-            updateEntityData: this.entitiesToUpdate.includes(value.ID),
-          };
-
-          if (this.entitiesToUpdate.includes(value.ID)) {
-            const index = this.entitiesToUpdate.indexOf(value.ID);
-            let temp = this.entitiesToUpdate.slice(0, index);
-            if (!(index + 1 > this.entitiesToUpdate.length))
-              temp.push(...this.entitiesToUpdate.slice(index + 1));
-            this.entitiesToUpdate = temp;
-          }
-        }
-      });
-      return processedEntities;
-    },
     canvasConfig: function () {
       return {
         height: this.height,
@@ -282,9 +243,7 @@ export default {
           if (ID === this.activeEntity.entityID) {
             this.activeEntity.selected = diffEntity
               ? true
-              : this.activeEntity.selected
-              ? false
-              : true;
+              : !this.activeEntity.selected;
             //console.log(this.activeEntity.selected);
           }
         }
@@ -302,10 +261,12 @@ export default {
         } else {
           // context: this is for the node
           //console.log("node unpressed");
-          this.activeEntity.pressed.state = false;
-          if (this.activeEntity.dragging.state) {
-            //console.log(event);
-            this.activeEntity.dragging.state = false;
+          if (this.$refs.canvasContainer !== event.target) {
+            this.activeEntity.pressed.state = false;
+            if (this.activeEntity.dragging.state) {
+              //console.log(event);
+              this.activeEntity.dragging.state = false;
+            }
           }
         }
       }
@@ -355,7 +316,7 @@ export default {
           ["mouseup", "touchend"].includes(event.type)
         )
       ) {
-        console.log("drag event : ", event);
+        //console.log("drag event : ", event);
         //console.log("from setcanvas.dragging func");
         //console.log(event);
         //event.preventDefault();
@@ -524,7 +485,194 @@ export default {
       });
     },
   },
-  watch: {},
+  watch: {
+    entities: {
+      handler() {
+        // doing: initializing processedEntitiesBetter
+        Object.keys(this.processedEntitiesBetter).forEach((entityID, index) => {
+          if (!this.entities.some((x) => x.ID === entityID)) {
+            //console.log("to delete : ", entityID);
+            Vue.delete(this.processedEntitiesBetter, entityID);
+            Vue.delete(this.relClaimTargetSpots, entityID);
+          }
+        });
+        this.entities.forEach((value, index) => {
+          if (!Object.keys(this.processedEntitiesBetter).includes(value.ID))
+            Vue.set(this.processedEntitiesBetter, value.ID, {
+              dragging: {
+                state:
+                  value.ID === this.activeEntity.entityID
+                    ? this.activeEntity.dragging.state
+                    : false,
+              },
+              pressed: {
+                state:
+                  value.ID === this.activeEntity.entityID
+                    ? this.activeEntity.pressed.state
+                    : undefined,
+              },
+              entitySelected:
+                value.ID === this.activeEntity.entityID
+                  ? this.activeEntity.selected
+                  : false,
+              canvasMousePos: this.activeEntity.dragging
+                ? this.activeEntity.entityID === value.ID
+                  ? this.canvasMousePos
+                  : undefined
+                : undefined,
+              entityLocationDef:
+                this.entities[index]["entityLocationDef"] === undefined
+                  ? { x: 0, y: 0 }
+                  : this.entities[index]["entityLocationDef"],
+              targetRelSpots: this.relClaimTargetSpots[value.ID],
+              updateEntityData: this.entitiesToUpdate.includes(value.ID),
+            });
+        });
+
+        //console.log("i should appear when creating new node");
+      },
+      deep: true,
+    },
+    relClaimTargetSpots: {
+      handler() {
+        Object.entries(this.relClaimTargetSpots).forEach((value, index) => {
+          if (
+            Object.keys(this.entities).some((entity) => entity.ID !== value[0])
+          ) {
+            if (
+              !lodash.isEqual(
+                value[1],
+                this.processedEntitiesBetter[value[0]].targetRelSpots
+              )
+            ) {
+              //console.log(value[0], JSON.stringify(value[1]));
+              //console.log("updating processedEntitiesBetter[x].targetRelSpots");
+              Vue.set(
+                this.processedEntitiesBetter[value[0]],
+                "targetRelSpots",
+                value[1]
+              );
+            }
+          } else {
+            console.log("wait this shouldn't be happening");
+            console.log(value[0], JSON.stringify(value[1]));
+          }
+        });
+      },
+      deep: true,
+    },
+    activeEntity: {
+      handler() {
+        if (this.activeEntity.entityID) {
+          if (this.prevActiveEntityID !== this.activeEntity.entityID) {
+            if (
+              this.prevActiveEntityID &&
+              Object.keys(this.processedEntitiesBetter).includes(
+                this.prevActiveEntityID
+              )
+            ) {
+              Vue.set(
+                this.processedEntitiesBetter[this.prevActiveEntityID],
+                "pressed",
+                { state: undefined }
+              );
+              Vue.set(
+                this.processedEntitiesBetter[this.prevActiveEntityID],
+                "entitySelected",
+                false
+              );
+              Vue.set(
+                this.processedEntitiesBetter[this.prevActiveEntityID],
+                "canvasMousePos",
+                undefined
+              );
+            }
+            this.prevActiveEntityID = this.activeEntity.entityID;
+          }
+          if (
+            this.activeEntity.pressed.state !==
+            this.processedEntitiesBetter[this.activeEntity.entityID].pressed
+              .state
+          )
+            Vue.set(
+              this.processedEntitiesBetter[this.activeEntity.entityID],
+              "pressed",
+              this.activeEntity.pressed
+            );
+          if (
+            this.activeEntity.selected !==
+            this.processedEntitiesBetter[this.activeEntity.entityID]
+              .entitySelected
+          )
+            Vue.set(
+              this.processedEntitiesBetter[this.activeEntity.entityID],
+              "entitySelected",
+              this.activeEntity.selected
+            );
+          if (
+            this.activeEntity.dragging.state !==
+            this.processedEntitiesBetter[this.activeEntity.entityID].dragging
+              .state
+          ) {
+            Vue.set(
+              this.processedEntitiesBetter[this.activeEntity.entityID],
+              "dragging",
+              this.activeEntity.dragging
+            );
+            if (this.activeEntity.dragging.state)
+              Vue.set(
+                this.processedEntitiesBetter[this.activeEntity.entityID],
+                "canvasMousePos",
+                this.canvasMousePos
+              );
+          }
+        } else if (
+          Object.keys(this.processedEntitiesBetter).includes(
+            this.prevActiveEntityID
+          )
+        ) {
+          console.log("on clicking canvas i should be seen");
+          Vue.set(
+            this.processedEntitiesBetter[this.prevActiveEntityID],
+            "pressed",
+            { state: undefined }
+          );
+          Vue.set(
+            this.processedEntitiesBetter[this.prevActiveEntityID],
+            "entitySelected",
+            false
+          );
+          Vue.set(
+            this.processedEntitiesBetter[this.prevActiveEntityID],
+            "canvasMousePos",
+            undefined
+          );
+        }
+      },
+      deep: true,
+    },
+    entitiesToUpdate() {
+      /*Object.entries(this.processedEntitiesBetter).forEach((value) => {
+        if (this.entitiesToUpdate.includes(value[0])) {
+          Vue.set(
+            this.processedEntitiesBetter[value[0]],
+            "updateEntityData",
+            true
+          );
+          const index = this.entitiesToUpdate.indexOf(value[0]);
+          let temp = this.entitiesToUpdate.slice(0, index);
+          if (!(index + 1 > this.entitiesToUpdate.length))
+            temp.push(...this.entitiesToUpdate.slice(index + 1));
+          this.entitiesToUpdate = temp;
+          Vue.set(
+            this.processedEntitiesBetter[value[0]],
+            "updateEntityData",
+            false
+          );
+        }
+      });*/
+    },
+  },
   created: function () {
     this.$store.subscribeAction({
       after: (action) => {
