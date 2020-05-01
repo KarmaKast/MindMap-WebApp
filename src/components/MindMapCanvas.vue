@@ -41,6 +41,7 @@
         :grid="grid"
         :targetRelSpots="value.targetRelSpots"
         :updateEntityData="value.updateEntityData"
+        @prevActiveEntityID="setPrevActiveEntityID"
         @removeEntity="removeEntity"
         @entityActivated="entityActivated"
         @setSelfRelSpots="
@@ -205,6 +206,12 @@ export default {
     },
   },
   methods: {
+    setPrevActiveEntityID(ID) {
+      //console.log("I should only be called once");
+      this.prevActiveEntityID = ID;
+      Vue.set(this.activeEntity, "entityID", ID);
+      Vue.set(this.activeEntity, "selected", true);
+    },
     handleTouchEnd(event) {
       event.preventDefault();
 
@@ -247,7 +254,7 @@ export default {
             //console.log(this.activeEntity.selected);
           }
         }
-      }, 100);
+      }, 200);
     },
     deactivateAllEntities(event) {
       if ([1].includes(event.which) || event.type === "touchend") {
@@ -410,7 +417,7 @@ export default {
             entityLocationDef_.x - this.width / 2 - this.canvasLocation.x;
           entityLocationDef_.y =
             entityLocationDef_.y - this.height / 2 - this.canvasLocation.y;
-          console.log(entityLocationDef_);
+          //console.log(entityLocationDef_);
           this.$emit("create-new-entity", entityLocationDef_);
         } else {
           this.canvas.taps.count = 0;
@@ -550,8 +557,8 @@ export default {
               );
             }
           } else {
-            console.log("wait this shouldn't be happening");
-            console.log(value[0], JSON.stringify(value[1]));
+            //console.log("wait this shouldn't be happening");
+            //console.log(value[0], JSON.stringify(value[1]));
           }
         });
       },
@@ -561,6 +568,9 @@ export default {
       handler() {
         if (this.activeEntity.entityID) {
           if (this.prevActiveEntityID !== this.activeEntity.entityID) {
+            /*console.log(
+              "on clicking from one entity to another i should be seen"
+            );*/
             if (
               this.prevActiveEntityID &&
               Object.keys(this.processedEntitiesBetter).includes(
@@ -575,11 +585,6 @@ export default {
               Vue.set(
                 this.processedEntitiesBetter[this.prevActiveEntityID],
                 "entitySelected",
-                false
-              );
-              Vue.set(
-                this.processedEntitiesBetter[this.prevActiveEntityID],
-                "canvasMousePos",
                 undefined
               );
             }
@@ -600,6 +605,7 @@ export default {
             this.processedEntitiesBetter[this.activeEntity.entityID]
               .entitySelected
           )*/
+          //console.log("entitySelected is being modified");
           Vue.set(
             this.processedEntitiesBetter[this.activeEntity.entityID],
             "entitySelected",
@@ -621,7 +627,7 @@ export default {
             this.prevActiveEntityID
           )
         ) {
-          console.log("on clicking canvas i should be seen");
+          //console.log("on clicking canvas i should be seen");
           Vue.set(
             this.processedEntitiesBetter[this.prevActiveEntityID],
             "pressed",
@@ -630,8 +636,9 @@ export default {
           Vue.set(
             this.processedEntitiesBetter[this.prevActiveEntityID],
             "entitySelected",
-            false
+            undefined
           );
+
           Vue.set(
             this.processedEntitiesBetter[this.prevActiveEntityID],
             "canvasMousePos",
@@ -643,15 +650,23 @@ export default {
     },
     canvasMousePos: {
       handler() {
-        if (this.activeEntity.entityID && this.activeEntity.dragging.state)
-          Vue.set(
-            this.processedEntitiesBetter[this.activeEntity.entityID],
-            "canvasMousePos",
-            {
-              x: this.canvasMousePos.x - this.canvasLocation.x,
-              y: this.canvasMousePos.y - this.canvasLocation.y,
-            }
-          );
+        if (this.activeEntity.entityID)
+          if (this.activeEntity.dragging.state)
+            Vue.set(
+              this.processedEntitiesBetter[this.activeEntity.entityID],
+              "canvasMousePos",
+              {
+                x: this.canvasMousePos.x - this.canvasLocation.x,
+                y: this.canvasMousePos.y - this.canvasLocation.y,
+              }
+            );
+          else {
+            Vue.set(
+              this.processedEntitiesBetter[this.prevActiveEntityID],
+              "canvasMousePos",
+              undefined
+            );
+          }
       },
       deep: true,
     },
