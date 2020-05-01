@@ -170,6 +170,7 @@ export default {
       entityLocation: this.entityLocationDef,
       entityLocationProcessed: {},
       entityLabel: "",
+      entitySelectedDef: undefined,
       entitySelectedFinal: this.entitySelected,
       entityColor: { h: 0, s: 0, l: 0, a: 1 },
       entityData: {
@@ -463,7 +464,8 @@ export default {
           }),
         }),
       }).then(() => {
-        this.entityData.viz_props[propName] = Object.assign({}, data);
+        this.entityData.viz_props[propName] =
+          data instanceof Object ? Object.assign({}, data) : data;
         if (this.autoSave) {
           // doing: ask server save state to file
           axios.post(this.apiUrl + "/collection/save");
@@ -556,7 +558,7 @@ export default {
     },
     entitySelected: {
       handler() {
-        //this.entitySelectedFinal = this.entitySelected;
+        this.entitySelectedFinal = this.entitySelected ? true : false;
       },
       deep: true,
     },
@@ -608,8 +610,14 @@ export default {
           this.entityData.viz_props.location
         );
       }
-      if (this.entityData.viz_props.selected !== this.entitySelectedFinal)
+      if (this.entityData.viz_props.selected !== this.entitySelectedFinal) {
+        if (this.entitySelectedDef === undefined) {
+          this.entitySelectedDef = this.entityData.viz_props.selected;
+        }
+        if (this.entitySelectedDef)
+          this.$emit("prevActiveEntityID", this.entityID);
         this.entitySelectedFinal = this.entityData.viz_props.selected;
+      }
       if (!lodash.isEqual(this.entityColor, this.entityData.viz_props.color))
         this.entityColor = Object.assign({}, this.entityData.viz_props.color);
     },
@@ -660,7 +668,14 @@ export default {
     pressed: {
       handler() {
         //if (this.pressed.state)
-        this.entitySelectedFinal = this.entitySelected;
+        /*if (this.entitySelected !== undefined) {
+          console.log(
+            "im called",
+            this.entitySelectedFinal,
+            this.entitySelected
+          );
+          this.entitySelectedFinal = this.entitySelected;
+        }*/
       },
       deep: true,
     },
