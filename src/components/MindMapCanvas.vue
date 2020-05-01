@@ -207,7 +207,7 @@ export default {
   },
   methods: {
     setPrevActiveEntityID(ID) {
-      //console.log("I should only be called once");
+      console.log("I should only be called once");
       this.prevActiveEntityID = ID;
       Vue.set(this.activeEntity, "entityID", ID);
       Vue.set(this.activeEntity, "selected", true);
@@ -568,9 +568,9 @@ export default {
       handler() {
         if (this.activeEntity.entityID) {
           if (this.prevActiveEntityID !== this.activeEntity.entityID) {
-            /*console.log(
+            console.log(
               "on clicking from one entity to another i should be seen"
-            );*/
+            );
             if (
               this.prevActiveEntityID &&
               Object.keys(this.processedEntitiesBetter).includes(
@@ -605,7 +605,7 @@ export default {
             this.processedEntitiesBetter[this.activeEntity.entityID]
               .entitySelected
           )*/
-          //console.log("entitySelected is being modified");
+          console.log("entitySelected is being modified");
           Vue.set(
             this.processedEntitiesBetter[this.activeEntity.entityID],
             "entitySelected",
