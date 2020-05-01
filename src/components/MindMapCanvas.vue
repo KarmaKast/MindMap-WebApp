@@ -264,6 +264,12 @@ export default {
           if (this.$refs.canvasContainer === event.target) {
             this.activeEntity.selected = false;
             this.activeEntity.entityID = undefined;
+            if (this.$store.state.relClaimMode.mode)
+              this.$store.commit("update_relClaimMode", {
+                mode: false,
+                targetID: null,
+                claimantID: this.$store.state.relClaimMode.claimantID,
+              });
           }
         } else {
           // context: this is for the node
@@ -523,7 +529,7 @@ export default {
               {},
               this.relClaimTargetSpots[value.ID]
             ),
-            updateEntityData: this.entitiesToUpdate.includes(value.ID),
+            updateEntityData: false, //this.entitiesToUpdate.includes(value.ID),
           });
       });
     },
@@ -605,7 +611,7 @@ export default {
             this.processedEntitiesBetter[this.activeEntity.entityID]
               .entitySelected
           )*/
-          console.log("entitySelected is being modified");
+          //console.log("entitySelected is being modified");
           Vue.set(
             this.processedEntitiesBetter[this.activeEntity.entityID],
             "entitySelected",
@@ -671,25 +677,14 @@ export default {
       deep: true,
     },
     entitiesToUpdate() {
-      /*Object.entries(this.processedEntitiesBetter).forEach((value) => {
-        if (this.entitiesToUpdate.includes(value[0])) {
-          Vue.set(
-            this.processedEntitiesBetter[value[0]],
-            "updateEntityData",
-            true
-          );
-          const index = this.entitiesToUpdate.indexOf(value[0]);
-          let temp = this.entitiesToUpdate.slice(0, index);
-          if (!(index + 1 > this.entitiesToUpdate.length))
-            temp.push(...this.entitiesToUpdate.slice(index + 1));
-          this.entitiesToUpdate = temp;
-          Vue.set(
-            this.processedEntitiesBetter[value[0]],
-            "updateEntityData",
-            false
-          );
-        }
-      });*/
+      if (this.entitiesToUpdate.length) {
+        Vue.set(
+          this.processedEntitiesBetter[this.entitiesToUpdate[0]],
+          "updateEntityData",
+          true
+        );
+        Vue.delete(this.entitiesToUpdate, 0);
+      }
     },
   },
   created: function () {
