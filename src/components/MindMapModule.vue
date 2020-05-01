@@ -325,6 +325,12 @@ export default {
       // todo: WIP
       // load app settings from app_settings.json either during mounted or created
     },
+    refreshCanvas() {
+      this.canvasForceUpdate = true;
+      this.$nextTick(() => {
+        this.canvasForceUpdate = false;
+      });
+    },
     loadCollection() {
       var url_ = this.apiUrl;
       this.entities = [];
@@ -353,10 +359,7 @@ export default {
           this.entities = response.data.Entities.map((ID) => {
             return { ID: ID };
           });
-          this.canvasForceUpdate = true;
-          this.$nextTick(() => {
-            this.canvasForceUpdate = false;
-          });
+          this.refreshCanvas();
           if (
             !(
               localStorage.getItem("apiUrl") &&
@@ -459,6 +462,13 @@ export default {
         this.getCollection();
       }
     },
+    apiValidity() {
+      if (!this.apiValidity && this.apiUrl === "") {
+        this.refreshCanvas();
+        this.entities = [];
+        localStorage.setItem("apiUrl", "");
+      }
+    },
   },
   created: function () {
     this.$store.subscribeAction({
@@ -473,6 +483,7 @@ export default {
   mounted: function () {
     if (localStorage.getItem("apiUrl")) {
       this.apiUrl = localStorage.getItem("apiUrl");
+      this.$store.dispatch("update_apiUrl", this.apiUrl);
       this.apiValidity = true;
     }
   },

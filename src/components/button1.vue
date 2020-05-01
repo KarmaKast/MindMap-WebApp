@@ -36,6 +36,7 @@
 </template>
 
 <script>
+import { mapState } from "vuex";
 export default {
   name: "buttonOne",
   props: {
@@ -59,6 +60,10 @@ export default {
     };
   },
   computed: {
+    urlInStore: function () {
+      return this.$store.state.apiUrl[0];
+    },
+
     containerStyle: function () {
       var templateC = `auto ${this.size[0]}px`;
       return {
@@ -210,6 +215,14 @@ export default {
       if (bttn == "test") {
         this.testButtonIsHovered = false;
       }
+    },
+  },
+  watch: {
+    urlInStore: {
+      handler() {
+        if (this.urlInStore !== this.urlInField)
+          this.urlInField = this.urlInStore;
+      },
     },
   },
 };
