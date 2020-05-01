@@ -41,6 +41,7 @@
         :grid="grid"
         :targetRelSpots="value.targetRelSpots"
         :updateEntityData="value.updateEntityData"
+        @prevActiveEntityID="setPrevActiveEntityID"
         @removeEntity="removeEntity"
         @entityActivated="entityActivated"
         @setSelfRelSpots="
@@ -205,6 +206,12 @@ export default {
     },
   },
   methods: {
+    setPrevActiveEntityID(ID) {
+      console.log("I should only be called once");
+      this.prevActiveEntityID = ID;
+      Vue.set(this.activeEntity, "entityID", ID);
+      Vue.set(this.activeEntity, "selected", true);
+    },
     handleTouchEnd(event) {
       event.preventDefault();
 
@@ -247,7 +254,7 @@ export default {
             //console.log(this.activeEntity.selected);
           }
         }
-      }, 100);
+      }, 200);
     },
     deactivateAllEntities(event) {
       if ([1].includes(event.which) || event.type === "touchend") {
@@ -278,25 +285,45 @@ export default {
       if (this.activeEntity.dragging.state || this.canvas.dragging.state) {
         if (event.type === "mousemove") {
           //console.log(event);
-          this.canvasMousePos.x = event.clientX - this.canvasContainerBoxLoc.x;
-          this.canvasMousePos.y = event.clientY - this.canvasContainerBoxLoc.y;
+          Vue.set(
+            this.canvasMousePos,
+            "x",
+            event.clientX - this.canvasContainerBoxLoc.x
+          );
+          Vue.set(
+            this.canvasMousePos,
+            "y",
+            event.clientY - this.canvasContainerBoxLoc.y
+          );
         } else if (event.type === "touchmove") {
           //console.log(event);
-          this.canvasMousePos.x =
-            event.touches[0].clientX - this.canvasContainerBoxLoc.x;
-          this.canvasMousePos.y =
-            event.touches[0].clientY - this.canvasContainerBoxLoc.y;
+          Vue.set(
+            this.canvasMousePos,
+            "x",
+            event.touches[0].clientX - this.canvasContainerBoxLoc.x
+          );
+          Vue.set(
+            this.canvasMousePos,
+            "y",
+            event.touches[0].clientY - this.canvasContainerBoxLoc.y
+          );
         }
 
         if (this.canvas.dragging.state) {
-          this.canvasLocation.x =
+          Vue.set(
+            this.canvasLocation,
+            "x",
             this.canvasMousePos.x -
-            this.width / 2 -
-            this.canvas.dragging.deltas.x;
-          this.canvasLocation.y =
+              this.width / 2 -
+              this.canvas.dragging.deltas.x
+          );
+          Vue.set(
+            this.canvasLocation,
+            "y",
             this.canvasMousePos.y -
-            this.height / 2 -
-            this.canvas.dragging.deltas.y;
+              this.height / 2 -
+              this.canvas.dragging.deltas.y
+          );
         }
       }
     },
@@ -390,7 +417,7 @@ export default {
             entityLocationDef_.x - this.width / 2 - this.canvasLocation.x;
           entityLocationDef_.y =
             entityLocationDef_.y - this.height / 2 - this.canvasLocation.y;
-          console.log(entityLocationDef_);
+          //console.log(entityLocationDef_);
           this.$emit("create-new-entity", entityLocationDef_);
         } else {
           this.canvas.taps.count = 0;
@@ -416,26 +443,6 @@ export default {
       //console.log([this.canvasMousePos.x, this.canvasMousePos.y]);
     },
     assignTargetRelSpots(claimantID, targetID) {
-      //console.log(claimantID, targetID);
-      /*
-      const value = {
-        [targetID]: this.relClaimSpots[targetID],
-      };
-      this.relClaimTargetSpots[claimantID] = this.relClaimTargetSpots[
-        claimantID
-      ]
-        ? Object.assign(this.relClaimTargetSpots[claimantID], value)
-        : value;*/
-
-      /*const value = {
-        [targetID]: this.relClaimSpots[targetID],
-      };
-      this.relClaimTargetSpots = Object.assign({}, this.relClaimTargetSpots, {
-        [claimantID]: this.relClaimTargetSpots[claimantID]
-          ? Object.assign({}, this.relClaimTargetSpots[claimantID], value)
-          : value,
-      });*/
-
       if (this.relClaimTargetSpots[claimantID])
         Vue.set(
           this.relClaimTargetSpots[claimantID],
@@ -446,11 +453,6 @@ export default {
         Vue.set(this.relClaimTargetSpots, claimantID, {
           [targetID]: this.relClaimSpots[targetID],
         });
-
-      /*
-      this.relClaimTargetSpots = Object.assign({}, this.relClaimTargetSpots, {
-        [claimantID]: { [targetID]: this.relClaimSpots[claimantID] },
-      });*/
     },
     setSelfRelSpots(entityID, relSpots) {
       //console.log(claimantID, targetID);
@@ -484,51 +486,52 @@ export default {
         this.entitiesToUpdate = response.data.claimantIDs;
       });
     },
+    initiateProcessedEntities() {
+      Object.keys(this.processedEntitiesBetter).forEach((entityID, index) => {
+        if (!this.entities.some((x) => x.ID === entityID)) {
+          //console.log("to delete : ", entityID);
+          Vue.delete(this.processedEntitiesBetter, entityID);
+          Vue.delete(this.relClaimTargetSpots, entityID);
+        }
+      });
+      this.entities.forEach((value, index) => {
+        if (!Object.keys(this.processedEntitiesBetter).includes(value.ID))
+          Vue.set(this.processedEntitiesBetter, value.ID, {
+            dragging: {
+              state:
+                value.ID === this.activeEntity.entityID
+                  ? this.activeEntity.dragging.state
+                  : false,
+            },
+            pressed: {
+              state:
+                value.ID === this.activeEntity.entityID
+                  ? this.activeEntity.pressed.state
+                  : undefined,
+            },
+            entitySelected: undefined,
+            canvasMousePos: this.activeEntity.dragging
+              ? this.activeEntity.entityID === value.ID
+                ? Object.assign({}, this.canvasMousePos)
+                : undefined
+              : undefined,
+            entityLocationDef:
+              this.entities[index]["entityLocationDef"] === undefined
+                ? { x: 0, y: 0 }
+                : Object.assign({}, this.entities[index]["entityLocationDef"]),
+            targetRelSpots: Object.assign(
+              {},
+              this.relClaimTargetSpots[value.ID]
+            ),
+            updateEntityData: this.entitiesToUpdate.includes(value.ID),
+          });
+      });
+    },
   },
   watch: {
     entities: {
       handler() {
-        // doing: initializing processedEntitiesBetter
-        Object.keys(this.processedEntitiesBetter).forEach((entityID, index) => {
-          if (!this.entities.some((x) => x.ID === entityID)) {
-            //console.log("to delete : ", entityID);
-            Vue.delete(this.processedEntitiesBetter, entityID);
-            Vue.delete(this.relClaimTargetSpots, entityID);
-          }
-        });
-        this.entities.forEach((value, index) => {
-          if (!Object.keys(this.processedEntitiesBetter).includes(value.ID))
-            Vue.set(this.processedEntitiesBetter, value.ID, {
-              dragging: {
-                state:
-                  value.ID === this.activeEntity.entityID
-                    ? this.activeEntity.dragging.state
-                    : false,
-              },
-              pressed: {
-                state:
-                  value.ID === this.activeEntity.entityID
-                    ? this.activeEntity.pressed.state
-                    : undefined,
-              },
-              entitySelected:
-                value.ID === this.activeEntity.entityID
-                  ? this.activeEntity.selected
-                  : false,
-              canvasMousePos: this.activeEntity.dragging
-                ? this.activeEntity.entityID === value.ID
-                  ? this.canvasMousePos
-                  : undefined
-                : undefined,
-              entityLocationDef:
-                this.entities[index]["entityLocationDef"] === undefined
-                  ? { x: 0, y: 0 }
-                  : this.entities[index]["entityLocationDef"],
-              targetRelSpots: this.relClaimTargetSpots[value.ID],
-              updateEntityData: this.entitiesToUpdate.includes(value.ID),
-            });
-        });
-
+        this.initiateProcessedEntities();
         //console.log("i should appear when creating new node");
       },
       deep: true,
@@ -554,8 +557,8 @@ export default {
               );
             }
           } else {
-            console.log("wait this shouldn't be happening");
-            console.log(value[0], JSON.stringify(value[1]));
+            //console.log("wait this shouldn't be happening");
+            //console.log(value[0], JSON.stringify(value[1]));
           }
         });
       },
@@ -565,6 +568,9 @@ export default {
       handler() {
         if (this.activeEntity.entityID) {
           if (this.prevActiveEntityID !== this.activeEntity.entityID) {
+            console.log(
+              "on clicking from one entity to another i should be seen"
+            );
             if (
               this.prevActiveEntityID &&
               Object.keys(this.processedEntitiesBetter).includes(
@@ -579,11 +585,6 @@ export default {
               Vue.set(
                 this.processedEntitiesBetter[this.prevActiveEntityID],
                 "entitySelected",
-                false
-              );
-              Vue.set(
-                this.processedEntitiesBetter[this.prevActiveEntityID],
-                "canvasMousePos",
                 undefined
               );
             }
@@ -597,18 +598,19 @@ export default {
             Vue.set(
               this.processedEntitiesBetter[this.activeEntity.entityID],
               "pressed",
-              this.activeEntity.pressed
+              { state: this.activeEntity.pressed.state }
             );
-          if (
+          /*if (
             this.activeEntity.selected !==
             this.processedEntitiesBetter[this.activeEntity.entityID]
               .entitySelected
-          )
-            Vue.set(
-              this.processedEntitiesBetter[this.activeEntity.entityID],
-              "entitySelected",
-              this.activeEntity.selected
-            );
+          )*/
+          console.log("entitySelected is being modified");
+          Vue.set(
+            this.processedEntitiesBetter[this.activeEntity.entityID],
+            "entitySelected",
+            this.activeEntity.selected
+          );
           if (
             this.activeEntity.dragging.state !==
             this.processedEntitiesBetter[this.activeEntity.entityID].dragging
@@ -617,21 +619,15 @@ export default {
             Vue.set(
               this.processedEntitiesBetter[this.activeEntity.entityID],
               "dragging",
-              this.activeEntity.dragging
+              { state: this.activeEntity.dragging.state }
             );
-            if (this.activeEntity.dragging.state)
-              Vue.set(
-                this.processedEntitiesBetter[this.activeEntity.entityID],
-                "canvasMousePos",
-                this.canvasMousePos
-              );
           }
         } else if (
           Object.keys(this.processedEntitiesBetter).includes(
             this.prevActiveEntityID
           )
         ) {
-          console.log("on clicking canvas i should be seen");
+          //console.log("on clicking canvas i should be seen");
           Vue.set(
             this.processedEntitiesBetter[this.prevActiveEntityID],
             "pressed",
@@ -640,14 +636,37 @@ export default {
           Vue.set(
             this.processedEntitiesBetter[this.prevActiveEntityID],
             "entitySelected",
-            false
+            undefined
           );
+
           Vue.set(
             this.processedEntitiesBetter[this.prevActiveEntityID],
             "canvasMousePos",
             undefined
           );
         }
+      },
+      deep: true,
+    },
+    canvasMousePos: {
+      handler() {
+        if (this.activeEntity.entityID)
+          if (this.activeEntity.dragging.state)
+            Vue.set(
+              this.processedEntitiesBetter[this.activeEntity.entityID],
+              "canvasMousePos",
+              {
+                x: this.canvasMousePos.x - this.canvasLocation.x,
+                y: this.canvasMousePos.y - this.canvasLocation.y,
+              }
+            );
+          else {
+            Vue.set(
+              this.processedEntitiesBetter[this.prevActiveEntityID],
+              "canvasMousePos",
+              undefined
+            );
+          }
       },
       deep: true,
     },
@@ -689,6 +708,7 @@ export default {
     //console.log(box);
     this.height = box.height;
     this.width = box.width;
+    this.initiateProcessedEntities();
   },
   beforeUpdate: function () {
     //console.log("before update called");

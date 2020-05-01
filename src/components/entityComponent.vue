@@ -15,7 +15,7 @@
               :config="{
                 points: relationWirePoints[relClaim.To],
                 stroke: relWireColor,
-                strokeWidth: dragging.state || entitySelected ? 2 : 1,
+                strokeWidth: dragging.state || entitySelectedFinal ? 2 : 1,
                 lineCap: 'round',
                 lineJoin: 'round',
               }"
@@ -25,7 +25,7 @@
       </v-stage>
     </div>
     <div
-      v-if="entitySelected"
+      v-if="entitySelectedFinal"
       class="entityUI"
       :style="{
         position: 'absolute',
@@ -102,6 +102,7 @@
 </template>
 
 <script>
+import Vue from "vue";
 import ColorPicker from "./general/ColorPicker.vue";
 
 //import {uuidv1} from 'uuid/v1';
@@ -147,7 +148,7 @@ export default {
       type: Object,
     },
     entitySelected: {
-      default: false,
+      default: undefined,
       type: Boolean,
     },
     entityLocationDef: {
@@ -169,6 +170,8 @@ export default {
       entityLocation: this.entityLocationDef,
       entityLocationProcessed: {},
       entityLabel: "",
+      entitySelectedDef: undefined,
+      entitySelectedFinal: this.entitySelected,
       entityColor: { h: 0, s: 0, l: 0, a: 1 },
       entityData: {
         source: { Label: "", RelationClaims: [] },
@@ -192,13 +195,13 @@ export default {
       return {
         position: "absolute",
         top: `${
-          this.canvasLocation["y"] +
+          /*this.canvasLocation["y"] +*/
           this.canvasSize.height / 2 +
           this.entityLocation_.y -
           this.entityBoundingBoxSize.height / 2
         }px`,
         left: `${
-          this.canvasLocation["x"] +
+          /*this.canvasLocation["x"] +*/
           this.canvasSize.width / 2 +
           this.entityLocation_.x -
           this.entityBoundingBoxSize.width / 2
@@ -207,9 +210,13 @@ export default {
         minHeight: `${this.entityLabel === "" ? this.minHeight : 0}px`,
         cursor: this.dragging.state ? "grabbing" : "grab",
         zIndex: this.dragging.state ? "5000" : "unset",
+        transform: `translate(
+          ${this.canvasLocation.x + "px"},
+          ${this.canvasLocation.y + "px"}
+        )`,
 
         backgroundColor:
-          this.editingLabel && this.entitySelected
+          this.editingLabel && this.entitySelectedFinal
             ? "white"
             : "hsla(0,0%,0%,0.01)",
         /*border: `1px dotted hsla(${this.entityColor.h},${this.entityColor.s}%,${this.entityColor.l}%, 0.2)`,*/
@@ -269,20 +276,12 @@ export default {
       };
     },
     entityLocation_: function () {
-      var entityLoc = Object.assign({}, this.entityLocation);
-      console.log("entityLocation_() is called from entity: ", this.entityID);
-      if (this.dragging.state) {
-        // todo: this is working as intended. Just need to detect drag differently from simply clicking in.
-        //console.log("entityLocation_() is called from entity: ", this.entityID);
-        entityLoc.x =
-          this.canvasMousePos.x -
-          this.canvasSize.width / 2 -
-          this.canvasLocation.x;
+      let entityLoc = {};
+      //console.log("entityLocation_() is called from entity: ", this.entityID);
+      if (this.canvasMousePos && this.pressed.state) {
+        entityLoc.x = this.canvasMousePos.x - this.canvasSize.width / 2;
 
-        entityLoc.y =
-          this.canvasMousePos.y -
-          this.canvasSize.height / 2 -
-          this.canvasLocation.y;
+        entityLoc.y = this.canvasMousePos.y - this.canvasSize.height / 2;
 
         if (this.grid.snap) {
           entityLoc.x =
@@ -295,6 +294,8 @@ export default {
               1) *
             this.grid.size;
         }
+      } else {
+        entityLoc = Object.assign({}, this.entityLocation);
       }
       return entityLoc;
     },
@@ -324,18 +325,7 @@ export default {
       //console.log(boundingBox);
       if (this.dragging.state && this.canvasLocation.x)
         boundingBox = this.$refs.entityContainer.getBoundingClientRect();
-      /*return [
-        boundingBox.left,
-        boundingBox.right,
-        boundingBox.top,
-        boundingBox.bottom,
-      ];*/
-      /*return [
-        this.entityBoundingBoxSize.left,
-        this.entityBoundingBoxSize.right,
-        this.entityBoundingBoxSize.top,
-        this.entityBoundingBoxSize.bottom,
-      ];*/
+
       return {
         left:
           this.canvasLocation.x +
@@ -360,22 +350,11 @@ export default {
       };
     },
     relationWirePoints: function () {
-      //console.log({ relClaim });
-      //this.$emit("assignTargetRelSpots", relClaim.To);
-      //const dist = Math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2);
-
       let res = {};
       for (const relClaim of this.entityData.source.RelationClaims) {
         let targetSpots = this.targetRelSpots
           ? this.targetRelSpots[relClaim.To]
           : undefined;
-        //console.log(this.targetRelSpots[relClaim.To]);
-        /*res[relClaim.To] = [
-          this.relationSpots.left,
-          (this.relationSpots.top + this.relationSpots.bottom) / 2,
-          targetSpots ? targetSpots.left : 0,
-          targetSpots ? (targetSpots.top + targetSpots.bottom) / 2 : 0,
-        ];*/
 
         // todo: find closest set of points between this entity and target entity
         function dist(p1, p2) {
@@ -437,14 +416,16 @@ export default {
 
           if (event.type === "mousedown") {
             this.draggingDeltas["x"] =
-              event.clientX - boundingBox.x + this.canvasLocation.x;
+              event.clientX - boundingBox.x - this.canvasLocation.x;
             this.draggingDeltas["y"] =
-              event.clientY - boundingBox.y + this.canvasLocation.y;
+              event.clientY - boundingBox.y - this.canvasLocation.y;
           } else if (event.type == "touchstart") {
             this.draggingDeltas["x"] =
-              event.touches[0].clientX - boundingBox.x + this.canvasLocation.x;
+              event.touches[0].clientX -
+              boundingBox.x /*+ this.canvasLocation.x*/;
             this.draggingDeltas["y"] =
-              event.touches[0].clientY - boundingBox.y + this.canvasLocation.y;
+              event.touches[0].clientY -
+              boundingBox.y /*+ this.canvasLocation.y*/;
           }
           this.$emit("setStartingCanvasMousePos", event);
           this.$emit("entityActivated", event, this.entityID);
@@ -483,7 +464,8 @@ export default {
           }),
         }),
       }).then(() => {
-        this.entityData.viz_props[propName] = Object.assign({}, data);
+        this.entityData.viz_props[propName] =
+          data instanceof Object ? Object.assign({}, data) : data;
         if (this.autoSave) {
           // doing: ask server save state to file
           axios.post(this.apiUrl + "/collection/save");
@@ -505,7 +487,7 @@ export default {
       }, time);
     },
     editentityLabel(event) {
-      console.log(event);
+      //console.log(event);
       this.editingLabel = this.editingLabel ? false : true;
       //setInterval
       if (this.editingLabel) {
@@ -517,12 +499,12 @@ export default {
     startRelClaimMode() {
       this.relClaimMode.mode = true;
       this.$store.commit("update_relClaimMode", this.relClaimMode);
-      console.log("starting relclaim mode on node : ", this.entityID);
+      //console.log("starting relclaim mode on node : ", this.entityID);
     },
     confirmRelClaimTarget(event) {
       event.preventDefault();
       if (!this.relClaimMode.mode && this.$store.state.relClaimMode.mode) {
-        console.log(event);
+        //console.log(event);
         if (event.type === "mouseup") {
           this.$store.commit("update_relClaimMode", {
             mode: true,
@@ -565,7 +547,6 @@ export default {
   watch: {
     "dragging.state"() {
       if (!this.dragging.state) {
-        this.entityLocation = this.entityLocation_;
       }
     },
     apiValidity() {},
@@ -575,9 +556,27 @@ export default {
       },
       deep: true,
     },
-
+    entitySelected: {
+      handler() {
+        this.entitySelectedFinal = this.entitySelected ? true : false;
+      },
+      deep: true,
+    },
+    entitySelectedFinal() {
+      if (this.apiValidity) {
+        if (
+          !lodash.isEqual(
+            this.entitySelectedFinal,
+            this.entityData.viz_props.selected
+          )
+        ) {
+          this.savePropToAPI("selected", this.entitySelectedFinal);
+        }
+      }
+    },
     entityLocation_() {
       // todo: save node location to database on drag end
+
       this.$emit("setSelfRelSpots", this.relationSpots);
       if (!this.dragging.state) {
         if (this.apiValidity) {
@@ -595,6 +594,8 @@ export default {
             this.savePropToAPI("location", this.entityLocation_);
           }
         }
+      } else {
+        this.entityLocation = Object.assign({}, this.entityLocation_);
       }
     },
     "entityData.viz_props"() {
@@ -608,6 +609,14 @@ export default {
           {},
           this.entityData.viz_props.location
         );
+      }
+      if (this.entityData.viz_props.selected !== this.entitySelectedFinal) {
+        if (this.entitySelectedDef === undefined) {
+          this.entitySelectedDef = this.entityData.viz_props.selected;
+        }
+        if (this.entitySelectedDef)
+          this.$emit("prevActiveEntityID", this.entityID);
+        this.entitySelectedFinal = this.entityData.viz_props.selected;
       }
       if (!lodash.isEqual(this.entityColor, this.entityData.viz_props.color))
         this.entityColor = Object.assign({}, this.entityData.viz_props.color);
@@ -631,7 +640,7 @@ export default {
           paramsSerializer: qs.stringify,
           data: qs.stringify({ Label: this.entityLabel }),
         }).then(() => {
-          this.entityData.source.Label = this.entityLabel;
+          Vue.set(this.entityData.source, "Label", this.entityLabel);
           //this.getEntityData();
           if (this.autoSave) {
             // doing: ask server save state to file
@@ -656,6 +665,20 @@ export default {
         this.getEntityData();
       }
     },
+    pressed: {
+      handler() {
+        //if (this.pressed.state)
+        /*if (this.entitySelected !== undefined) {
+          console.log(
+            "im called",
+            this.entitySelectedFinal,
+            this.entitySelected
+          );
+          this.entitySelectedFinal = this.entitySelected;
+        }*/
+      },
+      deep: true,
+    },
   },
   created: function () {},
   mounted: function () {
@@ -671,7 +694,7 @@ export default {
     this.$store.subscribe((mutation, state) => {
       if (this.relClaimMode.mode)
         if (mutation.type === "update_relClaimMode") {
-          console.log(state.relClaimMode.targetID);
+          //console.log(state.relClaimMode.targetID);
           this.relClaimMode.targetID = state.relClaimMode.targetID;
           if (this.relClaimMode.targetID !== null && this.apiValidity)
             this.addRelClaim();
