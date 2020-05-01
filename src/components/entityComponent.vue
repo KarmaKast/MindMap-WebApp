@@ -86,7 +86,7 @@
           borderRadius: '50%',
           pointerEvents: 'all',
         }"
-        v-touch:start.self="startRelClaimMode"
+        v-touch:start.self="toggleRelClaimMode"
       ></div>
     </div>
     <div
@@ -496,24 +496,32 @@ export default {
         }, 100);
       }
     },
-    startRelClaimMode() {
-      this.relClaimMode.mode = true;
-      this.$store.commit("update_relClaimMode", this.relClaimMode);
+    toggleRelClaimMode() {
+      this.relClaimMode.mode = !this.relClaimMode.mode;
+      console.log("I should not have been called yet");
+      this.$store.commit("update_relClaimMode", {
+        mode: this.relClaimMode.mode,
+        targetID: this.relClaimMode.targetID,
+        claimantID: this.entityID,
+      });
       //console.log("starting relclaim mode on node : ", this.entityID);
     },
     confirmRelClaimTarget(event) {
       event.preventDefault();
       if (!this.relClaimMode.mode && this.$store.state.relClaimMode.mode) {
         //console.log(event);
+        //console.log("I should not have been called yet");
         if (event.type === "mouseup") {
           this.$store.commit("update_relClaimMode", {
             mode: true,
             targetID: this.entityID,
+            claimantID: this.$store.state.relClaimMode.claimantID,
           });
         } else {
           this.$store.commit("update_relClaimMode", {
             mode: true,
             targetID: this.entityID,
+            claimantID: this.$store.state.relClaimMode.claimantID,
           });
           //alert("touch mode for adding relclaim not implimented yet");
         }
@@ -698,6 +706,8 @@ export default {
           this.relClaimMode.targetID = state.relClaimMode.targetID;
           if (this.relClaimMode.targetID !== null && this.apiValidity)
             this.addRelClaim();
+          if (state.relClaimMode.claimantID === this.entityID)
+            this.relClaimMode.mode = state.relClaimMode.mode;
         }
     });
   },

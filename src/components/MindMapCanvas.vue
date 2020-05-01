@@ -264,6 +264,12 @@ export default {
           if (this.$refs.canvasContainer === event.target) {
             this.activeEntity.selected = false;
             this.activeEntity.entityID = undefined;
+            if (this.$store.state.relClaimMode.mode)
+              this.$store.commit("update_relClaimMode", {
+                mode: false,
+                targetID: null,
+                claimantID: this.$store.state.relClaimMode.claimantID,
+              });
           }
         } else {
           // context: this is for the node

@@ -15,6 +15,7 @@ export default new Vuex.Store({
     relClaimMode: {
       mode: false,
       targetID: null,
+      claimantID: null,
     },
   },
   mutations: {
@@ -40,6 +41,7 @@ export default new Vuex.Store({
     update_relClaimMode(state, relClaimMode) {
       state.relClaimMode.mode = relClaimMode.mode;
       state.relClaimMode.targetID = relClaimMode.targetID;
+      state.relClaimMode.claimantID = relClaimMode.claimantID;
     },
   },
   getters: {},
