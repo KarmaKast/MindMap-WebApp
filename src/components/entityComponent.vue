@@ -498,7 +498,7 @@ export default {
     },
     toggleRelClaimMode() {
       this.relClaimMode.mode = !this.relClaimMode.mode;
-      console.log("I should not have been called yet");
+      //console.log("I should not have been called yet");
       this.$store.commit("update_relClaimMode", {
         mode: this.relClaimMode.mode,
         targetID: this.relClaimMode.targetID,
