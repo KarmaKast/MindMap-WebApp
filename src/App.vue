@@ -1,6 +1,7 @@
 <template>
   <div id="app" :style="this.appStyle">
     <div
+      v-if="APP_MODE === 'development'"
       :style="{
         height: '400px',
         width: '100%',
@@ -24,14 +25,6 @@ export default {
   },
   data: function () {
     return {
-      mindMapContainerStyle: {
-        height: "100%",
-        width: "100%",
-        marginTop: "0px",
-        marginLeft: "0px",
-        boxSizing: "border-box",
-        padding: "20px",
-      },
       MindMapColors: {
         background: { h: 0, s: 0, l: 100, a: 0.5 },
         theme: { h: 358, s: 97, l: 67, a: 1 },
@@ -42,9 +35,22 @@ export default {
         height: 0,
       },
       entityLimit: 20,
+      APP_MODE: process.env.VUE_APP_MODE,
     };
   },
   computed: {
+    mindMapContainerStyle: function () {
+      return {
+        height: "100%",
+        width: "100%",
+        marginTop: "0px",
+        marginLeft: "0px",
+        boxSizing: "border-box",
+        borderRadius:
+          this.APP_MODE === "development" ? "15px 15px 10px 10px" : "unset",
+        padding: this.APP_MODE === "development" ? "20px" : "0px",
+      };
+    },
     appStyle: function () {
       return {
         height: `${this.window_size.height}px`,

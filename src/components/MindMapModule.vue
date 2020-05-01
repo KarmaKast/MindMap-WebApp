@@ -234,7 +234,7 @@ export default {
         height: "100%",
         width: "100%",
         overflow: "hidden",
-        borderRadius: "15px 15px 10px 10px",
+        borderRadius: "inherit",
         position: "relative",
         touchAction: "none",
       };
