@@ -17,9 +17,15 @@
     ></div>
     <div
       v-if="grid.show && grid.opacity > 0 && grid.size > 1 && grid.width > 0"
-      id="gridCenter"
-      :style="gridCenterStyle"
+      id="gridCenterTop"
+      :style="gridCenterTopStyle"
     ></div>
+    <div
+      v-if="grid.show && grid.opacity > 0 && grid.size > 1 && grid.width > 0"
+      id="gridCenterHor"
+      :style="gridCenterHorStyle"
+    ></div>
+    <!--<div class="gridBetter" :style="gridBetterStyle"></div>-->
     <div id="entities">
       <entityComponent
         v-for="(value, key_) in processedEntitiesBetter"
@@ -84,6 +90,7 @@ export default {
     },
     apiUrl: String,
     apiValidity: Boolean,
+
     grid: {
       default() {
         /*
@@ -133,8 +140,6 @@ export default {
           deltas: { x: 0, y: 0 },
         },
       },
-      height: 0,
-      width: 0,
       relClaimTargetSpots: {},
       relClaimSpots: {},
       entitiesToUpdate: [],
@@ -142,10 +147,10 @@ export default {
     };
   },
   computed: {
-    canvasConfig: function () {
+    canvasSize: function () {
       return {
-        height: this.height,
-        width: this.width,
+        height: this.$store.state.window_height,
+        width: this.$store.state.window_width,
       };
     },
     canvasContainerStyle: function () {
@@ -161,47 +166,84 @@ export default {
     },
     gridStyle: function () {
       // todo: move color processing functionality to vuex store
-      var processedColor = `hsla(${this.colors["theme_light"].h}, ${this.colors["theme_light"].s}%, ${this.colors["theme_light"].l}%, ${this.grid.opacity})`;
-      var size_ = this.grid.size * 2;
-      return {
+      let processedColor = `hsla(${this.colors["theme_light"].h}, ${this.colors["theme_light"].s}%, ${this.colors["theme_light"].l}%, ${this.grid.opacity})`;
+      let size_ = this.grid.size * 2;
+      let topPart = (this.canvasLocation["y"] % size_) - size_;
+      let leftPart = (this.canvasLocation["x"] % size_) - size_;
+      /*return {
         height: "200%",
         width: "200%",
         position: "absolute",
         top: `${
-          ((this.height / 2 + this.canvasLocation["y"]) % size_) - size_
+          ((this.canvasSize.height / 2 + this.canvasLocation["y"]) % size_) - size_
         }px`,
         left: `${
-          ((this.width / 2 + this.canvasLocation["x"]) % size_) - size_
+          ((this.canvasSize.width / 2 + this.canvasLocation["x"]) % size_) - size_
+        }px`,
+        backgroundImage: `repeating-linear-gradient(rgba(255, 255, 255, 0), ${processedColor} ${this.grid.width}px, rgba(255, 255, 255, 0) ${this.grid.width}px, rgba(255, 255, 255, 0) ${size_}px), repeating-linear-gradient(90deg, rgba(255, 255, 255, 0), ${processedColor} ${this.grid.width}px, rgba(255, 255, 255, 0) ${this.grid.width}px, rgba(255, 255, 255, 0) ${size_}px)`,
+        pointerEvents: "none",
+      };*/
+      return {
+        height: `calc(100% + ${size_ * 2}px)`,
+        width: `calc(100% + ${size_ * 2}px)`,
+        position: "absolute",
+        //top: `${((this.canvasSize.height / 2 + this.canvasLocation.y) % size_) - size_}px`,
+        top: `${
+          ((this.canvasSize.height / 2 + this.canvasLocation.y) % size_) -
+          size_ * 1.5
+        }px`,
+        left: `${
+          ((this.canvasSize.width / 2 + this.canvasLocation.x) % size_) -
+          size_ * 1.5
         }px`,
         backgroundImage: `repeating-linear-gradient(rgba(255, 255, 255, 0), ${processedColor} ${this.grid.width}px, rgba(255, 255, 255, 0) ${this.grid.width}px, rgba(255, 255, 255, 0) ${size_}px), repeating-linear-gradient(90deg, rgba(255, 255, 255, 0), ${processedColor} ${this.grid.width}px, rgba(255, 255, 255, 0) ${this.grid.width}px, rgba(255, 255, 255, 0) ${size_}px)`,
         pointerEvents: "none",
       };
     },
-    gridCenterStyle: function () {
-      var size_x = this.width * 1.5;
-      var size_y = this.height * 1.5;
-      //var size_ = this.grid.size * 2;
+    gridCenterTopStyle: function () {
+      let size_ = this.grid.size * 2;
+      var size_x = this.canvasSize.width * 1.5;
+      var size_y = this.canvasSize.height * 1.5;
       return {
-        height: "400%",
-        width: "400%",
+        height: "100%",
+        width: "100%",
         position: "absolute",
-        top: `${
-          ((this.height / 2 + this.canvasLocation["y"]) % size_y) - size_y
-        }px`,
-        left: `${
-          ((this.width / 2 + this.canvasLocation["x"]) % size_x) - size_x
-        }px`,
-        backgroundImage: `repeating-linear-gradient(rgba(255, 255, 255, 0), hsla(19, 100%, 50%, ${
+        top: "0px",
+        left: `${this.canvasLocation.x}px`,
+        backgroundImage: `linear-gradient(to right, transparent calc(50% - ${
+          this.grid.width / 2
+        }px), hsla(19, 100%, 50%, ${
           this.grid.opacity * 2
-        }) ${this.grid.width}px, rgba(255, 255, 255, 0) ${
-          this.grid.width
-        }px, rgba(255, 255, 255, 0) ${size_y}px), repeating-linear-gradient(90deg, rgba(255, 255, 255, 0), hsla(183, 91%, 32%, ${
-          this.grid.opacity * 2
-        }) ${this.grid.width}px, rgba(255, 255, 255, 0) ${
-          this.grid.width
-        }px, rgba(255, 255, 255, 0) ${size_x}px)`,
+        }) 1px, transparent calc(50% + ${this.grid.width / 2}px))`,
         pointerEvents: "none",
-        /*backgroundImage: `linear-gradient(90deg, #FFFFFF 49.9%, rgba(0, 0, 0, 0.520833) 50%, rgba(255, 255, 255, 0) 51.1%)`*/
+      };
+    },
+    gridCenterHorStyle: function () {
+      let size_ = this.grid.size * 2;
+      var size_x = this.canvasSize.width * 1.5;
+      var size_y = this.canvasSize.height * 1.5;
+      return {
+        height: "100%",
+        width: "100%",
+        position: "absolute",
+        top: `${this.canvasLocation.y}px`,
+        left: "0px",
+        backgroundImage: `linear-gradient(to bottom, transparent calc(50% - ${
+          this.grid.width / 2
+        }px), hsla(183, 91%, 50%, ${
+          this.grid.opacity * 2
+        }) 1px, transparent calc(50% + ${this.grid.width / 2}px))`,
+        pointerEvents: "none",
+      };
+    },
+    gridBetterStyle: function () {
+      return {
+        position: "absolute",
+        top: "-50%",
+        left: "-50%",
+
+        height: "200%",
+        width: "200%",
       };
     },
   },
@@ -231,7 +273,7 @@ export default {
        */
       //console.log("drag started at canvas");
 
-      var diffEntity = this.activeEntity.entityID !== ID;
+      let diffEntity = this.activeEntity.entityID !== ID;
       this.activeEntity.entityID = ID;
       //console.log("node pressed");
       this.activeEntity.pressed.state = true;
@@ -320,14 +362,14 @@ export default {
             this.canvasLocation,
             "x",
             this.canvasMousePos.x -
-              this.width / 2 -
+              this.canvasSize.width / 2 -
               this.canvas.dragging.deltas.x
           );
           Vue.set(
             this.canvasLocation,
             "y",
             this.canvasMousePos.y -
-              this.height / 2 -
+              this.canvasSize.height / 2 -
               this.canvas.dragging.deltas.y
           );
         }
@@ -366,7 +408,7 @@ export default {
 
           this.updateCanvasContainerBoxLoc();
 
-          var clientPos = { x: 0, y: 0 };
+          let clientPos = { x: 0, y: 0 };
           if (event.type === "mousedown") {
             this.canvas.dragging.state = true;
             this.canvas.dragging.event = event;
@@ -387,12 +429,12 @@ export default {
           if (this.canvas.dragging.state) {
             this.canvas.dragging.deltas.x =
               clientPos.x -
-              this.width / 2 -
+              this.canvasSize.width / 2 -
               this.canvasLocation.x -
               this.canvasContainerBoxLoc.x;
             this.canvas.dragging.deltas.y =
               clientPos.y -
-              this.height / 2 -
+              this.canvasSize.height / 2 -
               this.canvasLocation.y -
               this.canvasContainerBoxLoc.y;
           }
@@ -403,14 +445,14 @@ export default {
       event.preventDefault();
       //console.log(event);
       this.canvas.taps.count += 1;
-      var tapMaxInterval = 250;
+      let tapMaxInterval = 250;
       //if (this.canvas.taps.timer === undefined) {
       this.canvas.taps.timer = setTimeout(() => {
         if (this.canvas.taps.count > 1) {
           this.canvas.taps.count = 0;
           //console.log("this is double tap i guess?");
 
-          var entityLocationDef_ = { x: 0, y: 0 };
+          let entityLocationDef_ = { x: 0, y: 0 };
           if (event.type.startsWith("mouse")) {
             entityLocationDef_ = { x: event.clientX, y: event.clientY };
           } else {
@@ -420,9 +462,13 @@ export default {
             };
           }
           entityLocationDef_.x =
-            entityLocationDef_.x - this.width / 2 - this.canvasLocation.x;
+            entityLocationDef_.x -
+            this.canvasSize.width / 2 -
+            this.canvasLocation.x;
           entityLocationDef_.y =
-            entityLocationDef_.y - this.height / 2 - this.canvasLocation.y;
+            entityLocationDef_.y -
+            this.canvasSize.height / 2 -
+            this.canvasLocation.y;
           //console.log(entityLocationDef_);
           this.$emit("create-new-entity", entityLocationDef_);
         } else {
@@ -479,7 +525,7 @@ export default {
       }
     },
     removeEntity(entityID) {
-      var url_ = this.apiUrl;
+      let url_ = this.apiUrl;
       axios({
         method: "POST",
         url: url_ + "/entity/remove",
@@ -535,6 +581,12 @@ export default {
     },
   },
   watch: {
+    canvasSize: {
+      handler() {
+        //this.canvasSize.height = this.canv
+      },
+      deep: true,
+    },
     entities: {
       handler() {
         this.initiateProcessedEntities();
@@ -688,33 +740,58 @@ export default {
     },
   },
   created: function () {
+    /*let box = this.$refs.canvasContainer;
     this.$store.subscribeAction({
       after: (action) => {
         if ("update_window_size" === action.type) {
-          var box = this.$refs.canvasContainer.getBoundingClientRect();
-          this.height = box.height;
-          this.width = box.width;
+          console.log("I should be called on resize");
+          if (box) {
+            box = box.getBoundingClientRect();
+            this.canvasSize.height = box.height;
+            this.canvasSize.width = box.width;
+          } else {
+            console.log(box);
+          }
         }
       },
-    });
+    });*/
   },
   mounted: function () {
-    var box = this.$refs.canvasContainer.getBoundingClientRect();
+    /*let box = this.$refs.canvasContainer;
+    if (box) {
+      box = box.getBoundingClientRect();
+      this.canvasSize.height = box.height;
+      this.canvasSize.width = box.width;
+    }*/
     //console.log(box);
-    this.height = box.height;
-    this.width = box.width;
     this.initiateProcessedEntities();
   },
   beforeUpdate: function () {
     //console.log("before update called");
-    var box = this.$refs.canvasContainer.getBoundingClientRect();
-    this.height = box.height;
-    this.width = box.width;
+    /*let box = this.$refs.canvasContainer;
+    if (box) {
+      box = box.getBoundingClientRect();
+      this.canvasSize.height = box.height;
+      this.canvasSize.width = box.width;
+    }*/
   },
   updated: function () {
-    /*var box = this.$refs.canvasContainer.getBoundingClientRect();
-    this.height = box.height;
-    this.width = box.width;*/
+    /*this.$store.subscribeAction({
+      after: (action) => {
+        if ("update_window_size" === action.type) {
+          console.log("I should be called on resize");
+          let box2 = this.$refs.canvasContainer;
+          if (box2) {
+            console.log(box2);
+            box2 = box2.getBoundingClientRect();
+            this.canvasSize.height = box2.height;
+            this.canvasSize.width = box2.width;
+          } else {
+            console.log(box2);
+          }
+        }
+      },
+    });*/
   },
 };
 </script>
