@@ -1,5 +1,5 @@
 <template>
-  <div ref="entityContainer" :style="entityContainerStyle">
+  <div ref="entityContainer" :style="entityContainerStyleFinal">
     <div class="relationWires" :style="relationWiresStyle">
       <v-stage
         :config="{
@@ -185,36 +185,26 @@ export default {
       draggingDeltas: { x: 0, y: 0 },
       editingLabel: false,
       relClaimMode: { mode: false, targetID: null },
+      entityContainerStylePartStatic: {
+        position: "absolute",
+        boxSizing: "border-box",
+        display: "grid",
+        gridTemplateColumns: "100%",
+        padding: "4px",
+        outline: "none",
+      },
     };
   },
   computed: {
     relWireColor: function () {
       return `hsla(${this.entityColor.h},${this.entityColor.s}%,${this.entityColor.l}%, ${this.entityColor.a})`;
     },
-    entityContainerStyle: function () {
+    entityContainerStylePart1: function () {
       return {
-        position: "absolute",
-        top: `${
-          /*this.canvasLocation["y"] +*/
-          this.canvasSize.height / 2 +
-          this.entityLocation_.y -
-          this.entityBoundingBoxSize.height / 2
-        }px`,
-        left: `${
-          /*this.canvasLocation["x"] +*/
-          this.canvasSize.width / 2 +
-          this.entityLocation_.x -
-          this.entityBoundingBoxSize.width / 2
-        }px`,
         minWidth: `${this.entityLabel === "" ? this.minWidth : 0}px`,
         minHeight: `${this.entityLabel === "" ? this.minHeight : 0}px`,
         cursor: this.dragging.state ? "grabbing" : "grab",
         zIndex: this.dragging.state ? "5000" : "unset",
-        transform: `translate(
-          ${this.canvasLocation.x + "px"},
-          ${this.canvasLocation.y + "px"}
-        )`,
-
         backgroundColor:
           this.editingLabel && this.entitySelectedFinal
             ? "white"
@@ -231,12 +221,35 @@ export default {
         }, inset 0px 0px 0 4px hsla(${this.entityColor.h},
         ${this.entityColor.s}%,
         ${this.entityColor.l}%, 0.2)`,
-        boxSizing: "border-box",
-        display: "grid",
-        gridTemplateColumns: "100%",
-        padding: "4px",
-        outline: "none",
       };
+    },
+    entityContainerStylePart2: function () {
+      return {
+        top: `${
+          this.canvasSize.height / 2 +
+          this.entityLocation_.y -
+          this.entityBoundingBoxSize.height / 2
+        }px`,
+        left: `${
+          this.canvasSize.width / 2 +
+          this.entityLocation_.x -
+          this.entityBoundingBoxSize.width / 2
+        }px`,
+      };
+    },
+    entityContainerStyleFinal: function () {
+      return Object.assign(
+        {},
+        this.entityContainerStylePartStatic,
+        this.entityContainerStylePart1,
+        this.entityContainerStylePart2,
+        {
+          transform: `translate(
+          ${this.canvasLocation.x + "px"},
+          ${this.canvasLocation.y + "px"}
+        )`,
+        }
+      );
     },
     entityStyle: function () {
       return {
@@ -299,88 +312,87 @@ export default {
       }
       return entityLoc;
     },
-    relationWiresStyle: function () {
+    relationWiresStylePart1: function () {
       return {
         position: "absolute",
         left:
           0 -
-          this.canvasLocation.x -
+          /*this.canvasLocation.x -*/
           this.canvasSize.width / 2 -
           this.entityLocation_.x +
-          this.entityBoundingBoxSize.width / 2 +
-          "px",
+          this.entityBoundingBoxSize.width / 2,
         top:
           0 -
-          this.canvasLocation.y -
+          /*this.canvasLocation.y -*/
           this.canvasSize.height / 2 -
           this.entityLocation_.y +
-          this.entityBoundingBoxSize.height / 2 +
-          "px",
+          this.entityBoundingBoxSize.height / 2,
         pointerEvents: "none",
         position: "absolute",
       };
     },
+    relationWiresStyle: function () {
+      return Object.assign({}, this.relationWiresStylePart1, {
+        left: this.relationWiresStylePart1.left - this.canvasLocation.x + "px",
+        top: this.relationWiresStylePart1.top - this.canvasLocation.y + "px",
+      });
+    },
     relationSpots: function () {
-      var boundingBox = this.$refs.entityContainer.getBoundingClientRect();
-      //console.log(boundingBox);
-      if (this.dragging.state && this.canvasLocation.x)
-        boundingBox = this.$refs.entityContainer.getBoundingClientRect();
-
       return {
         left:
-          this.canvasLocation.x +
+          /*this.canvasLocation.x +*/
           this.canvasSize.width / 2 +
           this.entityLocation_.x -
           this.entityBoundingBoxSize.width / 2,
         right:
-          this.canvasLocation.x +
+          /*this.canvasLocation.x +*/
           this.canvasSize.width / 2 +
           this.entityLocation_.x +
           this.entityBoundingBoxSize.width / 2,
         top:
-          this.canvasLocation.y +
+          /*this.canvasLocation.y +*/
           this.canvasSize.height / 2 +
           this.entityLocation_.y -
           this.entityBoundingBoxSize.height / 2,
         bottom:
-          this.canvasLocation.y +
+          /*this.canvasLocation.y +*/
           this.canvasSize.height / 2 +
           this.entityLocation_.y +
           this.entityBoundingBoxSize.height / 2,
       };
     },
-    relationWirePoints: function () {
+    relationWirePointsPart1: function () {
       let res = {};
       for (const relClaim of this.entityData.source.RelationClaims) {
         let targetSpots = this.targetRelSpots
           ? this.targetRelSpots[relClaim.To]
           : undefined;
-
-        // todo: find closest set of points between this entity and target entity
-        function dist(p1, p2) {
-          return Math.sqrt((p1.x - p2.x) ** 2 + (p1.y - p2.y) ** 2);
-        }
-        const yMidSelf =
-          (this.relationSpots.top + this.relationSpots.bottom) / 2;
-        const xMidSelf =
-          (this.relationSpots.left + this.relationSpots.right) / 2;
-        const yMidTarget = (targetSpots.top + targetSpots.bottom) / 2;
-        const xMidTarget = (targetSpots.left + targetSpots.right) / 2;
-        targetSpots = {
-          left: { x: targetSpots.left, y: yMidTarget },
-          top: { x: xMidTarget, y: targetSpots.top },
-          right: { x: targetSpots.right, y: yMidTarget },
-          bottom: { x: xMidTarget, y: targetSpots.bottom },
-        };
-        let selfSpots = {
-          left: { x: this.relationSpots.left, y: yMidSelf },
-          top: { x: xMidSelf, y: this.relationSpots.top },
-          right: { x: this.relationSpots.right, y: yMidSelf },
-          bottom: { x: xMidSelf, y: this.relationSpots.bottom },
-        };
-        let minDistance;
-        let minDistanceKeys;
         if (targetSpots) {
+          // todo: find closest set of points between this entity and target entity
+          function dist(p1, p2) {
+            return Math.sqrt((p1.x - p2.x) ** 2 + (p1.y - p2.y) ** 2);
+          }
+          const yMidSelf =
+            (this.relationSpots.top + this.relationSpots.bottom) / 2;
+          const xMidSelf =
+            (this.relationSpots.left + this.relationSpots.right) / 2;
+          const yMidTarget = (targetSpots.top + targetSpots.bottom) / 2;
+          const xMidTarget = (targetSpots.left + targetSpots.right) / 2;
+          targetSpots = {
+            left: { x: targetSpots.left, y: yMidTarget },
+            top: { x: xMidTarget, y: targetSpots.top },
+            right: { x: targetSpots.right, y: yMidTarget },
+            bottom: { x: xMidTarget, y: targetSpots.bottom },
+          };
+          let selfSpots = {
+            left: { x: this.relationSpots.left, y: yMidSelf },
+            top: { x: xMidSelf, y: this.relationSpots.top },
+            right: { x: this.relationSpots.right, y: yMidSelf },
+            bottom: { x: xMidSelf, y: this.relationSpots.bottom },
+          };
+          let minDistance;
+          let minDistanceKeys;
+
           for (const targetKey in targetSpots) {
             for (const selfKey in selfSpots) {
               const distance = dist(targetSpots[targetKey], selfSpots[selfKey]);
@@ -399,6 +411,21 @@ export default {
           ];
         } else res[relClaim.To] = [0, 0, 0, 0];
       }
+      return res;
+    },
+    relationWirePoints: function () {
+      //relationWireTargetPoints
+      const res = {};
+      Object.entries(this.relationWirePointsPart1).forEach(
+        ([entityID, targetPoints]) => {
+          res[entityID] = [
+            targetPoints[0] + this.canvasLocation.x,
+            targetPoints[1] + this.canvasLocation.y,
+            targetPoints[2] + this.canvasLocation.x,
+            targetPoints[3] + this.canvasLocation.y,
+          ];
+        }
+      );
       return res;
     },
     relStageSize: function () {
@@ -570,6 +597,9 @@ export default {
       },
       deep: true,
     },
+    relationSpots() {
+      this.$emit("setSelfRelSpots", this.relationSpots);
+    },
     entitySelectedFinal() {
       if (this.apiValidity) {
         if (
@@ -675,6 +705,9 @@ export default {
     },
     pressed: {
       handler() {
+        /*console.log(
+          ` ${this.entityID} If i haven't pressed any entity I should not be seen`
+        );*/
         //if (this.pressed.state)
         /*if (this.entitySelected !== undefined) {
           console.log(

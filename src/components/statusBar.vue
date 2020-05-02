@@ -9,7 +9,7 @@
     >
       <div id="current" :style="lightDarkToggleCurrentStyle"></div>
       <div
-        v-if="showNextToggle"
+        v-show="showNextToggle"
         id="next"
         ref="next"
         :style="lightDarkToggleNextStyle"
@@ -51,7 +51,11 @@
           {{ apiUrl }}
         </p>
       </div>
-      <div id="api-status-indicator" :style="apiStatusStyle"></div>
+      <div
+        id="api-status-indicator"
+        :style="apiStatusStyle"
+        :aria-label="statusIndicatorToolTipText"
+      ></div>
     </div>
   </div>
 </template>
@@ -73,6 +77,13 @@ export default {
     };
   },
   computed: {
+    statusIndicatorToolTipText: function () {
+      return this.apiValidity
+        ? "api valid. Connection State Unknown/ not implemented."
+        : this.apiUrl === ""
+        ? "no api url provided yet"
+        : "api url provided not valid";
+    },
     statusBarStyle: function () {
       return {
         position: "absolute",
@@ -81,7 +92,9 @@ export default {
         width: `100%`,
         height: `${this.height}px`,
         boxSizing: "border-box",
-        boxShadow: "0px -2px 4px 0px hsla(0, 0%, 0%, 0.18)",
+        boxShadow: `hsla(0, 0%, ${
+          this.colors["background"].l - 15
+        }%, 0.5) 0px -2px 2px 1px`,
         padding: `${this.padding}px`,
         borderBottomLeftRadius: "inherit",
         borderBottomRightRadius: "inherit",

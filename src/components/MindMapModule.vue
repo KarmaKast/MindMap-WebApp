@@ -46,11 +46,11 @@
           :style="burgerTimeButtonStyle"
           @click.left="toggleMenu"
         >
-          <icon-base :iconColor="colorsProcessed['theme']"
+          <icon-base iconName="Main Menu" :iconColor="colorsProcessed['theme']"
             ><icon-hamburger1
           /></icon-base>
         </button>
-        <div id="menuItems" :style="this.menuItemsStyle">
+        <div v-show="showMenu" id="menuItems" :style="this.menuItemsStyle">
           <button-one
             :validity="this.apiValidity"
             :colors="colorsFinal"
@@ -272,7 +272,7 @@ export default {
     },
     menuItemsStyle: function () {
       return {
-        display: this.showMenu ? "grid" : "none",
+        display: "grid",
         gridRowGap: "12px",
         position: "absolute",
         top: "0px",

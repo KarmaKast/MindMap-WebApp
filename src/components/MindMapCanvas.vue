@@ -50,16 +50,8 @@
         @prevActiveEntityID="setPrevActiveEntityID"
         @removeEntity="removeEntity"
         @entityActivated="entityActivated"
-        @setSelfRelSpots="
-          (relSpots) => {
-            setSelfRelSpots(key_, relSpots);
-          }
-        "
-        @assignTargetRelSpots="
-          (targetID) => {
-            assignTargetRelSpots(key_, targetID);
-          }
-        "
+        @setSelfRelSpots="setSelfRelSpots(key_, $event)"
+        @assignTargetRelSpots="assignTargetRelSpots(key_, $event)"
       >
       </entityComponent>
     </div>
@@ -76,7 +68,7 @@ import lodash from "lodash";
 export default {
   name: "MindMapCanvas",
   components: {
-    entityComponent,
+    entityComponent: () => import("./entityComponent"),
   },
   props: {
     colors: Object,
@@ -167,27 +159,41 @@ export default {
         backgroundColor: "inherit",
       };
     },
-    gridStyle: function () {
+    gridStylePart1: function () {
       // todo: move color processing functionality to vuex store
       let processedColor = `hsla(${this.colors["theme_light"].h}, ${
         this.colors["theme_light"].s
       }%, ${this.colors["theme_light"].l}%, ${this.grid.opacity / 1.4})`;
       let size_ = this.grid.size * 2;
-      let height = this.canvasSize.height + size_;
-      let width = this.canvasSize.width + size_;
+
       return {
-        height: `${height}px`,
-        width: `${width}px`,
         position: "absolute",
-        top: `${
-          ((this.canvasSize.height / 2 + this.canvasLocation.y) % size_) - size_
-        }px`,
-        left: `${
-          ((this.canvasSize.width / 2 + this.canvasLocation.x) % size_) - size_
-        }px`,
+
         backgroundImage: `repeating-linear-gradient(transparent, ${processedColor} ${this.grid.width}px, transparent ${this.grid.width}px, transparent ${size_}px), repeating-linear-gradient(90deg, transparent, ${processedColor} ${this.grid.width}px, transparent ${this.grid.width}px, transparent ${size_}px)`,
         pointerEvents: "none",
       };
+    },
+    gridStylePart2: function () {
+      let size_ = this.grid.size * 2;
+      let height = this.canvasSize.height + size_ * 2;
+      let width = this.canvasSize.width + size_ * 2;
+      /*const top =
+        ((this.canvasSize.height / 2 + this.canvasLocation.y) % size_) - size_;*/
+      const top = ((height / 2 + this.canvasLocation.y) % size_) - size_ * 1;
+      /*const left =
+        ((this.canvasSize.width / 2 + this.canvasLocation.x) % size_) - size_;*/
+      const left = ((width / 2 + this.canvasLocation.x) % size_) - size_ * 1;
+      if (Math.abs(left) > size_ || Math.abs(top) > size_)
+        console.log("This shouldnt have happened");
+      return {
+        height: `${height}px`,
+        width: `${width}px`,
+        top: `${top}px`,
+        left: `${left}px`,
+      };
+    },
+    gridStyle: function () {
+      return Object.assign({}, this.gridStylePart1, this.gridStylePart2);
     },
     gridCenterTopStyle: function () {
       let size_ = this.grid.size * 2;
@@ -570,20 +576,19 @@ export default {
     },
   },
   watch: {
-    windowSize: {
-      handler() {
-        //this.canvasSize.height = this.canv
-        let box = this.$refs.canvasContainer;
-        if (!box) this.canvasSize = { height: 0, width: 0 };
-        else {
+    windowSize() {
+      //this.canvasSize.height = this.canv
+      let box = this.$refs.canvasContainer;
+      if (!box) this.canvasSize = { height: 0, width: 0 };
+      else {
+        setTimeout(() => {
           box = box.getBoundingClientRect();
           this.canvasSize = {
             height: box.height,
             width: box.width,
           };
-        }
-      },
-      deep: true,
+        }, 50);
+      }
     },
     entities: {
       handler() {
@@ -692,12 +697,6 @@ export default {
           Vue.set(
             this.processedEntitiesBetter[this.prevActiveEntityID],
             "entitySelected",
-            undefined
-          );
-
-          Vue.set(
-            this.processedEntitiesBetter[this.prevActiveEntityID],
-            "canvasMousePos",
             undefined
           );
         }
