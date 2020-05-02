@@ -566,20 +566,19 @@ export default {
     },
   },
   watch: {
-    windowSize: {
-      handler() {
-        //this.canvasSize.height = this.canv
-        let box = this.$refs.canvasContainer;
-        if (!box) this.canvasSize = { height: 0, width: 0 };
-        else {
+    windowSize() {
+      //this.canvasSize.height = this.canv
+      let box = this.$refs.canvasContainer;
+      if (!box) this.canvasSize = { height: 0, width: 0 };
+      else {
+        setTimeout(() => {
           box = box.getBoundingClientRect();
           this.canvasSize = {
             height: box.height,
             width: box.width,
           };
-        }
-      },
-      deep: true,
+        }, 50);
+      }
     },
     entities: {
       handler() {
