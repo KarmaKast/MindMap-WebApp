@@ -321,11 +321,6 @@ export default {
       };
     },
     relationSpots: function () {
-      var boundingBox = this.$refs.entityContainer.getBoundingClientRect();
-      //console.log(boundingBox);
-      if (this.dragging.state && this.canvasLocation.x)
-        boundingBox = this.$refs.entityContainer.getBoundingClientRect();
-
       return {
         left:
           this.canvasLocation.x +
@@ -570,6 +565,9 @@ export default {
       },
       deep: true,
     },
+    relationSpots() {
+      this.$emit("setSelfRelSpots", this.relationSpots);
+    },
     entitySelectedFinal() {
       if (this.apiValidity) {
         if (
@@ -675,6 +673,9 @@ export default {
     },
     pressed: {
       handler() {
+        /*console.log(
+          ` ${this.entityID} If i haven't pressed any entity I should not be seen`
+        );*/
         //if (this.pressed.state)
         /*if (this.entitySelected !== undefined) {
           console.log(
