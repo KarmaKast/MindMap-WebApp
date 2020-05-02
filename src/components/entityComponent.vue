@@ -362,6 +362,7 @@ export default {
       };
     },
     relationWirePointsPart1: function () {
+      // todo: this is a object of objects. refactor this with a data object and watchers
       let res = {};
       for (const relClaim of this.entityData.source.RelationClaims) {
         let targetSpots = this.targetRelSpots
