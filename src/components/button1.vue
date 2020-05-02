@@ -196,7 +196,7 @@ export default {
       isAPI = true;
       if (isAPI) {
         //this.apiUrl = this.urlInField;
-        this.$store.dispatch("update_apiUrl", this.urlInField);
+        this.$store.commit("update_apiUrl", this.urlInField);
         this.active = false;
       }
     },
