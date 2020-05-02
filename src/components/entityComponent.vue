@@ -1,5 +1,5 @@
 <template>
-  <div ref="entityContainer" :style="entityContainerStyle">
+  <div ref="entityContainer" :style="entityContainerStyleFinal">
     <div class="relationWires" :style="relationWiresStyle">
       <v-stage
         :config="{
@@ -191,17 +191,15 @@ export default {
     relWireColor: function () {
       return `hsla(${this.entityColor.h},${this.entityColor.s}%,${this.entityColor.l}%, ${this.entityColor.a})`;
     },
-    entityContainerStyle: function () {
+    entityContainerStylePart1: function () {
       return {
         position: "absolute",
         top: `${
-          /*this.canvasLocation["y"] +*/
           this.canvasSize.height / 2 +
           this.entityLocation_.y -
           this.entityBoundingBoxSize.height / 2
         }px`,
         left: `${
-          /*this.canvasLocation["x"] +*/
           this.canvasSize.width / 2 +
           this.entityLocation_.x -
           this.entityBoundingBoxSize.width / 2
@@ -210,10 +208,10 @@ export default {
         minHeight: `${this.entityLabel === "" ? this.minHeight : 0}px`,
         cursor: this.dragging.state ? "grabbing" : "grab",
         zIndex: this.dragging.state ? "5000" : "unset",
-        transform: `translate(
+        /*transform: `translate(
           ${this.canvasLocation.x + "px"},
           ${this.canvasLocation.y + "px"}
-        )`,
+        )`,*/
 
         backgroundColor:
           this.editingLabel && this.entitySelectedFinal
@@ -237,6 +235,14 @@ export default {
         padding: "4px",
         outline: "none",
       };
+    },
+    entityContainerStyleFinal: function () {
+      return Object.assign({}, this.entityContainerStylePart1, {
+        transform: `translate(
+          ${this.canvasLocation.x + "px"},
+          ${this.canvasLocation.y + "px"}
+        )`,
+      });
     },
     entityStyle: function () {
       return {
@@ -299,52 +305,56 @@ export default {
       }
       return entityLoc;
     },
-    relationWiresStyle: function () {
+    relationWiresStylePart1: function () {
       return {
         position: "absolute",
         left:
           0 -
-          this.canvasLocation.x -
+          /*this.canvasLocation.x -*/
           this.canvasSize.width / 2 -
           this.entityLocation_.x +
-          this.entityBoundingBoxSize.width / 2 +
-          "px",
+          this.entityBoundingBoxSize.width / 2,
         top:
           0 -
-          this.canvasLocation.y -
+          /*this.canvasLocation.y -*/
           this.canvasSize.height / 2 -
           this.entityLocation_.y +
-          this.entityBoundingBoxSize.height / 2 +
-          "px",
+          this.entityBoundingBoxSize.height / 2,
         pointerEvents: "none",
         position: "absolute",
       };
     },
+    relationWiresStyle: function () {
+      return Object.assign({}, this.relationWiresStylePart1, {
+        left: this.relationWiresStylePart1.left - this.canvasLocation.x + "px",
+        top: this.relationWiresStylePart1.top - this.canvasLocation.y + "px",
+      });
+    },
     relationSpots: function () {
       return {
         left:
-          this.canvasLocation.x +
+          /*this.canvasLocation.x +*/
           this.canvasSize.width / 2 +
           this.entityLocation_.x -
           this.entityBoundingBoxSize.width / 2,
         right:
-          this.canvasLocation.x +
+          /*this.canvasLocation.x +*/
           this.canvasSize.width / 2 +
           this.entityLocation_.x +
           this.entityBoundingBoxSize.width / 2,
         top:
-          this.canvasLocation.y +
+          /*this.canvasLocation.y +*/
           this.canvasSize.height / 2 +
           this.entityLocation_.y -
           this.entityBoundingBoxSize.height / 2,
         bottom:
-          this.canvasLocation.y +
+          /*this.canvasLocation.y +*/
           this.canvasSize.height / 2 +
           this.entityLocation_.y +
           this.entityBoundingBoxSize.height / 2,
       };
     },
-    relationWirePoints: function () {
+    relationWirePointsPart1: function () {
       let res = {};
       for (const relClaim of this.entityData.source.RelationClaims) {
         let targetSpots = this.targetRelSpots
@@ -394,6 +404,21 @@ export default {
           ];
         } else res[relClaim.To] = [0, 0, 0, 0];
       }
+      return res;
+    },
+    relationWirePoints: function () {
+      //relationWireTargetPoints
+      const res = {};
+      Object.entries(this.relationWirePointsPart1).forEach(
+        ([entityID, targetPoints]) => {
+          res[entityID] = [
+            targetPoints[0] + this.canvasLocation.x,
+            targetPoints[1] + this.canvasLocation.y,
+            targetPoints[2] + this.canvasLocation.x,
+            targetPoints[3] + this.canvasLocation.y,
+          ];
+        }
+      );
       return res;
     },
     relStageSize: function () {
