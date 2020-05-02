@@ -355,32 +355,32 @@ export default {
         let targetSpots = this.targetRelSpots
           ? this.targetRelSpots[relClaim.To]
           : undefined;
-
-        // todo: find closest set of points between this entity and target entity
-        function dist(p1, p2) {
-          return Math.sqrt((p1.x - p2.x) ** 2 + (p1.y - p2.y) ** 2);
-        }
-        const yMidSelf =
-          (this.relationSpots.top + this.relationSpots.bottom) / 2;
-        const xMidSelf =
-          (this.relationSpots.left + this.relationSpots.right) / 2;
-        const yMidTarget = (targetSpots.top + targetSpots.bottom) / 2;
-        const xMidTarget = (targetSpots.left + targetSpots.right) / 2;
-        targetSpots = {
-          left: { x: targetSpots.left, y: yMidTarget },
-          top: { x: xMidTarget, y: targetSpots.top },
-          right: { x: targetSpots.right, y: yMidTarget },
-          bottom: { x: xMidTarget, y: targetSpots.bottom },
-        };
-        let selfSpots = {
-          left: { x: this.relationSpots.left, y: yMidSelf },
-          top: { x: xMidSelf, y: this.relationSpots.top },
-          right: { x: this.relationSpots.right, y: yMidSelf },
-          bottom: { x: xMidSelf, y: this.relationSpots.bottom },
-        };
-        let minDistance;
-        let minDistanceKeys;
         if (targetSpots) {
+          // todo: find closest set of points between this entity and target entity
+          function dist(p1, p2) {
+            return Math.sqrt((p1.x - p2.x) ** 2 + (p1.y - p2.y) ** 2);
+          }
+          const yMidSelf =
+            (this.relationSpots.top + this.relationSpots.bottom) / 2;
+          const xMidSelf =
+            (this.relationSpots.left + this.relationSpots.right) / 2;
+          const yMidTarget = (targetSpots.top + targetSpots.bottom) / 2;
+          const xMidTarget = (targetSpots.left + targetSpots.right) / 2;
+          targetSpots = {
+            left: { x: targetSpots.left, y: yMidTarget },
+            top: { x: xMidTarget, y: targetSpots.top },
+            right: { x: targetSpots.right, y: yMidTarget },
+            bottom: { x: xMidTarget, y: targetSpots.bottom },
+          };
+          let selfSpots = {
+            left: { x: this.relationSpots.left, y: yMidSelf },
+            top: { x: xMidSelf, y: this.relationSpots.top },
+            right: { x: this.relationSpots.right, y: yMidSelf },
+            bottom: { x: xMidSelf, y: this.relationSpots.bottom },
+          };
+          let minDistance;
+          let minDistanceKeys;
+
           for (const targetKey in targetSpots) {
             for (const selfKey in selfSpots) {
               const distance = dist(targetSpots[targetKey], selfSpots[selfKey]);

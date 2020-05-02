@@ -50,16 +50,8 @@
         @prevActiveEntityID="setPrevActiveEntityID"
         @removeEntity="removeEntity"
         @entityActivated="entityActivated"
-        @setSelfRelSpots="
-          (relSpots) => {
-            setSelfRelSpots(key_, relSpots);
-          }
-        "
-        @assignTargetRelSpots="
-          (targetID) => {
-            assignTargetRelSpots(key_, targetID);
-          }
-        "
+        @setSelfRelSpots="setSelfRelSpots(key_, $event)"
+        @assignTargetRelSpots="assignTargetRelSpots(key_, $event)"
       >
       </entityComponent>
     </div>
@@ -692,12 +684,6 @@ export default {
           Vue.set(
             this.processedEntitiesBetter[this.prevActiveEntityID],
             "entitySelected",
-            undefined
-          );
-
-          Vue.set(
-            this.processedEntitiesBetter[this.prevActiveEntityID],
-            "canvasMousePos",
             undefined
           );
         }
