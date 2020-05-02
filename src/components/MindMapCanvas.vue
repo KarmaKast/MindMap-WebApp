@@ -35,7 +35,7 @@
         :apiUrl="apiUrl"
         :autoSave="false"
         :apiValidity="apiValidity"
-        :canvasSize="{ height: height, width: width }"
+        :canvasSize="{ height: canvasSize.height, width: canvasSize.width }"
         :canvasLocation="canvasLocation"
         :canvasMousePos="value.canvasMousePos"
         @setStartingCanvasMousePos="setStartingCanvasMousePos"
@@ -148,9 +148,11 @@ export default {
   },
   computed: {
     canvasSize: function () {
+      let height = this.$store.state.window_height;
+      let width = this.$store.state.window_width;
       return {
-        height: this.$store.state.window_height,
-        width: this.$store.state.window_width,
+        height: height ? height : 0,
+        width: width ? width : 0,
       };
     },
     canvasContainerStyle: function () {
@@ -166,7 +168,9 @@ export default {
     },
     gridStyle: function () {
       // todo: move color processing functionality to vuex store
-      let processedColor = `hsla(${this.colors["theme_light"].h}, ${this.colors["theme_light"].s}%, ${this.colors["theme_light"].l}%, ${this.grid.opacity})`;
+      let processedColor = `hsla(${this.colors["theme_light"].h}, ${
+        this.colors["theme_light"].s
+      }%, ${this.colors["theme_light"].l}%, ${this.grid.opacity / 1.4})`;
       let size_ = this.grid.size * 2;
       let topPart = (this.canvasLocation["y"] % size_) - size_;
       let leftPart = (this.canvasLocation["x"] % size_) - size_;
@@ -180,7 +184,7 @@ export default {
         left: `${
           ((this.canvasSize.width / 2 + this.canvasLocation["x"]) % size_) - size_
         }px`,
-        backgroundImage: `repeating-linear-gradient(rgba(255, 255, 255, 0), ${processedColor} ${this.grid.width}px, rgba(255, 255, 255, 0) ${this.grid.width}px, rgba(255, 255, 255, 0) ${size_}px), repeating-linear-gradient(90deg, rgba(255, 255, 255, 0), ${processedColor} ${this.grid.width}px, rgba(255, 255, 255, 0) ${this.grid.width}px, rgba(255, 255, 255, 0) ${size_}px)`,
+        backgroundImage: `repeating-linear-gradient(transparent, ${processedColor} ${this.grid.width}px, transparent ${this.grid.width}px, transparent ${size_}px), repeating-linear-gradient(90deg, transparent, ${processedColor} ${this.grid.width}px, transparent ${this.grid.width}px, transparent ${size_}px)`,
         pointerEvents: "none",
       };*/
       return {
@@ -196,7 +200,11 @@ export default {
           ((this.canvasSize.width / 2 + this.canvasLocation.x) % size_) -
           size_ * 1.5
         }px`,
-        backgroundImage: `repeating-linear-gradient(rgba(255, 255, 255, 0), ${processedColor} ${this.grid.width}px, rgba(255, 255, 255, 0) ${this.grid.width}px, rgba(255, 255, 255, 0) ${size_}px), repeating-linear-gradient(90deg, rgba(255, 255, 255, 0), ${processedColor} ${this.grid.width}px, rgba(255, 255, 255, 0) ${this.grid.width}px, rgba(255, 255, 255, 0) ${size_}px)`,
+        backgroundImage: `repeating-linear-gradient(0deg, ${processedColor} 0px, transparent ${
+          this.grid.width
+        }px, transparent ${size_}px), repeating-linear-gradient(90deg, ${processedColor} 0px, transparent ${
+          this.grid.width
+        }px, transparent ${size_ - 0.2}px)`,
         pointerEvents: "none",
       };
     },
@@ -212,9 +220,9 @@ export default {
         left: `${this.canvasLocation.x}px`,
         backgroundImage: `linear-gradient(to right, transparent calc(50% - ${
           this.grid.width / 2
-        }px), hsla(19, 100%, 50%, ${
+        }px), hsla(183, 91%, 50%, ${
           this.grid.opacity * 2
-        }) 1px, transparent calc(50% + ${this.grid.width / 2}px))`,
+        }) , transparent calc(50% + ${this.grid.width / 2}px))`,
         pointerEvents: "none",
       };
     },
@@ -230,9 +238,9 @@ export default {
         left: "0px",
         backgroundImage: `linear-gradient(to bottom, transparent calc(50% - ${
           this.grid.width / 2
-        }px), hsla(183, 91%, 50%, ${
+        }px), hsla(19, 100%, 50%, ${
           this.grid.opacity * 2
-        }) 1px, transparent calc(50% + ${this.grid.width / 2}px))`,
+        }), transparent calc(50% + ${this.grid.width / 2}px))`,
         pointerEvents: "none",
       };
     },
