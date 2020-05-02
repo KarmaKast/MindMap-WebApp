@@ -32,16 +32,18 @@ export default new Vuex.Store({
       state.canvas_width = val;
     },*/
     update_apiUrl(state, url) {
-      state.apiUrl[0] = url;
+      state.apiUrl = [url, state.apiUrl[1]];
     },
     update_apiUrlValidity(state, isValid) {
-      state.apiUrl[1] = isValid;
+      state.apiUrl = [state.apiUrl[0], isValid];
     },
 
     update_relClaimMode(state, relClaimMode) {
-      state.relClaimMode.mode = relClaimMode.mode;
-      state.relClaimMode.targetID = relClaimMode.targetID;
-      state.relClaimMode.claimantID = relClaimMode.claimantID;
+      state.relClaimMode = {
+        mode: relClaimMode.mode,
+        targetID: relClaimMode.targetID,
+        claimantID: relClaimMode.claimantID,
+      };
     },
   },
   getters: {},
@@ -50,12 +52,13 @@ export default new Vuex.Store({
       context.commit("update_window_width");
       context.commit("update_window_height");
     },
-    update_apiUrl(context, url) {
+    update_apiState(context, url) {
+      // note: this action is probably not being used currently
       //console.log("doing action");
       context.commit("update_apiUrl", url);
 
-      var isValid = url === "" ? false : true;
-      context.commit("update_apiUrlValidity", isValid);
+      //var isValid = url === "" ? false : true;
+      //context.commit("update_apiUrlValidity", isValid);
     },
   },
   modules: {},

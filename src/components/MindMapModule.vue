@@ -201,7 +201,7 @@ export default {
         },
         {
           text: "Settings",
-          action: function () {},
+          action: this.showSettings,
           args: [],
           if: true,
         },
@@ -325,6 +325,15 @@ export default {
       // todo: WIP
       // load app settings from app_settings.json either during mounted or created
     },
+    refreshCanvas() {
+      this.canvasForceUpdate = true;
+      this.$nextTick(() => {
+        this.canvasForceUpdate = false;
+      });
+    },
+    showSettings() {
+      alert("Settings section not implimented yet");
+    },
     loadCollection() {
       var url_ = this.apiUrl;
       this.entities = [];
@@ -338,7 +347,9 @@ export default {
         .then(() => {
           this.getCollection();
         })
-        .catch((err) => this.createCollection());
+        .catch((err) => {
+          this.createCollection();
+        });
     },
     getCollection() {
       var url_ = this.apiUrl;
@@ -353,10 +364,9 @@ export default {
           this.entities = response.data.Entities.map((ID) => {
             return { ID: ID };
           });
-          this.canvasForceUpdate = true;
-          this.$nextTick(() => {
-            this.canvasForceUpdate = false;
-          });
+          this.refreshCanvas();
+          this.$store.commit("update_apiUrlValidity", true);
+          this.apiValidity = true;
           if (
             !(
               localStorage.getItem("apiUrl") &&
@@ -376,10 +386,15 @@ export default {
         url: url_ + "/collection/create",
         data: qs.stringify({ Label: "testCollection" }),
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      }).then(() => {
-        this.saveCollection();
-        this.getCollection();
-      });
+      })
+        .then(() => {
+          this.saveCollection();
+          this.getCollection();
+        })
+        .catch((err) => {
+          this.$store.commit("update_apiUrlValidity", false);
+          this.apiValidity = false;
+        });
     },
     clearCollection() {
       var url_ = this.apiUrl;
@@ -455,25 +470,35 @@ export default {
   },
   watch: {
     apiUrl() {
-      if (this.apiValidity) {
-        this.getCollection();
+      //if (this.apiValidity) {
+      if (this.apiUrl !== "") this.getCollection();
+      else {
+        this.apiValidity = false;
+        this.$store.commit("update_apiUrlValidity", false);
+      }
+      //}
+    },
+    apiValidity() {
+      if (!this.apiValidity && this.apiUrl === "") {
+        this.refreshCanvas();
+        this.entities = [];
+        localStorage.setItem("apiUrl", "");
       }
     },
   },
   created: function () {
-    this.$store.subscribeAction({
-      after: (action, state) => {
-        if (action.type === "update_apiUrl") {
-          this.apiUrl = state.apiUrl[0];
-          this.apiValidity = state.apiUrl[1];
-        }
-      },
+    this.$store.subscribe((mutation, state) => {
+      if (mutation.type === "update_apiUrl") {
+        this.apiUrl = state.apiUrl[0];
+        //this.apiValidity = state.apiUrl[1];
+      }
     });
   },
   mounted: function () {
     if (localStorage.getItem("apiUrl")) {
       this.apiUrl = localStorage.getItem("apiUrl");
-      this.apiValidity = true;
+      this.$store.commit("update_apiUrl", this.apiUrl);
+      //this.apiValidity = true;
     }
   },
   updated: function () {},
