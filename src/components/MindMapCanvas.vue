@@ -68,7 +68,7 @@ import lodash from "lodash";
 export default {
   name: "MindMapCanvas",
   components: {
-    entityComponent,
+    entityComponent: () => import("./entityComponent"),
   },
   props: {
     colors: Object,
