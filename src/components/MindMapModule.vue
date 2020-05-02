@@ -201,7 +201,7 @@ export default {
         },
         {
           text: "Settings",
-          action: function () {},
+          action: this.showSettings,
           args: [],
           if: true,
         },
@@ -330,6 +330,9 @@ export default {
       this.$nextTick(() => {
         this.canvasForceUpdate = false;
       });
+    },
+    showSettings() {
+      alert("Settings section not implimented yet");
     },
     loadCollection() {
       var url_ = this.apiUrl;
