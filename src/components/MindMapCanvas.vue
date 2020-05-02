@@ -165,18 +165,22 @@ export default {
         this.colors["theme_light"].s
       }%, ${this.colors["theme_light"].l}%, ${this.grid.opacity / 1.4})`;
       let size_ = this.grid.size * 2;
-      let height = this.canvasSize.height + size_;
-      let width = this.canvasSize.width + size_;
+      let height = this.canvasSize.height + size_ * 2;
+      let width = this.canvasSize.width + size_ * 2;
+      /*const top =
+        ((this.canvasSize.height / 2 + this.canvasLocation.y) % size_) - size_;*/
+      const top = ((height / 2 + this.canvasLocation.y) % size_) - size_ * 1;
+      /*const left =
+        ((this.canvasSize.width / 2 + this.canvasLocation.x) % size_) - size_;*/
+      const left = ((width / 2 + this.canvasLocation.x) % size_) - size_ * 1;
+      if (Math.abs(left) > size_ || Math.abs(top) > size_)
+        console.log("This shouldnt have happened");
       return {
         height: `${height}px`,
         width: `${width}px`,
         position: "absolute",
-        top: `${
-          ((this.canvasSize.height / 2 + this.canvasLocation.y) % size_) - size_
-        }px`,
-        left: `${
-          ((this.canvasSize.width / 2 + this.canvasLocation.x) % size_) - size_
-        }px`,
+        top: `${top}px`,
+        left: `${left}px`,
         backgroundImage: `repeating-linear-gradient(transparent, ${processedColor} ${this.grid.width}px, transparent ${this.grid.width}px, transparent ${size_}px), repeating-linear-gradient(90deg, transparent, ${processedColor} ${this.grid.width}px, transparent ${this.grid.width}px, transparent ${size_}px)`,
         pointerEvents: "none",
       };
