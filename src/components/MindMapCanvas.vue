@@ -159,11 +159,21 @@ export default {
         backgroundColor: "inherit",
       };
     },
-    gridStyle: function () {
+    gridStylePart1: function () {
       // todo: move color processing functionality to vuex store
       let processedColor = `hsla(${this.colors["theme_light"].h}, ${
         this.colors["theme_light"].s
       }%, ${this.colors["theme_light"].l}%, ${this.grid.opacity / 1.4})`;
+      let size_ = this.grid.size * 2;
+
+      return {
+        position: "absolute",
+
+        backgroundImage: `repeating-linear-gradient(transparent, ${processedColor} ${this.grid.width}px, transparent ${this.grid.width}px, transparent ${size_}px), repeating-linear-gradient(90deg, transparent, ${processedColor} ${this.grid.width}px, transparent ${this.grid.width}px, transparent ${size_}px)`,
+        pointerEvents: "none",
+      };
+    },
+    gridStylePart2: function () {
       let size_ = this.grid.size * 2;
       let height = this.canvasSize.height + size_ * 2;
       let width = this.canvasSize.width + size_ * 2;
@@ -178,12 +188,12 @@ export default {
       return {
         height: `${height}px`,
         width: `${width}px`,
-        position: "absolute",
         top: `${top}px`,
         left: `${left}px`,
-        backgroundImage: `repeating-linear-gradient(transparent, ${processedColor} ${this.grid.width}px, transparent ${this.grid.width}px, transparent ${size_}px), repeating-linear-gradient(90deg, transparent, ${processedColor} ${this.grid.width}px, transparent ${this.grid.width}px, transparent ${size_}px)`,
-        pointerEvents: "none",
       };
+    },
+    gridStyle: function () {
+      return Object.assign({}, this.gridStylePart1, this.gridStylePart2);
     },
     gridCenterTopStyle: function () {
       let size_ = this.grid.size * 2;

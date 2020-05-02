@@ -92,7 +92,9 @@ export default {
         width: `100%`,
         height: `${this.height}px`,
         boxSizing: "border-box",
-        boxShadow: "0px -2px 4px 0px hsla(0, 0%, 0%, 0.18)",
+        boxShadow: `hsla(0, 0%, ${
+          this.colors["background"].l - 15
+        }%, 0.5) 0px -2px 2px 1px`,
         padding: `${this.padding}px`,
         borderBottomLeftRadius: "inherit",
         borderBottomRightRadius: "inherit",
