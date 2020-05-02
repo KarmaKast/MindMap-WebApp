@@ -108,6 +108,7 @@ export default {
       },
       type: Object,
     },
+
     popupLock: {
       // context: if true disables this canvas from using popup feature * WIP *
       default: true,
@@ -128,7 +129,6 @@ export default {
         pressed: { state: false },
         selected: false,
       },
-
       canvas: {
         taps: {
           timer: undefined,
@@ -144,10 +144,11 @@ export default {
       relClaimSpots: {},
       entitiesToUpdate: [],
       processedEntitiesBetter: {}, // better optimized updates
+      canvasSize: { height: 0, width: 0 },
     };
   },
   computed: {
-    canvasSize: function () {
+    windowSize: function () {
       let height = this.$store.state.window_height;
       let width = this.$store.state.window_width;
       return {
@@ -172,39 +173,19 @@ export default {
         this.colors["theme_light"].s
       }%, ${this.colors["theme_light"].l}%, ${this.grid.opacity / 1.4})`;
       let size_ = this.grid.size * 2;
-      let topPart = (this.canvasLocation["y"] % size_) - size_;
-      let leftPart = (this.canvasLocation["x"] % size_) - size_;
-      /*return {
-        height: "200%",
-        width: "200%",
+      let height = this.canvasSize.height + size_;
+      let width = this.canvasSize.width + size_;
+      return {
+        height: `${height}px`,
+        width: `${width}px`,
         position: "absolute",
         top: `${
-          ((this.canvasSize.height / 2 + this.canvasLocation["y"]) % size_) - size_
+          ((this.canvasSize.height / 2 + this.canvasLocation.y) % size_) - size_
         }px`,
         left: `${
-          ((this.canvasSize.width / 2 + this.canvasLocation["x"]) % size_) - size_
+          ((this.canvasSize.width / 2 + this.canvasLocation.x) % size_) - size_
         }px`,
         backgroundImage: `repeating-linear-gradient(transparent, ${processedColor} ${this.grid.width}px, transparent ${this.grid.width}px, transparent ${size_}px), repeating-linear-gradient(90deg, transparent, ${processedColor} ${this.grid.width}px, transparent ${this.grid.width}px, transparent ${size_}px)`,
-        pointerEvents: "none",
-      };*/
-      return {
-        height: `calc(100% + ${size_ * 2}px)`,
-        width: `calc(100% + ${size_ * 2}px)`,
-        position: "absolute",
-        //top: `${((this.canvasSize.height / 2 + this.canvasLocation.y) % size_) - size_}px`,
-        top: `${
-          ((this.canvasSize.height / 2 + this.canvasLocation.y) % size_) -
-          size_ * 1.5
-        }px`,
-        left: `${
-          ((this.canvasSize.width / 2 + this.canvasLocation.x) % size_) -
-          size_ * 1.5
-        }px`,
-        backgroundImage: `repeating-linear-gradient(0deg, ${processedColor} 0px, transparent ${
-          this.grid.width
-        }px, transparent ${size_}px), repeating-linear-gradient(90deg, ${processedColor} 0px, transparent ${
-          this.grid.width
-        }px, transparent ${size_ - 0.2}px)`,
         pointerEvents: "none",
       };
     },
@@ -589,9 +570,18 @@ export default {
     },
   },
   watch: {
-    canvasSize: {
+    windowSize: {
       handler() {
         //this.canvasSize.height = this.canv
+        let box = this.$refs.canvasContainer;
+        if (!box) this.canvasSize = { height: 0, width: 0 };
+        else {
+          box = box.getBoundingClientRect();
+          this.canvasSize = {
+            height: box.height,
+            width: box.width,
+          };
+        }
       },
       deep: true,
     },
@@ -747,60 +737,21 @@ export default {
       }
     },
   },
-  created: function () {
-    /*let box = this.$refs.canvasContainer;
-    this.$store.subscribeAction({
-      after: (action) => {
-        if ("update_window_size" === action.type) {
-          console.log("I should be called on resize");
-          if (box) {
-            box = box.getBoundingClientRect();
-            this.canvasSize.height = box.height;
-            this.canvasSize.width = box.width;
-          } else {
-            console.log(box);
-          }
-        }
-      },
-    });*/
-  },
+  created: function () {},
   mounted: function () {
-    /*let box = this.$refs.canvasContainer;
-    if (box) {
+    let box = this.$refs.canvasContainer;
+    if (!box) this.canvasSize = { height: 0, width: 0 };
+    else {
       box = box.getBoundingClientRect();
-      this.canvasSize.height = box.height;
-      this.canvasSize.width = box.width;
-    }*/
-    //console.log(box);
+      this.canvasSize = {
+        height: box.height,
+        width: box.width,
+      };
+    }
     this.initiateProcessedEntities();
   },
-  beforeUpdate: function () {
-    //console.log("before update called");
-    /*let box = this.$refs.canvasContainer;
-    if (box) {
-      box = box.getBoundingClientRect();
-      this.canvasSize.height = box.height;
-      this.canvasSize.width = box.width;
-    }*/
-  },
-  updated: function () {
-    /*this.$store.subscribeAction({
-      after: (action) => {
-        if ("update_window_size" === action.type) {
-          console.log("I should be called on resize");
-          let box2 = this.$refs.canvasContainer;
-          if (box2) {
-            console.log(box2);
-            box2 = box2.getBoundingClientRect();
-            this.canvasSize.height = box2.height;
-            this.canvasSize.width = box2.width;
-          } else {
-            console.log(box2);
-          }
-        }
-      },
-    });*/
-  },
+  beforeUpdate: function () {},
+  updated: function () {},
 };
 </script>
 <style lang="sass" scoped></style>

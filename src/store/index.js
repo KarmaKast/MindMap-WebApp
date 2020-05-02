@@ -53,6 +53,7 @@ export default new Vuex.Store({
       context.commit("update_window_height");
     },
     update_apiUrl(context, url) {
+      // note: this action is probably not being used currently
       //console.log("doing action");
       context.commit("update_apiUrl", url);
 
