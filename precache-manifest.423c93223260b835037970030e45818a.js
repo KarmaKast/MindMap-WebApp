@@ -1,6 +1,6 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "a1c7030c2ec45c8f51a8",
+    "revision": "651fd5eff0c7a9b4c55b",
     "url": "/MindMap-WebApp/css/app.3435ffe6.css"
   },
   {
@@ -8,12 +8,12 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/MindMap-WebApp/img/ic_chevron_left_48px.5bbac221.svg"
   },
   {
-    "revision": "5d1957e97f6e7372e750f88adb5b8fc9",
+    "revision": "e9ad4cb24cd4b9fbec91e8c82411a2e4",
     "url": "/MindMap-WebApp/index.html"
   },
   {
-    "revision": "a1c7030c2ec45c8f51a8",
-    "url": "/MindMap-WebApp/js/app.7146d02d.js"
+    "revision": "651fd5eff0c7a9b4c55b",
+    "url": "/MindMap-WebApp/js/app.8f6af092.js"
   },
   {
     "revision": "59742ae221521338cc6c",
