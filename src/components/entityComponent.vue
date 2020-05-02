@@ -185,6 +185,14 @@ export default {
       draggingDeltas: { x: 0, y: 0 },
       editingLabel: false,
       relClaimMode: { mode: false, targetID: null },
+      entityContainerStylePartStatic: {
+        position: "absolute",
+        boxSizing: "border-box",
+        display: "grid",
+        gridTemplateColumns: "100%",
+        padding: "4px",
+        outline: "none",
+      },
     };
   },
   computed: {
@@ -193,26 +201,10 @@ export default {
     },
     entityContainerStylePart1: function () {
       return {
-        position: "absolute",
-        top: `${
-          this.canvasSize.height / 2 +
-          this.entityLocation_.y -
-          this.entityBoundingBoxSize.height / 2
-        }px`,
-        left: `${
-          this.canvasSize.width / 2 +
-          this.entityLocation_.x -
-          this.entityBoundingBoxSize.width / 2
-        }px`,
         minWidth: `${this.entityLabel === "" ? this.minWidth : 0}px`,
         minHeight: `${this.entityLabel === "" ? this.minHeight : 0}px`,
         cursor: this.dragging.state ? "grabbing" : "grab",
         zIndex: this.dragging.state ? "5000" : "unset",
-        /*transform: `translate(
-          ${this.canvasLocation.x + "px"},
-          ${this.canvasLocation.y + "px"}
-        )`,*/
-
         backgroundColor:
           this.editingLabel && this.entitySelectedFinal
             ? "white"
@@ -229,20 +221,35 @@ export default {
         }, inset 0px 0px 0 4px hsla(${this.entityColor.h},
         ${this.entityColor.s}%,
         ${this.entityColor.l}%, 0.2)`,
-        boxSizing: "border-box",
-        display: "grid",
-        gridTemplateColumns: "100%",
-        padding: "4px",
-        outline: "none",
+      };
+    },
+    entityContainerStylePart2: function () {
+      return {
+        top: `${
+          this.canvasSize.height / 2 +
+          this.entityLocation_.y -
+          this.entityBoundingBoxSize.height / 2
+        }px`,
+        left: `${
+          this.canvasSize.width / 2 +
+          this.entityLocation_.x -
+          this.entityBoundingBoxSize.width / 2
+        }px`,
       };
     },
     entityContainerStyleFinal: function () {
-      return Object.assign({}, this.entityContainerStylePart1, {
-        transform: `translate(
+      return Object.assign(
+        {},
+        this.entityContainerStylePartStatic,
+        this.entityContainerStylePart1,
+        this.entityContainerStylePart2,
+        {
+          transform: `translate(
           ${this.canvasLocation.x + "px"},
           ${this.canvasLocation.y + "px"}
         )`,
-      });
+        }
+      );
     },
     entityStyle: function () {
       return {
