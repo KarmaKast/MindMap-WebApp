@@ -46,7 +46,7 @@
           :style="burgerTimeButtonStyle"
           @click.left="toggleMenu"
         >
-          <icon-base :iconColor="colorsProcessed['theme']"
+          <icon-base iconName="Main Menu" :iconColor="colorsProcessed['theme']"
             ><icon-hamburger1
           /></icon-base>
         </button>
