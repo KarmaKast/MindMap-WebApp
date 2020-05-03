@@ -364,6 +364,15 @@ export default {
     relationWirePointsPart1: function () {
       // todo: this is a object of objects. refactor this with a data object and watchers
       let res = {};
+      let offsetsStatic = {
+        x: {
+          left: -1,
+          top: 0,
+          right: 1,
+          bottom: 0,
+        },
+        y: { left: 0, top: -1, right: 0, bottom: 1 },
+      };
       for (const relClaim of this.entityData.source.RelationClaims) {
         let targetSpots = this.targetRelSpots
           ? this.targetRelSpots[relClaim.To]
@@ -404,26 +413,24 @@ export default {
             }
           }
           //console.log(minDistance, minDistanceKeys);
-          let offsetsStatic = {
-            x: {
-              left: -1,
-              top: 0,
-              right: 1,
-              bottom: 0,
-            },
-            y: { left: 0, top: -1, right: 0, bottom: 1 },
-          };
+
           res[relClaim.To] = [
-            selfSpots[minDistanceKeys.self].x +
-              this.relationSpotsOffset * offsetsStatic.x[minDistanceKeys.self],
-            selfSpots[minDistanceKeys.self].y +
-              this.relationSpotsOffset * offsetsStatic.y[minDistanceKeys.self],
-            targetSpots[minDistanceKeys.target].x +
-              this.relationSpotsOffset *
-                offsetsStatic.x[minDistanceKeys.target],
-            targetSpots[minDistanceKeys.target].y +
-              this.relationSpotsOffset *
-                offsetsStatic.y[minDistanceKeys.target],
+            {
+              point: selfSpots[minDistanceKeys.self].x,
+              offsetDirection: offsetsStatic.x[minDistanceKeys.self],
+            },
+            {
+              point: selfSpots[minDistanceKeys.self].y,
+              offsetDirection: offsetsStatic.y[minDistanceKeys.self],
+            },
+            {
+              point: targetSpots[minDistanceKeys.target].x,
+              offsetDirection: offsetsStatic.x[minDistanceKeys.target],
+            },
+            {
+              point: targetSpots[minDistanceKeys.target].y,
+              offsetDirection: offsetsStatic.y[minDistanceKeys.target],
+            },
           ];
         } else res[relClaim.To] = [0, 0, 0, 0];
       }
@@ -432,27 +439,48 @@ export default {
     relationWirePointsPart2: function () {
       const res = {};
       Object.entries(this.relationWirePointsPart1).forEach(
-        ([entityID, targetPoints]) => {
+        ([entityID, relationWirePoints]) => {
           res[entityID] = [
-            targetPoints[0] + this.relationSpotsOffset,
-            targetPoints[1] + this.relationSpotsOffset,
-            targetPoints[2] + this.relationSpotsOffset,
-            targetPoints[3] + this.relationSpotsOffset,
+            relationWirePoints[0].point +
+              this.relationSpotsOffset * relationWirePoints[0].offsetDirection,
+            relationWirePoints[1].point +
+              this.relationSpotsOffset * relationWirePoints[1].offsetDirection,
+            relationWirePoints[2].point +
+              this.relationSpotsOffset * relationWirePoints[2].offsetDirection,
+            relationWirePoints[3].point +
+              this.relationSpotsOffset * relationWirePoints[3].offsetDirection,
           ];
         }
       );
       return res;
     },
-    relationWirePoints: function () {
+    /*relationWirePoints: function () {
       //relationWireTargetPoints
       const res = {};
-      Object.entries(this.relationWirePointsPart1).forEach(
-        ([entityID, targetPoints]) => {
+      Object.entries(this.relationWirePointsPart2).forEach(
+        ([entityID, relationWirePoints]) => {
           res[entityID] = [
-            targetPoints[0] + this.canvasLocation.x,
-            targetPoints[1] + this.canvasLocation.y,
-            targetPoints[2] + this.canvasLocation.x,
-            targetPoints[3] + this.canvasLocation.y,
+            relationWirePoints[0] + this.canvasLocation.x,
+            relationWirePoints[1] + this.canvasLocation.y,
+            relationWirePoints[2] + this.canvasLocation.x,
+            relationWirePoints[3] + this.canvasLocation.y,
+          ];
+        }
+      );
+      return res;
+    },*/
+    relationWirePoints: function () {
+      //relationWireTargetPoints
+      // a circle of radius this.relationSpotsOffset is created. and the target line should stop at the that circle
+      // so the end points needs to calculation by removing a length of that radius * 2
+      const res = {};
+      Object.entries(this.relationWirePointsPart2).forEach(
+        ([entityID, relationWirePoints]) => {
+          res[entityID] = [
+            relationWirePoints[0] + this.canvasLocation.x,
+            relationWirePoints[1] + this.canvasLocation.y,
+            relationWirePoints[2] + this.canvasLocation.x,
+            relationWirePoints[3] + this.canvasLocation.y,
           ];
         }
       );
