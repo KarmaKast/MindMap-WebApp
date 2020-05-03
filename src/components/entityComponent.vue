@@ -12,13 +12,7 @@
             <v-line
               v-for="(relClaim, index) in entityData.source.RelationClaims"
               :key="index"
-              :config="{
-                points: relationWirePoints[relClaim.To],
-                stroke: relWireColor,
-                strokeWidth: dragging.state || entitySelectedFinal ? 2 : 1,
-                lineCap: 'round',
-                lineJoin: 'round',
-              }"
+              :config="relationLineConfigs[relClaim.To]"
             ></v-line>
           </v-group>
         </v-layer>
@@ -193,6 +187,7 @@ export default {
         padding: "4px",
         outline: "none",
       },
+      relationLineConfigs: {},
     };
   },
   computed: {
@@ -338,6 +333,7 @@ export default {
       });
     },
     relationSpots: function () {
+      //console.log("I should not be seen when dragging canvas");
       return {
         left:
           /*this.canvasLocation.x +*/
@@ -362,6 +358,7 @@ export default {
       };
     },
     relationWirePointsPart1: function () {
+      // todo: this is a object of objects. refactor this with a data object and watchers
       let res = {};
       for (const relClaim of this.entityData.source.RelationClaims) {
         let targetSpots = this.targetRelSpots
@@ -471,6 +468,7 @@ export default {
         //console.log(JSON.stringify(response.data));
         this.entityData.source = response.data[0];
         this.entityData.viz_props = response.data[1].Data;
+        //console.log("I should not be seen when dragging canvas");
         this.$emit("setSelfRelSpots", this.relationSpots);
         for (const relClaim of this.entityData.source.RelationClaims)
           this.$emit("assignTargetRelSpots", relClaim.To);
@@ -508,6 +506,7 @@ export default {
           width: boundingBox.width,
           height: boundingBox.height,
         };
+        //console.log("I should not be seen when dragging canvas");
         this.$emit("setSelfRelSpots", this.relationSpots);
         //console.log(boundingBox);
         //this.entityBoundingBoxSize = boundingBox;
@@ -580,14 +579,10 @@ export default {
     },
   },
   watch: {
-    "dragging.state"() {
-      if (!this.dragging.state) {
-      }
-    },
     apiValidity() {},
     canvasLocation: {
       handler() {
-        this.$emit("setSelfRelSpots", this.relationSpots);
+        //this.$emit("setSelfRelSpots", this.relationSpots);
       },
       deep: true,
     },
@@ -598,8 +593,75 @@ export default {
       deep: true,
     },
     relationSpots() {
+      //console.log("I should not be seen when dragging canvas");
       this.$emit("setSelfRelSpots", this.relationSpots);
     },
+
+    relationWirePoints() {
+      // doing: initiate and modify relationLineConfigs data
+      Object.entries(this.relationWirePoints).forEach(([key, points]) => {
+        // doing: if key doesn't exist in relationLineConfigs add it.
+        if (
+          Object.keys(this.relationLineConfigs).some(
+            (targetEntityID) => targetEntityID === key
+          )
+        ) {
+          if (!lodash.isEqual(points, this.relationLineConfigs[key].points)) {
+            Vue.set(
+              this.relationLineConfigs,
+              key,
+              Object.assign({}, this.relationLineConfigs[key], {
+                points: points,
+              })
+            );
+          }
+        } else {
+          Vue.set(
+            this.relationLineConfigs,
+            key,
+            Object.assign({}, this.relationLineConfigs[key], {
+              points: points,
+              stroke: this.relWireColor,
+              strokeWidth:
+                this.dragging.state || this.entitySelectedFinal ? 2 : 1,
+              lineCap: "round",
+              lineJoin: "round",
+            })
+          );
+        }
+      });
+      // doing: if relationLineConfigs has a key that relationWirePoints doesn't have remove it
+      Object.keys(this.relationLineConfigs).some((targetEntityID) => {
+        if (!Object.keys(this.relationWirePoints).includes(targetEntityID)) {
+          Vue.delete(this.relationLineConfigs, targetEntityID);
+        }
+      });
+    },
+    relWireColor() {
+      Object.entries(this.relationLineConfigs).forEach(([key, config]) => {
+        //
+        Vue.set(
+          this.relationLineConfigs,
+          key,
+          Object.assign({}, this.relationLineConfigs[key], {
+            stroke: this.relWireColor,
+          })
+        );
+      });
+    },
+    "dragging.state"() {
+      Object.entries(this.relationLineConfigs).forEach(([key, config]) => {
+        Vue.set(
+          this.relationLineConfigs,
+          key,
+          Object.assign({}, this.relationLineConfigs[key], {
+            strokeWidth:
+              this.dragging.state || this.entitySelectedFinal ? 2 : 1,
+          })
+        );
+      });
+    },
+
     entitySelectedFinal() {
       if (this.apiValidity) {
         if (
@@ -611,6 +673,16 @@ export default {
           this.savePropToAPI("selected", this.entitySelectedFinal);
         }
       }
+      Object.entries(this.relationLineConfigs).forEach(([key, config]) => {
+        Vue.set(
+          this.relationLineConfigs,
+          key,
+          Object.assign({}, this.relationLineConfigs[key], {
+            strokeWidth:
+              this.dragging.state || this.entitySelectedFinal ? 2 : 1,
+          })
+        );
+      });
     },
     entityLocation_() {
       // todo: save node location to database on drag end
@@ -660,7 +732,8 @@ export default {
         this.entityColor = Object.assign({}, this.entityData.viz_props.color);
     },
     "entityData.source"() {
-      this.entityLabel = this.entityData.source.Label;
+      if (this.entityData.source.Label)
+        this.entityLabel = this.entityData.source.Label;
     },
     entityLabel() {
       // doing: updating node's bounding box width and height

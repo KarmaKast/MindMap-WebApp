@@ -35,7 +35,7 @@
         :apiUrl="apiUrl"
         :autoSave="false"
         :apiValidity="apiValidity"
-        :canvasSize="{ height: canvasSize.height, width: canvasSize.width }"
+        :canvasSize="canvasSize"
         :canvasLocation="canvasLocation"
         :canvasMousePos="value.canvasMousePos"
         @setStartingCanvasMousePos="setStartingCanvasMousePos"
@@ -195,16 +195,17 @@ export default {
     gridStyle: function () {
       return Object.assign({}, this.gridStylePart1, this.gridStylePart2);
     },
-    gridCenterTopStyle: function () {
-      let size_ = this.grid.size * 2;
-      var size_x = this.canvasSize.width * 1.5;
-      var size_y = this.canvasSize.height * 1.5;
+    gridCenterTopStylePart1: function () {
+      return {
+        left: `${this.canvasLocation.x}px`,
+      };
+    },
+    gridCenterTopStylePart2: function () {
       return {
         height: "100%",
         width: "100%",
         position: "absolute",
         top: "0px",
-        left: `${this.canvasLocation.x}px`,
         backgroundImage: `linear-gradient(to right, transparent calc(50% - ${
           this.grid.width / 2
         }px), hsla(183, 91%, 50%, ${
@@ -213,15 +214,23 @@ export default {
         pointerEvents: "none",
       };
     },
-    gridCenterHorStyle: function () {
-      let size_ = this.grid.size * 2;
-      var size_x = this.canvasSize.width * 1.5;
-      var size_y = this.canvasSize.height * 1.5;
+    gridCenterTopStyle: function () {
+      return Object.assign(
+        {},
+        this.gridCenterTopStylePart2,
+        this.gridCenterTopStylePart1
+      );
+    },
+    gridCenterHorStylePart1: function () {
+      return {
+        top: `${this.canvasLocation.y}px`,
+      };
+    },
+    gridCenterHorStylePart2: function () {
       return {
         height: "100%",
         width: "100%",
         position: "absolute",
-        top: `${this.canvasLocation.y}px`,
         left: "0px",
         backgroundImage: `linear-gradient(to bottom, transparent calc(50% - ${
           this.grid.width / 2
@@ -230,6 +239,13 @@ export default {
         }), transparent calc(50% + ${this.grid.width / 2}px))`,
         pointerEvents: "none",
       };
+    },
+    gridCenterHorStyle: function () {
+      return Object.assign(
+        {},
+        this.gridCenterHorStylePart1,
+        this.gridCenterHorStylePart2
+      );
     },
     gridBetterStyle: function () {
       return {
@@ -257,7 +273,7 @@ export default {
       this.deactivateAllEntities(event);
     },
     updateCanvasContainerBoxLoc() {
-      // context: since canvas bounding box x,y is taken once at the start of the drag, if for some reason canvas container position changes relative to the window top-left it will make the drag to malfunction
+      // context: since canvas bounding box x,y is taken once at the start of the drag, if for some reason canvas container position changes relative to the window top-left it may make the drag to malfunction
       this.canvasContainerBoxLoc.x = this.$refs.canvasContainer.getBoundingClientRect().x;
       this.canvasContainerBoxLoc.y = this.$refs.canvasContainer.getBoundingClientRect().y;
     },
@@ -578,6 +594,7 @@ export default {
   watch: {
     windowSize() {
       //this.canvasSize.height = this.canv
+      //console.log("I should not be seen when dragging canvas");
       let box = this.$refs.canvasContainer;
       if (!box) this.canvasSize = { height: 0, width: 0 };
       else {
@@ -599,22 +616,24 @@ export default {
     },
     relClaimTargetSpots: {
       handler() {
-        Object.entries(this.relClaimTargetSpots).forEach((value, index) => {
+        Object.entries(this.relClaimTargetSpots).forEach(([key, value]) => {
           if (
-            Object.keys(this.entities).some((entity) => entity.ID !== value[0])
+            Object.keys(this.processedEntitiesBetter).some(
+              (entityID) => entityID !== key
+            )
           ) {
             if (
               !lodash.isEqual(
-                value[1],
-                this.processedEntitiesBetter[value[0]].targetRelSpots
+                value,
+                this.processedEntitiesBetter[key].targetRelSpots
               )
             ) {
               //console.log(value[0], JSON.stringify(value[1]));
               //console.log("updating processedEntitiesBetter[x].targetRelSpots");
               Vue.set(
-                this.processedEntitiesBetter[value[0]],
+                this.processedEntitiesBetter[key],
                 "targetRelSpots",
-                value[1]
+                value
               );
             }
           } else {
@@ -629,9 +648,9 @@ export default {
       handler() {
         if (this.activeEntity.entityID) {
           if (this.prevActiveEntityID !== this.activeEntity.entityID) {
-            console.log(
+            /*console.log(
               "on clicking from one entity to another i should be seen"
-            );
+            );*/
             if (
               this.prevActiveEntityID &&
               Object.keys(this.processedEntitiesBetter).includes(
