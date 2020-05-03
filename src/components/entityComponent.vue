@@ -1,5 +1,11 @@
 <template>
   <div ref="entityContainer" :style="entityContainerStyleFinal">
+    <div class="relSpotsContainer">
+      <div class="relSpotLeft relSpots" :style="relSpotsLeftStyle"></div>
+      <div class="relSpotBottom relSpots" :style="relSpotsBottomStyle"></div>
+      <div class="relSpotRight relSpots" :style="relSpotsRightStyle"></div>
+      <div class="relSpotTop relSpots" :style="relSpotsTopStyle"></div>
+    </div>
     <div class="relationWires" :style="relationWiresStyle">
       <v-stage
         :config="{
@@ -15,14 +21,11 @@
               :config="relationLineConfigs[relClaim.To]"
             ></v-line>
           </v-group>
-          <v-group>
-            <v-circle></v-circle>
-          </v-group>
         </v-layer>
       </v-stage>
     </div>
     <div
-      v-if="entitySelectedFinal"
+      v-show="entitySelectedFinal"
       class="entityUI"
       :style="{
         position: 'absolute',
@@ -199,7 +202,7 @@ export default {
   },
   computed: {
     relWireColor: function () {
-      return `hsla(${this.entityColor.h},${this.entityColor.s}%,${this.entityColor.l}%, ${this.entityColor.a})`;
+      return `hsla(${this.entityColor.h},${this.entityColor.s}%,${this.entityColor.l}%, 1)`;
     },
     entityContainerStylePart1: function () {
       return {
@@ -504,6 +507,55 @@ export default {
 
     relStageSize: function () {
       return this.canvasSize;
+    },
+    relSpotsStylePart1: function () {
+      return {
+        height: this.relationSpotsOffset * 2 + "px",
+        width: this.relationSpotsOffset * 2 + "px",
+        border: `1px solid ${this.relWireColor}`,
+        //boxShadow: `0px 0px 0 ${this.relationSpotsOffset}px ${this.relWireColor}`,
+        boxShadow: `inset rgb(60, 60, 60) 0px 0px 0px ${
+          this.relationSpotsOffset - 2
+        }px, inset ${this.relWireColor} 0px 0px 0px ${
+          this.relationSpotsOffset
+        }px`,
+      };
+    },
+    relSpotsLeftStyle: function () {
+      return Object.assign({}, this.relSpotsStylePart1, {
+        top:
+          (this.relationSpots.top - this.relationSpots.bottom) / 2 -
+          this.relationSpotsOffset * 2 +
+          "px",
+        left: -this.relationSpotsOffset * 2 + "px",
+      });
+    },
+    relSpotsBottomStyle: function () {
+      return Object.assign({}, this.relSpotsStylePart1, {
+        bottom: -this.relationSpotsOffset * 2 + "px",
+        left:
+          (this.relationSpots.right - this.relationSpots.left) / 2 -
+          this.relationSpotsOffset * 2 +
+          "px",
+      });
+    },
+    relSpotsRightStyle: function () {
+      return Object.assign({}, this.relSpotsStylePart1, {
+        top:
+          (this.relationSpots.top - this.relationSpots.bottom) / 2 -
+          this.relationSpotsOffset * 2 +
+          "px",
+        right: -this.relationSpotsOffset * 2 + "px",
+      });
+    },
+    relSpotsTopStyle: function () {
+      return Object.assign({}, this.relSpotsStylePart1, {
+        top: -this.relationSpotsOffset * 2 + "px",
+        left:
+          (this.relationSpots.right - this.relationSpots.left) / 2 -
+          this.relationSpotsOffset * 2 +
+          "px",
+      });
     },
   },
   methods: {
@@ -899,4 +951,9 @@ export default {
 };
 </script>
 
-<style lang="sass" scoped></style>
+<style scoped>
+.relSpots {
+  border-radius: 50%;
+  position: absolute;
+}
+</style>
