@@ -345,19 +345,27 @@ export default {
         left:
           /*this.canvasLocation.x +*/
           /*this.canvasSize.width / 2 +*/
-          this.entityLocation_.x - this.entityBoundingBoxSize.width / 2,
+          this.entityLocation_.x -
+          this.entityBoundingBoxSize.width / 2 -
+          this.relationSpotsOffset,
         right:
           /*this.canvasLocation.x +*/
           /*this.canvasSize.width / 2 +*/
-          this.entityLocation_.x + this.entityBoundingBoxSize.width / 2,
+          this.entityLocation_.x +
+          this.entityBoundingBoxSize.width / 2 +
+          this.relationSpotsOffset,
         bottom:
           /*this.canvasLocation.y +*/
           /*this.canvasSize.height / 2 +*/
-          this.entityLocation_.y - this.entityBoundingBoxSize.height / 2,
+          this.entityLocation_.y -
+          this.entityBoundingBoxSize.height / 2 -
+          this.relationSpotsOffset,
         top:
           /*this.canvasLocation.y +*/
           /*this.canvasSize.height / 2 +*/
-          this.entityLocation_.y + this.entityBoundingBoxSize.height / 2,
+          this.entityLocation_.y +
+          this.entityBoundingBoxSize.height / 2 +
+          this.relationSpotsOffset,
       };
     },
     relationWirePointsPart1: function () {
@@ -414,22 +422,10 @@ export default {
           //console.log(minDistance, minDistanceKeys);
 
           res[relClaim.To] = [
-            {
-              point: selfSpots[minDistanceKeys.self].x,
-              offsetDirection: offsetsStatic.x[minDistanceKeys.self],
-            },
-            {
-              point: selfSpots[minDistanceKeys.self].y,
-              offsetDirection: offsetsStatic.y[minDistanceKeys.self],
-            },
-            {
-              point: targetSpots[minDistanceKeys.target].x,
-              offsetDirection: offsetsStatic.x[minDistanceKeys.target],
-            },
-            {
-              point: targetSpots[minDistanceKeys.target].y,
-              offsetDirection: offsetsStatic.y[minDistanceKeys.target],
-            },
+            selfSpots[minDistanceKeys.self].x,
+            selfSpots[minDistanceKeys.self].y,
+            targetSpots[minDistanceKeys.target].x,
+            targetSpots[minDistanceKeys.target].y,
           ];
         } else res[relClaim.To] = [0, 0, 0, 0];
       }
@@ -439,19 +435,9 @@ export default {
       const res = {};
       Object.entries(this.relationWirePointsPart1).forEach(
         ([entityID, relationWirePoints]) => {
-          res[entityID] = [
-            relationWirePoints[0].point +
-              this.relationSpotsOffset * relationWirePoints[0].offsetDirection,
-            relationWirePoints[1].point +
-              this.relationSpotsOffset * relationWirePoints[1].offsetDirection,
-            relationWirePoints[2].point +
-              this.relationSpotsOffset * relationWirePoints[2].offsetDirection,
-            relationWirePoints[3].point +
-              this.relationSpotsOffset * relationWirePoints[3].offsetDirection,
-          ];
           // doing: accounting for target radius offset
           const radiusOffset = this.relationSpotsOffset; // might be different to relationSpotsOffset in future
-          const temp = res[entityID];
+          const temp = relationWirePoints;
           const totalDist = Math.sqrt(
             Math.pow(temp[2] - temp[0], 2) + Math.pow(temp[3] - temp[1], 2)
           );
