@@ -141,6 +141,10 @@ export default {
       },
       type: Object,
     },
+    relationSpotsOffset: {
+      default: 10,
+      type: Number,
+    },
     entitySelected: {
       default: undefined,
       type: Boolean,
@@ -400,14 +404,43 @@ export default {
             }
           }
           //console.log(minDistance, minDistanceKeys);
+          let offsetsStatic = {
+            x: {
+              left: -1,
+              top: 0,
+              right: 1,
+              bottom: 0,
+            },
+            y: { left: 0, top: -1, right: 0, bottom: 1 },
+          };
           res[relClaim.To] = [
-            selfSpots[minDistanceKeys.self].x,
-            selfSpots[minDistanceKeys.self].y,
-            targetSpots[minDistanceKeys.target].x,
-            targetSpots[minDistanceKeys.target].y,
+            selfSpots[minDistanceKeys.self].x +
+              this.relationSpotsOffset * offsetsStatic.x[minDistanceKeys.self],
+            selfSpots[minDistanceKeys.self].y +
+              this.relationSpotsOffset * offsetsStatic.y[minDistanceKeys.self],
+            targetSpots[minDistanceKeys.target].x +
+              this.relationSpotsOffset *
+                offsetsStatic.x[minDistanceKeys.target],
+            targetSpots[minDistanceKeys.target].y +
+              this.relationSpotsOffset *
+                offsetsStatic.y[minDistanceKeys.target],
           ];
         } else res[relClaim.To] = [0, 0, 0, 0];
       }
+      return res;
+    },
+    relationWirePointsPart2: function () {
+      const res = {};
+      Object.entries(this.relationWirePointsPart1).forEach(
+        ([entityID, targetPoints]) => {
+          res[entityID] = [
+            targetPoints[0] + this.relationSpotsOffset,
+            targetPoints[1] + this.relationSpotsOffset,
+            targetPoints[2] + this.relationSpotsOffset,
+            targetPoints[3] + this.relationSpotsOffset,
+          ];
+        }
+      );
       return res;
     },
     relationWirePoints: function () {
