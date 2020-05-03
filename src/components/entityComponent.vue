@@ -732,7 +732,8 @@ export default {
         this.entityColor = Object.assign({}, this.entityData.viz_props.color);
     },
     "entityData.source"() {
-      this.entityLabel = this.entityData.source.Label;
+      if (this.entityData.source.Label)
+        this.entityLabel = this.entityData.source.Label;
     },
     entityLabel() {
       // doing: updating node's bounding box width and height
