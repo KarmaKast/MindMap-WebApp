@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "/MindMap-WebApp/precache-manifest.f122694abcab9ee6ad30efbc7f2df93d.js"
+  "/MindMap-WebApp/precache-manifest.115a2b2ae40eb4ca7e1ba8133491a36c.js"
 );
 
 workbox.core.setCacheNameDetails({prefix: "map-thy-mind"});
