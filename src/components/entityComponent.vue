@@ -15,6 +15,9 @@
               :config="relationLineConfigs[relClaim.To]"
             ></v-line>
           </v-group>
+          <v-group>
+            <v-circle></v-circle>
+          </v-group>
         </v-layer>
       </v-stage>
     </div>
@@ -142,7 +145,7 @@ export default {
       type: Object,
     },
     relationSpotsOffset: {
-      default: 20,
+      default: 8,
       type: Number,
     },
     entitySelected: {
@@ -445,6 +448,20 @@ export default {
               this.relationSpotsOffset * relationWirePoints[2].offsetDirection,
             relationWirePoints[3].point +
               this.relationSpotsOffset * relationWirePoints[3].offsetDirection,
+          ];
+          // doing: accounting for target radius offset
+          const radiusOffset = this.relationSpotsOffset; // might be different to relationSpotsOffset in future
+          const temp = res[entityID];
+          const totalDist = Math.sqrt(
+            Math.pow(temp[2] - temp[0], 2) + Math.pow(temp[3] - temp[1], 2)
+          );
+          const distRatio = radiusOffset / totalDist;
+          res[entityID] = [
+            temp[0],
+            temp[1],
+            // doing: accounting for target radius offset
+            (1 - distRatio) * temp[2] + distRatio * temp[0],
+            (1 - distRatio) * temp[3] + distRatio * temp[1],
           ];
         }
       );
