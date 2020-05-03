@@ -112,7 +112,7 @@ export default {
   },
   props: {
     colors: Object,
-    entityID: String,
+    entityID: { type: String, required: true },
     apiUrl: String,
     apiValidity: Boolean,
     canvasSize: { height: Number, width: Number },
@@ -142,7 +142,7 @@ export default {
       type: Object,
     },
     relationSpotsOffset: {
-      default: 10,
+      default: 20,
       type: Number,
     },
     entitySelected: {
@@ -341,24 +341,20 @@ export default {
       return {
         left:
           /*this.canvasLocation.x +*/
-          this.canvasSize.width / 2 +
-          this.entityLocation_.x -
-          this.entityBoundingBoxSize.width / 2,
+          /*this.canvasSize.width / 2 +*/
+          this.entityLocation_.x - this.entityBoundingBoxSize.width / 2,
         right:
           /*this.canvasLocation.x +*/
-          this.canvasSize.width / 2 +
-          this.entityLocation_.x +
-          this.entityBoundingBoxSize.width / 2,
-        top:
-          /*this.canvasLocation.y +*/
-          this.canvasSize.height / 2 +
-          this.entityLocation_.y -
-          this.entityBoundingBoxSize.height / 2,
+          /*this.canvasSize.width / 2 +*/
+          this.entityLocation_.x + this.entityBoundingBoxSize.width / 2,
         bottom:
           /*this.canvasLocation.y +*/
-          this.canvasSize.height / 2 +
-          this.entityLocation_.y +
-          this.entityBoundingBoxSize.height / 2,
+          /*this.canvasSize.height / 2 +*/
+          this.entityLocation_.y - this.entityBoundingBoxSize.height / 2,
+        top:
+          /*this.canvasLocation.y +*/
+          /*this.canvasSize.height / 2 +*/
+          this.entityLocation_.y + this.entityBoundingBoxSize.height / 2,
       };
     },
     relationWirePointsPart1: function () {
@@ -371,7 +367,7 @@ export default {
           right: 1,
           bottom: 0,
         },
-        y: { left: 0, top: -1, right: 0, bottom: 1 },
+        y: { left: 0, top: 1, right: 0, bottom: -1 },
       };
       for (const relClaim of this.entityData.source.RelationClaims) {
         let targetSpots = this.targetRelSpots
@@ -469,7 +465,8 @@ export default {
       );
       return res;
     },*/
-    relationWirePoints: function () {
+    relationWirePointsPart3: function () {
+      // doing: accounting for canvas location changes
       //relationWireTargetPoints
       // a circle of radius this.relationSpotsOffset is created. and the target line should stop at the that circle
       // so the end points needs to calculation by removing a length of that radius * 2
@@ -486,6 +483,22 @@ export default {
       );
       return res;
     },
+    relationWirePoints: function () {
+      // doing: accounting for canvas resize
+      const res = {};
+      Object.entries(this.relationWirePointsPart3).forEach(
+        ([entityID, relationWirePoints]) => {
+          res[entityID] = [
+            relationWirePoints[0] + this.canvasSize.width / 2,
+            relationWirePoints[1] + this.canvasSize.height / 2,
+            relationWirePoints[2] + this.canvasSize.width / 2,
+            relationWirePoints[3] + this.canvasSize.height / 2,
+          ];
+        }
+      );
+      return res;
+    },
+
     relStageSize: function () {
       return this.canvasSize;
     },
