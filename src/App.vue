@@ -1,5 +1,5 @@
 <template>
-  <div id="app" :style="this.appStyle">
+  <div id="app">
     <div
       v-if="APP_MODE === 'development'"
       :style="{
@@ -51,16 +51,6 @@ export default {
         padding: this.APP_MODE === "development" ? "20px" : "0px",
       };
     },
-    appStyle: function () {
-      return {
-        height: `${this.window_size.height}px`,
-        width: `${this.window_size.width}px`,
-        position: "absolute",
-        top: "0px",
-        left: "0px",
-        overflowX: "hidden",
-      };
-    },
   },
   methods: {
     handleResize() {
@@ -71,18 +61,6 @@ export default {
   },
   created: function () {
     window.addEventListener("resize", this.handleResize);
-
-    this.window_size.width = this.$store.state.window_width;
-    this.window_size.height = this.$store.state.window_height;
-
-    this.$store.subscribeAction({
-      after: (action, state) => {
-        if ("update_window_size" === action.type) {
-          this.window_size.width = state.window_width;
-          this.window_size.height = state.window_height;
-        }
-      },
-    });
   },
   destroyed: function () {
     window.removeEventListener("resize", this.handleResize);
@@ -100,5 +78,15 @@ export default {
 }
 body {
   margin: 0px;
+  height: 100%;
+  width: 100%;
+}
+#app {
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  overflow-x: hidden;
 }
 </style>
