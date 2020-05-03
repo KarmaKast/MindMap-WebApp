@@ -1,6 +1,6 @@
 <template>
   <div ref="entityContainer" :style="entityContainerStyleFinal">
-    <div class="relSpotsContainer">
+    <div v-if="true" class="relSpotsContainer">
       <div class="relSpotLeft relSpots" :style="relSpotsLeftStyle"></div>
       <div class="relSpotBottom relSpots" :style="relSpotsBottomStyle"></div>
       <div class="relSpotRight relSpots" :style="relSpotsRightStyle"></div>
@@ -202,7 +202,7 @@ export default {
   },
   computed: {
     relWireColor: function () {
-      return `hsla(${this.entityColor.h},${this.entityColor.s}%,${this.entityColor.l}%, 1)`;
+      return `hsla(0,0%,${this.colors["background"].l + 20}%, 1)`;
     },
     entityContainerStylePart1: function () {
       return {
@@ -512,13 +512,20 @@ export default {
       return {
         height: this.relationSpotsOffset * 2 + "px",
         width: this.relationSpotsOffset * 2 + "px",
-        border: `1px solid ${this.relWireColor}`,
+        //border: `1px solid ${this.relWireColor}`,
         //boxShadow: `0px 0px 0 ${this.relationSpotsOffset}px ${this.relWireColor}`,
-        boxShadow: `inset rgb(60, 60, 60) 0px 0px 0px ${
+        boxSizing: "border-box",
+        //boxShadow: `rgb(206, 206, 206) 0px 0px 0px 4px inset, rgb(153, 153, 153) 0px 0px 0px 8px inset`,
+        boxShadow: `hsla(0,0%,${
+          this.colors["background"].l + 10
+        }%,1) 0px 0px 0px 4px inset, ${
+          this.relWireColor
+        } 0px 0px 0px 8px inset`,
+        /*boxShadow: `inset rgb(60, 60, 60) 0px 0px 0px ${
           this.relationSpotsOffset - 2
         }px, inset ${this.relWireColor} 0px 0px 0px ${
           this.relationSpotsOffset
-        }px`,
+        }px`,*/
       };
     },
     relSpotsLeftStyle: function () {
