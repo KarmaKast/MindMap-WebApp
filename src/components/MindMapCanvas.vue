@@ -35,7 +35,7 @@
         :apiUrl="apiUrl"
         :autoSave="false"
         :apiValidity="apiValidity"
-        :canvasSize="{ height: canvasSize.height, width: canvasSize.width }"
+        :canvasSize="canvasSize"
         :canvasLocation="canvasLocation"
         :canvasMousePos="value.canvasMousePos"
         @setStartingCanvasMousePos="setStartingCanvasMousePos"
@@ -594,6 +594,7 @@ export default {
   watch: {
     windowSize() {
       //this.canvasSize.height = this.canv
+      //console.log("I should not be seen when dragging canvas");
       let box = this.$refs.canvasContainer;
       if (!box) this.canvasSize = { height: 0, width: 0 };
       else {
@@ -615,22 +616,24 @@ export default {
     },
     relClaimTargetSpots: {
       handler() {
-        Object.entries(this.relClaimTargetSpots).forEach((value, index) => {
+        Object.entries(this.relClaimTargetSpots).forEach(([key, value]) => {
           if (
-            Object.keys(this.entities).some((entity) => entity.ID !== value[0])
+            Object.keys(this.processedEntitiesBetter).some(
+              (entityID) => entityID !== key
+            )
           ) {
             if (
               !lodash.isEqual(
-                value[1],
-                this.processedEntitiesBetter[value[0]].targetRelSpots
+                value,
+                this.processedEntitiesBetter[key].targetRelSpots
               )
             ) {
               //console.log(value[0], JSON.stringify(value[1]));
               //console.log("updating processedEntitiesBetter[x].targetRelSpots");
               Vue.set(
-                this.processedEntitiesBetter[value[0]],
+                this.processedEntitiesBetter[key],
                 "targetRelSpots",
-                value[1]
+                value
               );
             }
           } else {
@@ -645,9 +648,9 @@ export default {
       handler() {
         if (this.activeEntity.entityID) {
           if (this.prevActiveEntityID !== this.activeEntity.entityID) {
-            console.log(
+            /*console.log(
               "on clicking from one entity to another i should be seen"
-            );
+            );*/
             if (
               this.prevActiveEntityID &&
               Object.keys(this.processedEntitiesBetter).includes(
