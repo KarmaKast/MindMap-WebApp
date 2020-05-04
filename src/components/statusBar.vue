@@ -125,6 +125,8 @@ export default {
         gridTemplateColumns: "auto auto",
         gridColumnGap: "3px",
         pointerEvents: "all",
+        //backgroundColor: `${this.colorsProcessed["theme_light"]}`,
+        borderRadius: `${this.height}px`,
       };
     },
     lightDarkToggleCurrentStyle: function () {
@@ -204,12 +206,12 @@ export default {
       event.preventDefault();
       //console.log(event);
       if (event.target !== this.$refs.next)
-        if (event.type.startsWith("mouse")) {
+        if (["mouseenter", "mouseleave"].includes(event.type)) {
           //console.log(event);
           this.showNextToggle
             ? (this.showNextToggle = false)
             : (this.showNextToggle = true);
-        } else {
+        } else if (event.type.startsWith("touch")) {
           // todo: for touch event toggle off showNext after a few seconds
           //console.log(event);
           this.showNextToggle
