@@ -124,6 +124,10 @@ export default {
       default: false,
       type: Boolean,
     },
+    themeDefault: {
+      default: "light",
+      type: String,
+    },
     entityLimit: {
       default: 25,
       type: Number,
@@ -230,23 +234,14 @@ export default {
       return colors_;
     },
     containerStyle: function () {
-      var style = {
-        height: "100%",
-        width: "100%",
-        overflow: "hidden",
-        borderRadius: "inherit",
-        position: "relative",
-        touchAction: "none",
+      return {
+        backgroundColor: `${
+          this.colorsProcessed ? this.colorsProcessed["background"] : "unset"
+        }`,
+        boxShadow: `0px 0px 0 2px ${
+          this.colorsProcessed ? this.colorsProcessed["theme_light"] : "unset"
+        }, inset 0px 0px 5px 3px hsla(0, 0%, 0%, 0.1`,
       };
-      if (this.colorsProcessed !== undefined) {
-        if ("background" in this.colorsProcessed) {
-          style["backgroundColor"] = `${this.colorsProcessed["background"]}`;
-          style[
-            "boxShadow"
-          ] = `0px 0px 0 2px ${this.colorsProcessed["theme_light"]}, inset 0px 0px 5px 3px hsla(0, 0%, 0%, 0.1`;
-        }
-      }
-      return style;
     },
     centerButtonStyle: function () {
       var size = 25;
@@ -507,10 +502,19 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
-/*div.container {
+/*
+* 
+*/
+:root {
+  --module-background-color: hsla(0, 0%, 95%, 1);
+}
+
+.MindMapModule {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  border-radius: inherit;
   position: relative;
-  margin-left: auto;
-  margin-right: auto;
-  background-color: rgb(49, 49, 49);
-}*/
+  touch-action: none;
+}
 </style>
