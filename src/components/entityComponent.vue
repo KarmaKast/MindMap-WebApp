@@ -148,7 +148,7 @@ export default {
       type: Object,
     },
     relationSpotsOffset: {
-      default: 8,
+      default: 7,
       type: Number,
     },
     entitySelected: {
@@ -202,7 +202,7 @@ export default {
   },
   computed: {
     relWireColor: function () {
-      return `hsla(0,0%,${this.colors["background"].l + 20}%, 1)`;
+      return `hsla(${this.colors["backgroundShade1"].h},${this.colors["backgroundShade1"].s}%,${this.colors["backgroundShade1"].l}%, 1)`;
     },
     entityContainerStylePart1: function () {
       return {
@@ -219,13 +219,13 @@ export default {
           this.entitySize["height"] > this.entitySize["width"]
             ? `${this.entitySize["height"]}px`
             : `${this.entitySize["width"]}px`,
-        boxShadow: `${
+        /*boxShadow: `${
           this.dragging.state
             ? "rgba(0, 0, 0, 0.2) 0px 0px 13px 4px"
             : "rgba(0, 0, 0, 0.05) 0px 0px 3px 2px"
         }, inset 0px 0px 0 4px hsla(${this.entityColor.h},
         ${this.entityColor.s}%,
-        ${this.entityColor.l}%, 0.2)`,
+        ${this.entityColor.l}%, 0.2)`,*/
       };
     },
     entityContainerStylePart2: function () {
@@ -512,20 +512,9 @@ export default {
       return {
         height: this.relationSpotsOffset * 2 + "px",
         width: this.relationSpotsOffset * 2 + "px",
-        //border: `1px solid ${this.relWireColor}`,
-        //boxShadow: `0px 0px 0 ${this.relationSpotsOffset}px ${this.relWireColor}`,
+        border: `1px solid ${this.relWireColor}`,
         boxSizing: "border-box",
-        //boxShadow: `rgb(206, 206, 206) 0px 0px 0px 4px inset, rgb(153, 153, 153) 0px 0px 0px 8px inset`,
-        boxShadow: `hsla(0,0%,${
-          this.colors["background"].l + 10
-        }%,1) 0px 0px 0px 4px inset, ${
-          this.relWireColor
-        } 0px 0px 0px 8px inset`,
-        /*boxShadow: `inset rgb(60, 60, 60) 0px 0px 0px ${
-          this.relationSpotsOffset - 2
-        }px, inset ${this.relWireColor} 0px 0px 0px ${
-          this.relationSpotsOffset
-        }px`,*/
+        boxShadow: `hsla(0,0%,${this.colors["backgroundShade2"].l}%,0.5) 0px 0px 0px 4px inset, ${this.relWireColor} 0px 0px 0px 8px inset`,
       };
     },
     relSpotsLeftStyle: function () {
@@ -762,6 +751,10 @@ export default {
                 this.dragging.state || this.entitySelectedFinal ? 2 : 1,
               lineCap: "round",
               lineJoin: "round",
+              // currently only starting and endling points are used. for bezier to work some points in the middle maybe needed
+              //tension: 5,
+              //bezier: true,
+              closed: false,
             })
           );
         }

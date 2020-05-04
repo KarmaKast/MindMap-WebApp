@@ -152,11 +152,15 @@ export default {
       MindMapColors: {
         theme_light: {
           background: { h: 0, s: 0, l: 95, a: 1 },
+          backgroundShade1: { h: 0, s: 0, l: 75, a: 1 },
+          backgroundShade2: { h: 0, s: 0, l: 100, a: 1 },
           theme: { h: 358, s: 97, l: 50, a: 1 },
           theme_light: { h: 0, s: 100, l: 84, a: 1 },
         },
         theme_dark: {
           background: { h: 0, s: 0, l: 15, a: 1 },
+          backgroundShade1: { h: 0, s: 0, l: 40, a: 1 },
+          backgroundShade2: { h: 0, s: 0, l: 5, a: 1 },
           theme: { h: 151, s: 70, l: 50, a: 1 },
           theme_light: { h: 151, s: 85, l: 32, a: 0.3 },
         },
