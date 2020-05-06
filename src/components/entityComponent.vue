@@ -108,7 +108,8 @@ import Vue from "vue";
 //import {uuidv1} from 'uuid/v1';
 import axios from "axios";
 import qs from "querystring";
-import lodash from "lodash";
+//import lodash from "lodash";
+import lodashIsEqual from "lodash/isEqual";
 //import * as morphCore from "@karmakast/morph-dbms-core";
 
 export default {
@@ -731,7 +732,7 @@ export default {
             (targetEntityID) => targetEntityID === key
           )
         ) {
-          if (!lodash.isEqual(points, this.relationLineConfigs[key].points)) {
+          if (!lodashIsEqual(points, this.relationLineConfigs[key].points)) {
             Vue.set(
               this.relationLineConfigs,
               key,
@@ -794,7 +795,7 @@ export default {
     entitySelectedFinal() {
       if (this.apiValidity) {
         if (
-          !lodash.isEqual(
+          !lodashIsEqual(
             this.entitySelectedFinal,
             this.entityData.viz_props.selected
           )
@@ -820,12 +821,12 @@ export default {
       if (!this.dragging.state) {
         if (this.apiValidity) {
           if (
-            !lodash.isEqual(
+            !lodashIsEqual(
               this.entityLocation_,
               this.entityData.viz_props.location
             ) &&
-            (!lodash.isEqual(this.entityLocation_, this.entityLocationDef) ||
-              lodash.isEqual(
+            (!lodashIsEqual(this.entityLocation_, this.entityLocationDef) ||
+              lodashIsEqual(
                 this.entityLocationDef,
                 this.entityData.viz_props.location
               ))
@@ -839,10 +840,7 @@ export default {
     },
     "entityData.viz_props"() {
       if (
-        !lodash.isEqual(
-          this.entityLocation_,
-          this.entityData.viz_props.location
-        )
+        !lodashIsEqual(this.entityLocation_, this.entityData.viz_props.location)
       ) {
         this.entityLocation = Object.assign(
           {},
@@ -857,7 +855,7 @@ export default {
           this.$emit("prevActiveEntityID", this.entityID);
         this.entitySelectedFinal = this.entityData.viz_props.selected;
       }
-      if (!lodash.isEqual(this.entityColor, this.entityData.viz_props.color))
+      if (!lodashIsEqual(this.entityColor, this.entityData.viz_props.color))
         this.entityColor = Object.assign({}, this.entityData.viz_props.color);
     },
     "entityData.source"() {
@@ -891,9 +889,7 @@ export default {
     },
     entityColor: {
       handler() {
-        if (
-          !lodash.isEqual(this.entityColor, this.entityData.viz_props.color)
-        ) {
+        if (!lodashIsEqual(this.entityColor, this.entityData.viz_props.color)) {
           this.savePropToAPI("color", this.entityColor);
         }
         //}
