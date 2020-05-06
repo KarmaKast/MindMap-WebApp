@@ -1,6 +1,6 @@
 {
   "name": "map-thy-mind",
-  "version": "0.5.12",
+  "version": "0.6.2",
   "private": true,
   "author": {
     "name": "Sree Chandan",
@@ -8,7 +8,7 @@
   },
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
+    "build": "vue-cli-service build --mode production --target app --modern",
     "build:serve": "serve ./dist",
     "build:deploy": "bash deploy.sh",
     "test:e2e": "vue-cli-service test:e2e",

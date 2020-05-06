@@ -50,22 +50,24 @@
             ><icon-hamburger1
           /></icon-base>
         </button>
-        <div v-show="showMenu" id="menuItems" :style="this.menuItemsStyle">
-          <button-one
-            :validity="this.apiValidity"
-            :colors="colorsFinal"
-            :colorsProcessed="colorsProcessed"
-            :style="{ order: 0 }"
-          ></button-one>
-          <button-two
-            v-for="(button, index) in menuButtons"
-            :key="index + 1"
-            :colors="colorsFinal"
-            :colorsProcessed="colorsProcessed"
-            :buttonText="button['text']"
-            @takeAction="button['action'](...button['args'])"
-            :style="{ order: index }"
-          ></button-two>
+        <div v-if="menuLoaded">
+          <div v-show="showMenu" id="menuItems" :style="this.menuItemsStyle">
+            <button-one
+              :validity="this.apiValidity"
+              :colors="colorsFinal"
+              :colorsProcessed="colorsProcessed"
+              :style="{ order: 0 }"
+            ></button-one>
+            <button-two
+              v-for="(button, index) in menuButtons"
+              :key="index + 1"
+              :colors="colorsFinal"
+              :colorsProcessed="colorsProcessed"
+              :buttonText="button['text']"
+              @takeAction="button['action'](...button['args'])"
+              :style="{ order: index }"
+            ></button-two>
+          </div>
         </div>
       </div>
       <status-bar
@@ -78,22 +80,28 @@
         @themeToggle="themeToggle"
       ></status-bar>
       <about-page
+        v-if="aboutPageLoaded"
         :colors="colorsFinal"
         :colorsProcessed="colorsProcessed"
         :showPage="showAboutPage"
-        @closePage="aboutPageDisplay"
+        @closePage="aboutPageDisplay(false)"
       ></about-page>
     </div>
   </div>
 </template>
 
 <script>
-import MindMapCanvas from "./MindMapCanvas.vue";
-import statusBar from "./statusBar.vue";
-import aboutPage from "./aboutPage.vue";
+//import MindMapCanvas from "./MindMapCanvas.vue";
+const MindMapCanvas = () => import("./MindMapCanvas");
 
-import buttonOne from "./button1.vue";
-import buttonTwo from "./button2.vue";
+import statusBar from "./statusBar.vue";
+//import aboutPage from "./aboutPage.vue";
+const aboutPage = () => import("./aboutPage");
+
+//import buttonOne from "./button1.vue";
+const buttonOne = () => import("./button1");
+//import buttonTwo from "./button2.vue";
+const buttonTwo = () => import("./button2");
 
 //import {uuidv1} from 'uuid/v1';
 import axios from "axios";
@@ -124,6 +132,10 @@ export default {
       default: false,
       type: Boolean,
     },
+    themeDefault: {
+      default: "light",
+      type: String,
+    },
     entityLimit: {
       default: 25,
       type: Number,
@@ -132,11 +144,13 @@ export default {
   data: function () {
     return {
       debugMsg: "",
+      menuLoaded: false,
       showMenu: false,
       apiUrl: "",
       apiValidity: false,
       collection: null,
       entities: [],
+      aboutPageLoaded: false,
       showAboutPage: false,
       grid: {
         size: 25,
@@ -148,13 +162,17 @@ export default {
       MindMapColors: {
         theme_light: {
           background: { h: 0, s: 0, l: 95, a: 1 },
+          backgroundShade1: { h: 0, s: 0, l: 75, a: 1 },
+          backgroundShade2: { h: 0, s: 0, l: 100, a: 1 },
           theme: { h: 358, s: 97, l: 50, a: 1 },
-          theme_light: { h: 0, s: 100, l: 84, a: 1 },
+          theme_light: { h: 0, s: 100, l: 75, a: 0.6 },
         },
         theme_dark: {
           background: { h: 0, s: 0, l: 15, a: 1 },
+          backgroundShade1: { h: 0, s: 0, l: 40, a: 1 },
+          backgroundShade2: { h: 0, s: 0, l: 5, a: 1 },
           theme: { h: 151, s: 70, l: 50, a: 1 },
-          theme_light: { h: 151, s: 85, l: 32, a: 0.3 },
+          theme_light: { h: 151, s: 85, l: 32, a: 0.6 },
         },
       },
       CurrentTheme: localStorage.getItem("theme")
@@ -168,7 +186,7 @@ export default {
       return this.colors ? this.colors : this.MindMapColors[this.CurrentTheme];
     },
     menuButtons: function () {
-      var list = [
+      let list = [
         {
           text: "Get Collection",
           action: this.getCollection,
@@ -216,13 +234,13 @@ export default {
         // method to process menu list
         return value["if"];
       }
-      var processedList = list.filter(process);
+      let processedList = list.filter(process);
       return processedList;
     },
     colorsProcessed: function () {
-      var colors_ = {};
-      for (var key in this.colorsFinal) {
-        var color_ = this.colorsFinal[key];
+      let colors_ = {};
+      for (let key in this.colorsFinal) {
+        let color_ = this.colorsFinal[key];
         colors_[
           key
         ] = `hsla(${color_.h},${color_.s}%,${color_.l}%,${color_.a})`;
@@ -230,26 +248,17 @@ export default {
       return colors_;
     },
     containerStyle: function () {
-      var style = {
-        height: "100%",
-        width: "100%",
-        overflow: "hidden",
-        borderRadius: "inherit",
-        position: "relative",
-        touchAction: "none",
+      return {
+        backgroundColor: `${
+          this.colorsProcessed ? this.colorsProcessed["background"] : "unset"
+        }`,
+        boxShadow: `0px 0px 0 2px ${
+          this.colorsProcessed ? this.colorsProcessed["theme_light"] : "unset"
+        }, inset 0px 0px 5px 3px hsla(0, 0%, 0%, 0.1`,
       };
-      if (this.colorsProcessed !== undefined) {
-        if ("background" in this.colorsProcessed) {
-          style["backgroundColor"] = `${this.colorsProcessed["background"]}`;
-          style[
-            "boxShadow"
-          ] = `0px 0px 0 2px ${this.colorsProcessed["theme_light"]}, inset 0px 0px 5px 3px hsla(0, 0%, 0%, 0.1`;
-        }
-      }
-      return style;
     },
     centerButtonStyle: function () {
-      var size = 25;
+      let size = 25;
       return {
         position: "absolute",
         height: `${size}px`,
@@ -335,7 +344,7 @@ export default {
       alert("Settings section not implimented yet");
     },
     loadCollection() {
-      var url_ = this.apiUrl;
+      let url_ = this.apiUrl;
       this.entities = [];
       // todo: directly using testCollection for now. Later a collection explorer feature need to be added.
       axios({
@@ -352,7 +361,7 @@ export default {
         });
     },
     getCollection() {
-      var url_ = this.apiUrl;
+      let url_ = this.apiUrl;
       this.entities = [];
       // todo: get a list of nodeIDs and create a list of nodes in the canvas
       console.log(`getting list of nodes\n${url_}`);
@@ -378,7 +387,7 @@ export default {
         .catch((err) => this.loadCollection());
     },
     createCollection() {
-      var url_ = this.apiUrl;
+      let url_ = this.apiUrl;
       // todo: get a list of nodeIDs and create a list of nodes in the canvas
       console.log(`getting list of nodes\n${url_}`);
       axios({
@@ -397,12 +406,12 @@ export default {
         });
     },
     clearCollection() {
-      var url_ = this.apiUrl;
+      let url_ = this.apiUrl;
       this.$axios.post(url_ + "/collection/clear");
       this.getCollection();
     },
     saveCollection() {
-      var url_ = this.apiUrl;
+      let url_ = this.apiUrl;
       this.$axios.post(url_ + "/collection/save");
     },
     toggleMenu() {
@@ -410,6 +419,7 @@ export default {
         this.showMenu = false;
       } else {
         this.showMenu = true;
+        if (!this.menuLoaded) this.menuLoaded = true;
       }
     },
     createNewEntity(entityLocationDef_) {
@@ -460,6 +470,7 @@ export default {
     },
     aboutPageDisplay(showOrHide) {
       this.showAboutPage = showOrHide;
+      if (showOrHide && !this.aboutPageLoaded) this.aboutPageLoaded = true;
     },
     themeToggle() {
       this.CurrentTheme === "theme_light"
@@ -507,10 +518,19 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
-/*div.container {
+/*
+* 
+*/
+:root {
+  --module-background-color: hsla(0, 0%, 95%, 1);
+}
+
+.MindMapModule {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  border-radius: inherit;
   position: relative;
-  margin-left: auto;
-  margin-right: auto;
-  background-color: rgb(49, 49, 49);
-}*/
+  touch-action: none;
+}
 </style>

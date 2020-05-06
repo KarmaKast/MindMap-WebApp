@@ -112,7 +112,7 @@ export default {
           CSS.supports("backdrop-filter: blur(3px)") ? 0.5 : 0.8
         })`,
         backdropFilter: "blur(3px)",
-        backgroundImage: `repeating-linear-gradient(45deg,rgba(255, 255, 255, 0), ${this.colorsProcessed["theme_light"]} 1px, rgba(255, 255, 255, 0) 1px, rgba(255, 255, 255, 0) 6px), repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0), ${this.colorsProcessed["theme_light"]} 1px, rgba(255, 255, 255, 0) 1px, rgba(255, 255, 255, 0) 6px)`,
+        backgroundImage: `repeating-linear-gradient(45deg,rgba(255, 255, 255, 0), hsla(${this.colors["theme_light"].h},${this.colors["theme_light"].s}%,${this.colors["theme_light"].l}%,0.4) 1px, rgba(255, 255, 255, 0) 1px, rgba(255, 255, 255, 0) 6px), repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0), hsla(${this.colors["theme_light"].h},${this.colors["theme_light"].s}%,${this.colors["theme_light"].l}%,0.4) 1px, rgba(255, 255, 255, 0) 1px, rgba(255, 255, 255, 0) 6px)`,
       };
     },
     lightDarkToggleContainerStyle: function () {
@@ -125,6 +125,8 @@ export default {
         gridTemplateColumns: "auto auto",
         gridColumnGap: "3px",
         pointerEvents: "all",
+        //backgroundColor: `${this.colorsProcessed["theme_light"]}`,
+        borderRadius: `${this.height}px`,
       };
     },
     lightDarkToggleCurrentStyle: function () {
@@ -204,12 +206,12 @@ export default {
       event.preventDefault();
       //console.log(event);
       if (event.target !== this.$refs.next)
-        if (event.type.startsWith("mouse")) {
+        if (["mouseenter", "mouseleave"].includes(event.type)) {
           //console.log(event);
           this.showNextToggle
             ? (this.showNextToggle = false)
             : (this.showNextToggle = true);
-        } else {
+        } else if (event.type.startsWith("touch")) {
           // todo: for touch event toggle off showNext after a few seconds
           //console.log(event);
           this.showNextToggle

@@ -225,6 +225,9 @@ export default {
       },
     },
   },
+  mounted() {
+    if (this.urlInStore !== this.urlInField) this.urlInField = this.urlInStore;
+  },
 };
 </script>
 
