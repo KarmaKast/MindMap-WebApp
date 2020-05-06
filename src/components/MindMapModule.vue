@@ -88,12 +88,17 @@
 </template>
 
 <script>
-import MindMapCanvas from "./MindMapCanvas.vue";
-import statusBar from "./statusBar.vue";
-import aboutPage from "./aboutPage.vue";
+//import MindMapCanvas from "./MindMapCanvas.vue";
+const MindMapCanvas = () => import("./MindMapCanvas");
 
-import buttonOne from "./button1.vue";
-import buttonTwo from "./button2.vue";
+import statusBar from "./statusBar.vue";
+//import aboutPage from "./aboutPage.vue";
+const aboutPage = () => import("./aboutPage");
+
+//import buttonOne from "./button1.vue";
+const buttonOne = () => import("./button1");
+//import buttonTwo from "./button2.vue";
+const buttonTwo = () => import("./button2");
 
 //import {uuidv1} from 'uuid/v1';
 import axios from "axios";

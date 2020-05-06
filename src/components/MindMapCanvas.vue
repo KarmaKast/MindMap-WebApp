@@ -59,7 +59,8 @@
 </template>
 <script>
 import Vue from "vue";
-import entityComponent from "./entityComponent";
+//import entityComponent from "./entityComponent";
+const entityComponent = () => import("./entityComponent");
 
 import axios from "axios";
 import qs from "querystring";
@@ -68,7 +69,7 @@ import lodash from "lodash";
 export default {
   name: "MindMapCanvas",
   components: {
-    entityComponent: () => import("./entityComponent"),
+    entityComponent,
   },
   props: {
     colors: Object,
