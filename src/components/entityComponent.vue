@@ -103,7 +103,7 @@
 
 <script>
 import Vue from "vue";
-import ColorPicker from "./general/ColorPicker.vue";
+//import ColorPicker from "./general/ColorPicker.vue";
 
 //import {uuidv1} from 'uuid/v1';
 import axios from "axios";
@@ -114,7 +114,7 @@ import lodash from "lodash";
 export default {
   name: "entityComponent",
   components: {
-    ColorPicker,
+    //ColorPicker,
   },
   props: {
     colors: Object,

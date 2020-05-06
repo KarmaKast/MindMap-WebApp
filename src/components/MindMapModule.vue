@@ -78,10 +78,11 @@
         @themeToggle="themeToggle"
       ></status-bar>
       <about-page
+        v-if="aboutPageLoaded"
         :colors="colorsFinal"
         :colorsProcessed="colorsProcessed"
         :showPage="showAboutPage"
-        @closePage="aboutPageDisplay"
+        @closePage="aboutPageDisplay(false)"
       ></about-page>
     </div>
   </div>
@@ -146,6 +147,7 @@ export default {
       apiValidity: false,
       collection: null,
       entities: [],
+      aboutPageLoaded: false,
       showAboutPage: false,
       grid: {
         size: 25,
@@ -464,6 +466,7 @@ export default {
     },
     aboutPageDisplay(showOrHide) {
       this.showAboutPage = showOrHide;
+      if (showOrHide && !this.aboutPageLoaded) this.aboutPageLoaded = true;
     },
     themeToggle() {
       this.CurrentTheme === "theme_light"

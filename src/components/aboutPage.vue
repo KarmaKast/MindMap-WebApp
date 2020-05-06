@@ -1,5 +1,5 @@
 <template>
-  <div id="aboutPage" v-if="showPage" :style="containerStyle">
+  <div id="aboutPage" v-show="showPage" :style="containerStyle">
     <div id="aboutSection" :style="aboutSectionStyle">
       <button
         id="closePageBttn"
@@ -124,25 +124,23 @@ export default {
       };
     },
   },
-  watch: {
-    showPage() {
-      if (this.showPage) {
-        window.addEventListener("keyup", this.onEscapeKeyUp);
-      } else {
-        window.removeEventListener("keyup", this.onEscapeKeyUp);
-      }
-    },
-  },
+  watch: {},
   methods: {
     onEscapeKeyUp(event) {
-      console.log(event);
+      //console.log(event);
       if (event.key === "Escape") {
         this.closePage();
       }
     },
     closePage() {
-      this.$emit("closePage", false);
+      this.$emit("closePage");
     },
+  },
+  mounted() {
+    window.addEventListener("keyup", this.onEscapeKeyUp);
+  },
+  beforeDestroy() {
+    window.removeEventListener("keyup", this.onEscapeKeyUp);
   },
 };
 </script>
