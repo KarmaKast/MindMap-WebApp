@@ -165,14 +165,14 @@ export default {
           backgroundShade1: { h: 0, s: 0, l: 75, a: 1 },
           backgroundShade2: { h: 0, s: 0, l: 100, a: 1 },
           theme: { h: 358, s: 97, l: 50, a: 1 },
-          theme_light: { h: 0, s: 100, l: 84, a: 1 },
+          theme_light: { h: 0, s: 100, l: 75, a: 0.6 },
         },
         theme_dark: {
           background: { h: 0, s: 0, l: 15, a: 1 },
           backgroundShade1: { h: 0, s: 0, l: 40, a: 1 },
           backgroundShade2: { h: 0, s: 0, l: 5, a: 1 },
           theme: { h: 151, s: 70, l: 50, a: 1 },
-          theme_light: { h: 151, s: 85, l: 32, a: 0.3 },
+          theme_light: { h: 151, s: 85, l: 32, a: 0.6 },
         },
       },
       CurrentTheme: localStorage.getItem("theme")
@@ -186,7 +186,7 @@ export default {
       return this.colors ? this.colors : this.MindMapColors[this.CurrentTheme];
     },
     menuButtons: function () {
-      var list = [
+      let list = [
         {
           text: "Get Collection",
           action: this.getCollection,
@@ -234,13 +234,13 @@ export default {
         // method to process menu list
         return value["if"];
       }
-      var processedList = list.filter(process);
+      let processedList = list.filter(process);
       return processedList;
     },
     colorsProcessed: function () {
-      var colors_ = {};
-      for (var key in this.colorsFinal) {
-        var color_ = this.colorsFinal[key];
+      let colors_ = {};
+      for (let key in this.colorsFinal) {
+        let color_ = this.colorsFinal[key];
         colors_[
           key
         ] = `hsla(${color_.h},${color_.s}%,${color_.l}%,${color_.a})`;
@@ -258,7 +258,7 @@ export default {
       };
     },
     centerButtonStyle: function () {
-      var size = 25;
+      let size = 25;
       return {
         position: "absolute",
         height: `${size}px`,
@@ -344,7 +344,7 @@ export default {
       alert("Settings section not implimented yet");
     },
     loadCollection() {
-      var url_ = this.apiUrl;
+      let url_ = this.apiUrl;
       this.entities = [];
       // todo: directly using testCollection for now. Later a collection explorer feature need to be added.
       axios({
@@ -361,7 +361,7 @@ export default {
         });
     },
     getCollection() {
-      var url_ = this.apiUrl;
+      let url_ = this.apiUrl;
       this.entities = [];
       // todo: get a list of nodeIDs and create a list of nodes in the canvas
       console.log(`getting list of nodes\n${url_}`);
@@ -387,7 +387,7 @@ export default {
         .catch((err) => this.loadCollection());
     },
     createCollection() {
-      var url_ = this.apiUrl;
+      let url_ = this.apiUrl;
       // todo: get a list of nodeIDs and create a list of nodes in the canvas
       console.log(`getting list of nodes\n${url_}`);
       axios({
@@ -406,12 +406,12 @@ export default {
         });
     },
     clearCollection() {
-      var url_ = this.apiUrl;
+      let url_ = this.apiUrl;
       this.$axios.post(url_ + "/collection/clear");
       this.getCollection();
     },
     saveCollection() {
-      var url_ = this.apiUrl;
+      let url_ = this.apiUrl;
       this.$axios.post(url_ + "/collection/save");
     },
     toggleMenu() {
