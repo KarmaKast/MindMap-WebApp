@@ -4,22 +4,22 @@
       <div
         v-show="showSpots.left"
         class="relSpotLeft relSpots"
-        :style="relSpotsLeftStyle"
+        :style="relSelfSpotsLeftStyle"
       ></div>
       <div
         v-show="showSpots.bottom"
         class="relSpotBottom relSpots"
-        :style="relSpotsBottomStyle"
+        :style="relSelfSpotsBottomStyle"
       ></div>
       <div
         v-show="showSpots.right"
         class="relSpotRight relSpots"
-        :style="relSpotsRightStyle"
+        :style="relSelfSpotsRightStyle"
       ></div>
       <div
         v-show="showSpots.top"
         class="relSpotTop relSpots"
-        :style="relSpotsTopStyle"
+        :style="relSelfSpotsTopStyle"
       ></div>
     </div>
     <div class="relationWires" :style="relationWiresStyle">
@@ -551,48 +551,55 @@ export default {
     relStageSize: function () {
       return this.canvasSize;
     },
-    relSpotsStylePart1: function () {
+    relSelfSpotsStylePart1: function () {
       return {
-        height: this.relationSpotsOffset * 2 + "px",
-        width: this.relationSpotsOffset * 2 + "px",
-        border: `1px solid ${this.relWireColor}`,
+        //height: this.relationSpotsOffset * 2 + "px",
+        //width: this.relationSpotsOffset * 2 + "px",
+        height: "4px",
+        width: "4px",
+        //border: `1px solid ${this.relWireColor}`,
+        backgroundColor: `${this.relWireColor}`,
         boxSizing: "border-box",
-        boxShadow: `hsla(0,0%,${this.colors["backgroundShade2"].l}%,0.5) 0px 0px 0px 4px inset, ${this.relWireColor} 0px 0px 0px 8px inset`,
+        //boxShadow: `hsla(0,0%,${this.colors["backgroundShade2"].l}%,0.5) 0px 0px 0px 4px inset, ${this.relWireColor} 0px 0px 0px 8px inset`,
       };
     },
-    relSpotsLeftStyle: function () {
-      return Object.assign({}, this.relSpotsStylePart1, {
+    relSelfSpotsLeftStyle: function () {
+      return Object.assign({}, this.relSelfSpotsStylePart1, {
         top:
           (this.relationSpots.bottom - this.relationSpots.top) / 2 -
-          this.relationSpotsOffset * 2 +
+          this.relationSpotsOffset -
+          2 +
           "px",
-        left: -this.relationSpotsOffset * 2 + "px",
+        left: -this.relationSpotsOffset - 2 + "px",
       });
     },
-    relSpotsBottomStyle: function () {
-      return Object.assign({}, this.relSpotsStylePart1, {
-        bottom: -this.relationSpotsOffset * 2 + "px",
+    relSelfSpotsBottomStyle: function () {
+      return Object.assign({}, this.relSelfSpotsStylePart1, {
+        bottom: -this.relationSpotsOffset - 2 + "px",
         left:
           (this.relationSpots.right - this.relationSpots.left) / 2 -
-          this.relationSpotsOffset * 2 +
+          this.relationSpotsOffset -
+          2 +
           "px",
       });
     },
-    relSpotsRightStyle: function () {
-      return Object.assign({}, this.relSpotsStylePart1, {
+    relSelfSpotsRightStyle: function () {
+      return Object.assign({}, this.relSelfSpotsStylePart1, {
         top:
           (this.relationSpots.bottom - this.relationSpots.top) / 2 -
-          this.relationSpotsOffset * 2 +
+          this.relationSpotsOffset -
+          2 +
           "px",
-        right: -this.relationSpotsOffset * 2 + "px",
+        right: -this.relationSpotsOffset - 2 + "px",
       });
     },
-    relSpotsTopStyle: function () {
-      return Object.assign({}, this.relSpotsStylePart1, {
-        top: -this.relationSpotsOffset * 2 + "px",
+    relSelfSpotsTopStyle: function () {
+      return Object.assign({}, this.relSelfSpotsStylePart1, {
+        top: -this.relationSpotsOffset - 2 + "px",
         left:
           (this.relationSpots.right - this.relationSpots.left) / 2 -
-          this.relationSpotsOffset * 2 +
+          this.relationSpotsOffset -
+          2 +
           "px",
       });
     },
