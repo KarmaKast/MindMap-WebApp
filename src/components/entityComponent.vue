@@ -1,10 +1,26 @@
 <template>
   <div ref="entityContainer" :style="entityContainerStyleFinal">
     <div v-if="true" class="relSpotsContainer">
-      <div class="relSpotLeft relSpots" :style="relSpotsLeftStyle"></div>
-      <div class="relSpotBottom relSpots" :style="relSpotsBottomStyle"></div>
-      <div class="relSpotRight relSpots" :style="relSpotsRightStyle"></div>
-      <div class="relSpotTop relSpots" :style="relSpotsTopStyle"></div>
+      <div
+        v-show="showSpots.left"
+        class="relSpotLeft relSpots"
+        :style="relSpotsLeftStyle"
+      ></div>
+      <div
+        v-show="showSpots.bottom"
+        class="relSpotBottom relSpots"
+        :style="relSpotsBottomStyle"
+      ></div>
+      <div
+        v-show="showSpots.right"
+        class="relSpotRight relSpots"
+        :style="relSpotsRightStyle"
+      ></div>
+      <div
+        v-show="showSpots.top"
+        class="relSpotTop relSpots"
+        :style="relSpotsTopStyle"
+      ></div>
     </div>
     <div class="relationWires" :style="relationWiresStyle">
       <v-stage
@@ -199,6 +215,13 @@ export default {
         outline: "none",
       },
       relationLineConfigs: {},
+      //relationWirePointsPart1: {},
+      /*showSpots: {
+        left: false,
+        bottom: false,
+        right: false,
+        top: false,
+      },*/
     };
   },
   computed: {
@@ -358,13 +381,13 @@ export default {
           this.entityLocation_.x +
           this.entityBoundingBoxSize.width / 2 +
           this.relationSpotsOffset,
-        bottom:
+        top:
           /*this.canvasLocation.y +*/
           /*this.canvasSize.height / 2 +*/
           this.entityLocation_.y -
           this.entityBoundingBoxSize.height / 2 -
           this.relationSpotsOffset,
-        top:
+        bottom:
           /*this.canvasLocation.y +*/
           /*this.canvasSize.height / 2 +*/
           this.entityLocation_.y +
@@ -375,7 +398,7 @@ export default {
     relationWirePointsPart1: function () {
       // todo: this is a object of objects. refactor this with a data object and watchers
       let res = {};
-      let offsetsStatic = {
+      /*let offsetsStatic = {
         x: {
           left: -1,
           top: 0,
@@ -383,7 +406,7 @@ export default {
           bottom: 0,
         },
         y: { left: 0, top: 1, right: 0, bottom: -1 },
-      };
+      };*/
       for (const relClaim of this.entityData.source.RelationClaims) {
         let targetSpots = this.targetRelSpots
           ? this.targetRelSpots[relClaim.To]
@@ -423,35 +446,54 @@ export default {
               }
             }
           }
-          //console.log(minDistance, minDistanceKeys);
-
-          res[relClaim.To] = [
-            selfSpots[minDistanceKeys.self].x,
-            selfSpots[minDistanceKeys.self].y,
-            targetSpots[minDistanceKeys.target].x,
-            targetSpots[minDistanceKeys.target].y,
-          ];
+          if (this.entityLabel === "client-side")
+            console.log(minDistance, minDistanceKeys);
+          // todo: .
+          //this.showSpots[minDistanceKeys.self] = true;
+          res[relClaim.To] = {
+            points: [
+              selfSpots[minDistanceKeys.self].x,
+              selfSpots[minDistanceKeys.self].y,
+              targetSpots[minDistanceKeys.target].x,
+              targetSpots[minDistanceKeys.target].y,
+            ],
+            selfSpot: minDistanceKeys.self,
+          };
         } else res[relClaim.To] = [0, 0, 0, 0];
       }
+      return res;
+    },
+    showSpots() {
+      const res = {
+        left: false,
+        bottom: false,
+        right: false,
+        top: false,
+      };
+      Object.entries(this.relationWirePointsPart1).forEach(
+        ([entityID, value]) => {
+          res[value.selfSpot] = true;
+        }
+      );
       return res;
     },
     relationWirePointsPart2: function () {
       const res = {};
       Object.entries(this.relationWirePointsPart1).forEach(
-        ([entityID, relationWirePoints]) => {
+        ([entityID, value]) => {
           // doing: accounting for target radius offset
           const radiusOffset = this.relationSpotsOffset; // might be different to relationSpotsOffset in future
-          const temp = relationWirePoints;
+          const temp = value.points;
           const totalDist = Math.sqrt(
             Math.pow(temp[2] - temp[0], 2) + Math.pow(temp[3] - temp[1], 2)
           );
-          const distRatio = radiusOffset / totalDist;
+          const distanceRatio = radiusOffset / totalDist;
           res[entityID] = [
             temp[0],
             temp[1],
             // doing: accounting for target radius offset
-            (1 - distRatio) * temp[2] + distRatio * temp[0],
-            (1 - distRatio) * temp[3] + distRatio * temp[1],
+            (1 - distanceRatio) * temp[2] + distanceRatio * temp[0],
+            (1 - distanceRatio) * temp[3] + distanceRatio * temp[1],
           ];
         }
       );
@@ -521,7 +563,7 @@ export default {
     relSpotsLeftStyle: function () {
       return Object.assign({}, this.relSpotsStylePart1, {
         top:
-          (this.relationSpots.top - this.relationSpots.bottom) / 2 -
+          (this.relationSpots.bottom - this.relationSpots.top) / 2 -
           this.relationSpotsOffset * 2 +
           "px",
         left: -this.relationSpotsOffset * 2 + "px",
@@ -539,7 +581,7 @@ export default {
     relSpotsRightStyle: function () {
       return Object.assign({}, this.relSpotsStylePart1, {
         top:
-          (this.relationSpots.top - this.relationSpots.bottom) / 2 -
+          (this.relationSpots.bottom - this.relationSpots.top) / 2 -
           this.relationSpotsOffset * 2 +
           "px",
         right: -this.relationSpotsOffset * 2 + "px",
@@ -721,6 +763,69 @@ export default {
     relationSpots() {
       //console.log("I should not be seen when dragging canvas");
       this.$emit("setSelfRelSpots", this.relationSpots);
+
+      // todo: this is a object of objects. refactor this with a data object and watchers
+      /*let res = {};
+      let offsetsStatic = {
+        x: {
+          left: -1,
+          top: 0,
+          right: 1,
+          bottom: 0,
+        },
+        y: { left: 0, top: 1, right: 0, bottom: -1 },
+      };
+      for (const relClaim of this.entityData.source.RelationClaims) {
+        let targetSpots = this.targetRelSpots
+          ? this.targetRelSpots[relClaim.To]
+          : undefined;
+        if (targetSpots) {
+          // todo: find closest set of points between this entity and target entity
+          function dist(p1, p2) {
+            return Math.sqrt((p1.x - p2.x) ** 2 + (p1.y - p2.y) ** 2);
+          }
+          const yMidSelf =
+            (this.relationSpots.top + this.relationSpots.bottom) / 2;
+          const xMidSelf =
+            (this.relationSpots.left + this.relationSpots.right) / 2;
+          const yMidTarget = (targetSpots.top + targetSpots.bottom) / 2;
+          const xMidTarget = (targetSpots.left + targetSpots.right) / 2;
+          targetSpots = {
+            left: { x: targetSpots.left, y: yMidTarget },
+            top: { x: xMidTarget, y: targetSpots.top },
+            right: { x: targetSpots.right, y: yMidTarget },
+            bottom: { x: xMidTarget, y: targetSpots.bottom },
+          };
+          let selfSpots = {
+            left: { x: this.relationSpots.left, y: yMidSelf },
+            top: { x: xMidSelf, y: this.relationSpots.top },
+            right: { x: this.relationSpots.right, y: yMidSelf },
+            bottom: { x: xMidSelf, y: this.relationSpots.bottom },
+          };
+          let minDistance;
+          let minDistanceKeys;
+
+          for (const targetKey in targetSpots) {
+            for (const selfKey in selfSpots) {
+              const distance = dist(targetSpots[targetKey], selfSpots[selfKey]);
+              if (minDistance === undefined || distance < minDistance) {
+                minDistance = distance;
+                minDistanceKeys = { target: targetKey, self: selfKey };
+              }
+            }
+          }
+          console.log(minDistance, minDistanceKeys);
+          // todo: .
+          this.showSpots[minDistanceKeys.self] = true;
+          res[relClaim.To] = [
+            selfSpots[minDistanceKeys.self].x,
+            selfSpots[minDistanceKeys.self].y,
+            targetSpots[minDistanceKeys.target].x,
+            targetSpots[minDistanceKeys.target].y,
+          ];
+        } else res[relClaim.To] = [0, 0, 0, 0];
+      }
+      this.relationWirePointsPart1 = Object.assign({}, res);*/
     },
 
     relationWirePoints() {
