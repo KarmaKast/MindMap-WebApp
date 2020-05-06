@@ -50,22 +50,24 @@
             ><icon-hamburger1
           /></icon-base>
         </button>
-        <div v-show="showMenu" id="menuItems" :style="this.menuItemsStyle">
-          <button-one
-            :validity="this.apiValidity"
-            :colors="colorsFinal"
-            :colorsProcessed="colorsProcessed"
-            :style="{ order: 0 }"
-          ></button-one>
-          <button-two
-            v-for="(button, index) in menuButtons"
-            :key="index + 1"
-            :colors="colorsFinal"
-            :colorsProcessed="colorsProcessed"
-            :buttonText="button['text']"
-            @takeAction="button['action'](...button['args'])"
-            :style="{ order: index }"
-          ></button-two>
+        <div v-if="menuLoaded">
+          <div v-show="showMenu" id="menuItems" :style="this.menuItemsStyle">
+            <button-one
+              :validity="this.apiValidity"
+              :colors="colorsFinal"
+              :colorsProcessed="colorsProcessed"
+              :style="{ order: 0 }"
+            ></button-one>
+            <button-two
+              v-for="(button, index) in menuButtons"
+              :key="index + 1"
+              :colors="colorsFinal"
+              :colorsProcessed="colorsProcessed"
+              :buttonText="button['text']"
+              @takeAction="button['action'](...button['args'])"
+              :style="{ order: index }"
+            ></button-two>
+          </div>
         </div>
       </div>
       <status-bar
@@ -142,6 +144,7 @@ export default {
   data: function () {
     return {
       debugMsg: "",
+      menuLoaded: false,
       showMenu: false,
       apiUrl: "",
       apiValidity: false,
@@ -416,6 +419,7 @@ export default {
         this.showMenu = false;
       } else {
         this.showMenu = true;
+        if (!this.menuLoaded) this.menuLoaded = true;
       }
     },
     createNewEntity(entityLocationDef_) {
