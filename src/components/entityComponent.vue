@@ -1,26 +1,37 @@
 <template>
   <div ref="entityContainer" :style="entityContainerStyleFinal">
-    <div v-if="true" class="relSpotsContainer">
+    <div
+      v-if="true"
+      class="relSpotsContainer"
+      :style="{ position: 'absolute' }"
+    >
       <div
-        v-show="showSpots.left"
+        v-if="showSpots.left"
         class="relSpotLeft relSpots"
         :style="relSelfSpotsLeftStyle"
       ></div>
       <div
-        v-show="showSpots.bottom"
+        v-if="showSpots.bottom"
         class="relSpotBottom relSpots"
         :style="relSelfSpotsBottomStyle"
       ></div>
       <div
-        v-show="showSpots.right"
+        v-if="showSpots.right"
         class="relSpotRight relSpots"
         :style="relSelfSpotsRightStyle"
       ></div>
       <div
-        v-show="showSpots.top"
+        v-if="showSpots.top"
         class="relSpotTop relSpots"
         :style="relSelfSpotsTopStyle"
       ></div>
+      <div class="targetSpots">
+        <div
+          v-for="(style, index) in relTargetSpotsStyles"
+          :key="index"
+          :style="style"
+        ></div>
+      </div>
     </div>
     <div class="relationWires" :style="relationWiresStyle">
       <v-stage
@@ -210,7 +221,7 @@ export default {
         position: "absolute",
         boxSizing: "border-box",
         display: "grid",
-        gridTemplateColumns: "100%",
+        //gridTemplateColumns: "100%",
         padding: "4px",
         outline: "none",
       },
@@ -233,7 +244,7 @@ export default {
         minWidth: `${this.entityLabel === "" ? this.minWidth : 0}px`,
         minHeight: `${this.entityLabel === "" ? this.minHeight : 0}px`,
         cursor: this.dragging.state ? "grabbing" : "grab",
-        zIndex: this.dragging.state ? "5000" : "unset",
+        zIndex: this.dragging.state ? "5000" : "initial",
         backgroundColor:
           this.editingLabel && this.entitySelectedFinal
             ? "white"
@@ -446,8 +457,8 @@ export default {
               }
             }
           }
-          if (this.entityLabel === "client-side")
-            console.log(minDistance, minDistanceKeys);
+          //if (this.entityLabel === "client-side")
+          //  console.log(minDistance, minDistanceKeys);
           // todo: .
           //this.showSpots[minDistanceKeys.self] = true;
           res[relClaim.To] = {
@@ -461,6 +472,52 @@ export default {
           };
         } else res[relClaim.To] = [0, 0, 0, 0];
       }
+      return res;
+    },
+    relTargetSpotsStylePart1: function () {
+      return {
+        position: "absolute",
+        height: this.relationSpotsOffset * 2 + "px",
+        width: this.relationSpotsOffset * 2 + "px",
+        border: `1px solid ${this.relWireColor}`,
+        borderRadius: "50%",
+        //backgroundColor: `${this.relWireColor}`,
+        boxSizing: "border-box",
+        //boxShadow: `hsla(0,0%,${this.colors["backgroundShade2"].l}%,0.5) 0px 0px 0px 4px inset, ${this.relWireColor} 0px 0px 0px 8px inset`,
+      };
+    },
+    relTargetSpotsStyles: function () {
+      const res = [];
+      Object.entries(this.relationWirePointsPart1).forEach(
+        ([entityID, value]) => {
+          //
+          res.push(
+            Object.assign({}, this.relTargetSpotsStylePart1, {
+              // todo: .
+              top: `${
+                value.points[3] -
+                value.points[1] +
+                (["left", "right"].includes(value.selfSpot)
+                  ? this.entityBoundingBoxSize.height / 2 -
+                    this.relationSpotsOffset
+                  : ["bottom"].includes(value.selfSpot)
+                  ? this.entityBoundingBoxSize.height
+                  : -this.relationSpotsOffset * 2)
+              }px`,
+              left: `${
+                value.points[2] -
+                value.points[0] +
+                (["top", "bottom"].includes(value.selfSpot)
+                  ? this.entityBoundingBoxSize.width / 2 -
+                    this.relationSpotsOffset
+                  : ["right"].includes(value.selfSpot)
+                  ? this.entityBoundingBoxSize.width
+                  : -this.relationSpotsOffset * 2)
+              }px`,
+            })
+          );
+        }
+      );
       return res;
     },
     showSpots() {
@@ -499,21 +556,6 @@ export default {
       );
       return res;
     },
-    /*relationWirePoints: function () {
-      //relationWireTargetPoints
-      const res = {};
-      Object.entries(this.relationWirePointsPart2).forEach(
-        ([entityID, relationWirePoints]) => {
-          res[entityID] = [
-            relationWirePoints[0] + this.canvasLocation.x,
-            relationWirePoints[1] + this.canvasLocation.y,
-            relationWirePoints[2] + this.canvasLocation.x,
-            relationWirePoints[3] + this.canvasLocation.y,
-          ];
-        }
-      );
-      return res;
-    },*/
     relationWirePointsPart3: function () {
       // doing: accounting for canvas location changes
       //relationWireTargetPoints
@@ -575,7 +617,11 @@ export default {
     },
     relSelfSpotsBottomStyle: function () {
       return Object.assign({}, this.relSelfSpotsStylePart1, {
-        bottom: -this.relationSpotsOffset - 2 + "px",
+        bottom:
+          -this.relationSpotsOffset -
+          2 -
+          this.entityBoundingBoxSize.height +
+          "px",
         left:
           (this.relationSpots.right - this.relationSpots.left) / 2 -
           this.relationSpotsOffset -
@@ -590,7 +636,11 @@ export default {
           this.relationSpotsOffset -
           2 +
           "px",
-        right: -this.relationSpotsOffset - 2 + "px",
+        right:
+          -this.relationSpotsOffset -
+          2 -
+          this.entityBoundingBoxSize.width +
+          "px",
       });
     },
     relSelfSpotsTopStyle: function () {
