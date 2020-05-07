@@ -13,18 +13,22 @@ let win;
 
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([
-  { scheme: "app", privileges: { secure: true, standard: true } },
+  {
+    scheme: "app",
+    privileges: { secure: true, standard: true, allowServiceWorkers: false },
+  },
 ]);
 
 function createWindow() {
   // Create the browser window.
   win = new BrowserWindow({
-    width: 800,
-    height: 600,
+    show: false,
     webPreferences: {
       nodeIntegration: true,
     },
   });
+  win.maximize();
+  win.show();
 
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode

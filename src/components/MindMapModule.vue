@@ -155,7 +155,7 @@ export default {
       grid: {
         size: 25,
         opacity: 0.3,
-        width: 2,
+        width: 1,
         show: true,
         snap: true,
       },
