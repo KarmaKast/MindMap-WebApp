@@ -39,7 +39,6 @@
         :canvasLocation="canvasLocation"
         :canvasMousePos="value.canvasMousePos"
         @setStartingCanvasMousePos="setStartingCanvasMousePos"
-        :defaultColors="colors"
         :dragging="value.dragging"
         :pressed="value.pressed"
         :entitySelected="value.entitySelected"
