@@ -5,7 +5,11 @@ import Vue2TouchEvents from "vue2-touch-events";
 
 import App from "./App.vue";
 import store from "./store";
-import "./registerServiceWorker";
+import { customRegistor } from "./registerServiceWorker";
+
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", customRegistor);
+}
 
 Vue.config.productionTip = false;
 Vue.prototype.$axios = axios;
