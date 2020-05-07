@@ -166,11 +166,16 @@ export default {
         this.colors["theme_light"].s
       }%, ${this.colors["theme_light"].l}%, ${this.grid.opacity / 1.4})`;
       let size_ = this.grid.size * 2;
-
+      const part = `transparent, ${processedColor} 0px, ${processedColor} ${
+        this.grid.width / 2
+      }px, transparent ${this.grid.width / 2}px, transparent ${
+        size_ - this.grid.width / 2
+      }px, ${processedColor} ${
+        size_ - this.grid.width / 2
+      }px, ${processedColor}  ${size_}px `;
       return {
         position: "absolute",
-
-        backgroundImage: `repeating-linear-gradient(transparent, ${processedColor} ${this.grid.width}px, transparent ${this.grid.width}px, transparent ${size_}px), repeating-linear-gradient(90deg, transparent, ${processedColor} ${this.grid.width}px, transparent ${this.grid.width}px, transparent ${size_}px)`,
+        backgroundImage: `repeating-linear-gradient( ${part} ), repeating-linear-gradient(90deg, ${part} )`,
         pointerEvents: "none",
       };
     },
@@ -209,9 +214,11 @@ export default {
         top: "0px",
         backgroundImage: `linear-gradient(to right, transparent calc(50% - ${
           this.grid.width / 2
-        }px), hsla(183, 91%, 50%, ${
-          this.grid.opacity * 2
-        }) , transparent calc(50% + ${this.grid.width / 2}px))`,
+        }px), hsla(183, 91%, 50%,${this.grid.opacity * 2}) calc(50% - ${
+          this.grid.width / 2
+        }px), hsla(183, 91%, 50%, ${this.grid.opacity * 2}) calc(50% + ${
+          this.grid.width / 2
+        }px) , transparent calc(50% + ${this.grid.width / 2}px))`,
         pointerEvents: "none",
       };
     },
@@ -235,9 +242,11 @@ export default {
         left: "0px",
         backgroundImage: `linear-gradient(to bottom, transparent calc(50% - ${
           this.grid.width / 2
-        }px), hsla(19, 100%, 50%, ${
-          this.grid.opacity * 2
-        }), transparent calc(50% + ${this.grid.width / 2}px))`,
+        }px), hsla(19, 100%, 50%,${this.grid.opacity * 2}) calc(50% - ${
+          this.grid.width / 2
+        }px), hsla(19, 100%, 50%, ${this.grid.opacity * 2}) calc(50% + ${
+          this.grid.width / 2
+        }px) , transparent calc(50% + ${this.grid.width / 2}px))`,
         pointerEvents: "none",
       };
     },

@@ -154,7 +154,7 @@ export default {
       showAboutPage: false,
       grid: {
         size: 25,
-        opacity: 0.3,
+        opacity: 0.2,
         width: 2,
         show: true,
         snap: true,
