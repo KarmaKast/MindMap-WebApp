@@ -1,5 +1,6 @@
 {
   "name": "map-thy-mind",
+  "description": "A fresh take on mindmap. Currently in early development.",
   "version": "0.6.6",
   "private": true,
   "author": {
@@ -28,6 +29,7 @@
     "core-js": "^3.6.5",
     "konva": "^6.0.0",
     "lodash": "^4.17.15",
+    "prerender-spa-plugin": "^3.4.0",
     "register-service-worker": "^1.7.1",
     "uuid": "^7.0.3",
     "vue": "^2.6.10",

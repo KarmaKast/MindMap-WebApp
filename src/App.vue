@@ -21,11 +21,28 @@ import MindMapModule from "./components/MindMapModule.vue";
 export default {
   name: "app",
   metaInfo: {
+    title: process.env.VUE_APP_NAME + " Prototype",
     meta: [
       {
         name: "description",
         content: "A fresh take on mindmap. Currently in early development.",
       },
+      {
+        property: "og:description",
+        content: "A fresh take on mindmap. Currently in early development.",
+      },
+      {
+        property: "og:title",
+        content: process.env.VUE_APP_NAME + " Prototype",
+      },
+      {
+        property: "og:url",
+        content: "https://karmakast.github.io/MindMap-WebApp/",
+        //content: `${process.env.BASE_URL}`,
+      },
+    ],
+    link: [
+      { rel: "canonical", href: "https://karmakast.github.io/MindMap-WebApp/" },
     ],
   },
   components: {
