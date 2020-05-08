@@ -66,9 +66,12 @@ export default {
   computed: {
     containerStyle: function () {
       return {
+        position: "absolute",
         height: "100%",
         width: "100%",
-        background: "hsla(0, 0%, 0%, 0.19)",
+        background: CSS.supports("backdrop-filter: blur(3px)")
+          ? `hsla(0, 0%, ${this.colors["background"].l}%, 0.19)`
+          : `hsla(0, 0%,  ${this.colors["background"].l}%, 1)`,
         backdropFilter: "blur(6px)",
         display: "grid",
         placeItems: "center",
@@ -78,7 +81,7 @@ export default {
     },
     aboutSectionStyle: function () {
       return {
-        background: "rgba(255, 255, 255, 0.5)",
+        background: `${this.colorsProcessed["background"]}`,
         borderRadius: "28px",
         padding: "15px",
         height: "fit-content",
@@ -121,6 +124,7 @@ export default {
         padding: "20px 20px",
         margin: "0px",
         textAlign: "left",
+        color: `${this.colorsProcessed["text"]}`,
       };
     },
   },
