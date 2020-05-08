@@ -245,22 +245,22 @@ export default {
         minHeight: `${this.entityLabel === "" ? this.minHeight : 0}px`,
         cursor: this.dragging.state ? "grabbing" : "grab",
         zIndex: this.dragging.state ? "5000" : "initial",
-        backgroundColor:
+        /*backgroundColor:
           this.editingLabel && this.entitySelectedFinal
             ? "white"
-            : "hsla(0,0%,0%,0.01)",
+            : "hsla(0,0%,0%,0.01)",*/
         /*border: `1px dotted hsla(${this.entityColor.h},${this.entityColor.s}%,${this.entityColor.l}%, 0.2)`,*/
         borderRadius:
           this.entitySize["height"] > this.entitySize["width"]
             ? `${this.entitySize["height"]}px`
             : `${this.entitySize["width"]}px`,
-        /*boxShadow: `${
-          this.dragging.state
-            ? "rgba(0, 0, 0, 0.2) 0px 0px 13px 4px"
-            : "rgba(0, 0, 0, 0.05) 0px 0px 3px 2px"
-        }, inset 0px 0px 0 4px hsla(${this.entityColor.h},
+        boxShadow: `${
+          this.dragging.state || this.entitySelectedFinal
+            ? `hsla(${this.entityColor.h},0%,${this.colors["backgroundShade1"].l}%,0.2) 0px 0px 0px 4px, `
+            : ""
+        } inset 0px 0px 0 4px hsla(${this.entityColor.h},
         ${this.entityColor.s}%,
-        ${this.entityColor.l}%, 0.2)`,*/
+        ${this.colors["backgroundShade1"].l}%, 0.2)`,
       };
     },
     entityContainerStylePart2: function () {
@@ -298,7 +298,11 @@ export default {
         border: `1px solid hsla(${this.entityColor.h},${this.entityColor.s}%, ${this.entityColor.l}%, 0.8)`,
         backdropFilter: "blur(2px)",
         backgroundColor: CSS.supports("backdrop-filter: blur(3px)")
-          ? `hsla(0,0%,${this.colors["background"].l + 5}%,0.2)`
+          ? this.editingLabel && this.entitySelectedFinal
+            ? `white`
+            : `hsla(0,0%,${this.colors["background"].l + 5}%,0.2)`
+          : this.editingLabel && this.entitySelectedFinal
+          ? `white`
           : `hsla(0,0%,${this.colors["background"].l + 5}%,1)`,
         pointerEvents: "all",
         display: "grid",
@@ -921,6 +925,7 @@ export default {
               // currently only starting and endling points are used. for bezier to work some points in the middle maybe needed
               //tension: 5,
               //bezier: true,
+              draggable: false,
               closed: false,
             })
           );
