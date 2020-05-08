@@ -5,7 +5,8 @@
     :height="height"
     viewBox="0 0 18 18"
     :aria-labelledby="iconName"
-    role="presentation"
+    :role="role"
+    v-bind="aria"
   >
     <title :id="iconName" lang="en">{{ iconName }}</title>
     <g :fill="iconColor">
@@ -32,6 +33,13 @@ export default {
     iconColor: {
       type: String,
       default: "currentColor",
+    },
+    role: {
+      type: String,
+      default: "presentation",
+    },
+    aria: {
+      type: Object,
     },
   },
 };

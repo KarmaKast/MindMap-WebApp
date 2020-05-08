@@ -20,6 +20,14 @@ import MindMapModule from "./components/MindMapModule.vue";
 
 export default {
   name: "app",
+  metaInfo: {
+    meta: [
+      {
+        name: "description",
+        content: "A fresh take on mindmap. Currently in early development.",
+      },
+    ],
+  },
   components: {
     MindMapModule,
   },

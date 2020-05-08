@@ -1,6 +1,6 @@
 {
   "name": "map-thy-mind",
-  "version": "0.6.5",
+  "version": "0.6.6",
   "private": true,
   "author": {
     "name": "Sree Chandan",
@@ -26,12 +26,13 @@
     "axios": "^0.19.2",
     "color-convert": "^2.0.1",
     "core-js": "^3.6.5",
-    "konva": "^4.x",
+    "konva": "^6.0.0",
     "lodash": "^4.17.15",
     "register-service-worker": "^1.7.1",
     "uuid": "^7.0.3",
     "vue": "^2.6.10",
-    "vue-konva": "^2.1.1",
+    "vue-konva": "^2.1.2",
+    "vue-meta": "^2.3.3",
     "vue2-touch-events": "^2.2.1",
     "vuex": "^3.3.0"
   },
