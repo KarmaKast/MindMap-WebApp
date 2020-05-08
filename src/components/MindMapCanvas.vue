@@ -6,8 +6,9 @@
     @mousemove="getMousePos"
     v-touch:moving="getMousePos"
     v-touch:end.prevent="deactivateAllEntities"
-    v-touch:start.self="setCanvasDragging"
-    v-touch:end.self="setCanvasDragging"
+    v-touch:start.self="startCanvasDragging"
+    v-touch:end.self="endCanvasDragging"
+    @mouseleave="endCanvasDragging"
     v-touch:tap.self="handleCanvasTap"
   >
     <div
@@ -404,7 +405,7 @@ export default {
         }
       }
     },
-    setCanvasDragging(event) {
+    startCanvasDragging(event) {
       //event.preventDefault();
       /*
       if (event.type is touch or a middle mouse bttn) but not if (this.canvas.dragging.state is false and event.type is touchend or mouseup)
@@ -413,61 +414,64 @@ export default {
       event.which === 2 is for middle click
        */
       if (
-        ((event.which === 2 && event.type.startsWith("mouse")) ||
+        ((event.type.startsWith("mouse") && event.which === 2) ||
           ["touchend", "touchstart"].includes(event.type)) &&
         !(
           this.canvas.dragging.state === false &&
           ["mouseup", "touchend"].includes(event.type)
         )
       ) {
-        //console.log("drag event : ", event);
-        //console.log("from setcanvas.dragging func");
-        //console.log(event);
-        //event.preventDefault();
-        // todo: this toggling mechanism causes problems if mouse moves out of canvas container
-        if (this.canvas.dragging.state) {
-          // doing: stop drag
-          this.canvas.dragging.state = false;
-          this.canvas.dragging.deltas = { x: 0, y: 0 };
-          this.canvas.dragging.event = undefined;
-          // todo: reset dragging deltas (not necessary)
-          this.canvas.dragging.deltas = { x: 0, y: 0 };
-        } else {
-          // doing: start drag
+        // doing: start drag
 
-          this.updateCanvasContainerBoxLoc();
+        this.updateCanvasContainerBoxLoc();
 
-          let clientPos = { x: 0, y: 0 };
-          if (event.type === "mousedown") {
-            this.canvas.dragging.state = true;
-            this.canvas.dragging.event = event;
+        let clientPos = { x: 0, y: 0 };
+        if (event.type === "mousedown") {
+          this.canvas.dragging.state = true;
+          this.canvas.dragging.event = event;
 
-            clientPos.x = event.clientX;
-            clientPos.y = event.clientY;
-          } else if (event.type.startsWith("touch")) {
-            // todo: check for double tap
+          clientPos.x = event.clientX;
+          clientPos.y = event.clientY;
+        } else if (event.type.startsWith("touch")) {
+          // todo: check for double tap
 
-            this.canvas.dragging.state = true;
-            this.canvas.dragging.event = event;
-            //console.log(event);
-            clientPos.x = event.changedTouches[0].clientX;
-            clientPos.y = event.changedTouches[0].clientY;
-          }
-
-          // todo: set dragging deltas
-          if (this.canvas.dragging.state) {
-            this.canvas.dragging.deltas.x =
-              clientPos.x -
-              this.canvasSize.width / 2 -
-              this.canvasLocation.x -
-              this.canvasContainerBoxLoc.x;
-            this.canvas.dragging.deltas.y =
-              clientPos.y -
-              this.canvasSize.height / 2 -
-              this.canvasLocation.y -
-              this.canvasContainerBoxLoc.y;
-          }
+          this.canvas.dragging.state = true;
+          this.canvas.dragging.event = event;
+          //console.log(event);
+          clientPos.x = event.changedTouches[0].clientX;
+          clientPos.y = event.changedTouches[0].clientY;
         }
+
+        // todo: set dragging deltas
+        if (this.canvas.dragging.state) {
+          this.canvas.dragging.deltas.x =
+            clientPos.x -
+            this.canvasSize.width / 2 -
+            this.canvasLocation.x -
+            this.canvasContainerBoxLoc.x;
+          this.canvas.dragging.deltas.y =
+            clientPos.y -
+            this.canvasSize.height / 2 -
+            this.canvasLocation.y -
+            this.canvasContainerBoxLoc.y;
+        }
+      }
+    },
+    endCanvasDragging(event) {
+      if (
+        ((event.type.startsWith("mouse") && event.which === 2) ||
+          ["touchend", "touchstart"].includes(event.type)) &&
+        !(
+          this.canvas.dragging.state === false &&
+          ["mouseup", "touchend"].includes(event.type)
+        )
+      ) {
+        // doing: stop drag
+        this.canvas.dragging.state = false;
+        this.canvas.dragging.deltas = { x: 0, y: 0 };
+        this.canvas.dragging.event = undefined;
+        // todo: reset dragging deltas (not necessary)
+        this.canvas.dragging.deltas = { x: 0, y: 0 };
       }
     },
     handleCanvasTap(event) {
