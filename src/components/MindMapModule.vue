@@ -168,7 +168,7 @@ export default {
           theme_light: { h: 0, s: 100, l: 75, a: 0.6 },
         },
         theme_dark: {
-          background: { h: 0, s: 0, l: 15, a: 1 },
+          background: { h: 0, s: 0, l: 10, a: 1 },
           backgroundShade1: { h: 0, s: 0, l: 40, a: 1 },
           backgroundShade2: { h: 0, s: 0, l: 5, a: 1 },
           theme: { h: 151, s: 70, l: 50, a: 1 },
