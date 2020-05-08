@@ -112,7 +112,7 @@ export default {
           CSS.supports("backdrop-filter: blur(3px)") ? 0.5 : 0.8
         })`,
         backdropFilter: "blur(3px)",
-        backgroundImage: `repeating-linear-gradient(45deg,rgba(255, 255, 255, 0), hsla(${this.colors["theme_light"].h},${this.colors["theme_light"].s}%,${this.colors["theme_light"].l}%,0.4) 1px, rgba(255, 255, 255, 0) 1px, rgba(255, 255, 255, 0) 6px), repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0), hsla(${this.colors["theme_light"].h},${this.colors["theme_light"].s}%,${this.colors["theme_light"].l}%,0.4) 1px, rgba(255, 255, 255, 0) 1px, rgba(255, 255, 255, 0) 6px)`,
+        backgroundImage: `repeating-linear-gradient(45deg,rgba(255, 255, 255, 0), hsla(${this.colors["theme_light"].h},${this.colors["theme_light"].s}%,${this.colors["theme_light"].l}%,0.5) 1px, rgba(255, 255, 255, 0) 1px, rgba(255, 255, 255, 0) 6px), repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0), hsla(${this.colors["theme_light"].h},${this.colors["theme_light"].s}%,${this.colors["theme_light"].l}%,0.5) 1px, rgba(255, 255, 255, 0) 1px, rgba(255, 255, 255, 0) 6px)`,
       };
     },
     lightDarkToggleContainerStyle: function () {

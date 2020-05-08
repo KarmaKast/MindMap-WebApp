@@ -5,28 +5,31 @@
       class="relSpotsContainer"
       :style="{ position: 'absolute' }"
     >
-      <div
-        v-if="showSpots.left"
-        class="relSpotLeft relSpots"
-        :style="relSelfSpotsLeftStyle"
-      ></div>
-      <div
-        v-if="showSpots.bottom"
-        class="relSpotBottom relSpots"
-        :style="relSelfSpotsBottomStyle"
-      ></div>
-      <div
-        v-if="showSpots.right"
-        class="relSpotRight relSpots"
-        :style="relSelfSpotsRightStyle"
-      ></div>
-      <div
-        v-if="showSpots.top"
-        class="relSpotTop relSpots"
-        :style="relSelfSpotsTopStyle"
-      ></div>
+      <div class="selfSpots">
+        <div
+          v-if="showSpots.left"
+          class="relSpotLeft selfSpot"
+          :style="relSelfSpotsLeftStyle"
+        ></div>
+        <div
+          v-if="showSpots.bottom"
+          class="relSpotBottom selfSpot"
+          :style="relSelfSpotsBottomStyle"
+        ></div>
+        <div
+          v-if="showSpots.right"
+          class="relSpotRight selfSpot"
+          :style="relSelfSpotsRightStyle"
+        ></div>
+        <div
+          v-if="showSpots.top"
+          class="relSpotTop selfSpot"
+          :style="relSelfSpotsTopStyle"
+        ></div>
+      </div>
       <div class="targetSpots">
         <div
+          class="targetSpot"
           v-for="(style, index) in relTargetSpotsStyles"
           :key="index"
           :style="style"
@@ -41,15 +44,21 @@
         }"
       >
         <v-layer>
-          <v-group>
-            <v-line
-              v-for="(relClaim, index) in entityData.source.RelationClaims"
-              :key="index"
-              :config="relationLineConfigs[relClaim.To]"
-            ></v-line>
+          <v-group
+            v-for="(relClaim, index) in entityData.source.RelationClaims"
+            :key="index"
+          >
+            <v-line :config="relationLineConfigs[relClaim.To]"></v-line>
           </v-group>
         </v-layer>
       </v-stage>
+      <div class="relationLabelsContainer">
+        <div
+          class="relationLabel"
+          v-for="(relClaim, index) in entityData.source.RelationClaims"
+          :key="index"
+        ></div>
+      </div>
     </div>
     <div
       v-show="entitySelectedFinal"
@@ -828,69 +837,6 @@ export default {
     relationSpots() {
       //console.log("I should not be seen when dragging canvas");
       this.$emit("setSelfRelSpots", this.relationSpots);
-
-      // todo: this is a object of objects. refactor this with a data object and watchers
-      /*let res = {};
-      let offsetsStatic = {
-        x: {
-          left: -1,
-          top: 0,
-          right: 1,
-          bottom: 0,
-        },
-        y: { left: 0, top: 1, right: 0, bottom: -1 },
-      };
-      for (const relClaim of this.entityData.source.RelationClaims) {
-        let targetSpots = this.targetRelSpots
-          ? this.targetRelSpots[relClaim.To]
-          : undefined;
-        if (targetSpots) {
-          // todo: find closest set of points between this entity and target entity
-          function dist(p1, p2) {
-            return Math.sqrt((p1.x - p2.x) ** 2 + (p1.y - p2.y) ** 2);
-          }
-          const yMidSelf =
-            (this.relationSpots.top + this.relationSpots.bottom) / 2;
-          const xMidSelf =
-            (this.relationSpots.left + this.relationSpots.right) / 2;
-          const yMidTarget = (targetSpots.top + targetSpots.bottom) / 2;
-          const xMidTarget = (targetSpots.left + targetSpots.right) / 2;
-          targetSpots = {
-            left: { x: targetSpots.left, y: yMidTarget },
-            top: { x: xMidTarget, y: targetSpots.top },
-            right: { x: targetSpots.right, y: yMidTarget },
-            bottom: { x: xMidTarget, y: targetSpots.bottom },
-          };
-          let selfSpots = {
-            left: { x: this.relationSpots.left, y: yMidSelf },
-            top: { x: xMidSelf, y: this.relationSpots.top },
-            right: { x: this.relationSpots.right, y: yMidSelf },
-            bottom: { x: xMidSelf, y: this.relationSpots.bottom },
-          };
-          let minDistance;
-          let minDistanceKeys;
-
-          for (const targetKey in targetSpots) {
-            for (const selfKey in selfSpots) {
-              const distance = dist(targetSpots[targetKey], selfSpots[selfKey]);
-              if (minDistance === undefined || distance < minDistance) {
-                minDistance = distance;
-                minDistanceKeys = { target: targetKey, self: selfKey };
-              }
-            }
-          }
-          console.log(minDistance, minDistanceKeys);
-          // todo: .
-          this.showSpots[minDistanceKeys.self] = true;
-          res[relClaim.To] = [
-            selfSpots[minDistanceKeys.self].x,
-            selfSpots[minDistanceKeys.self].y,
-            targetSpots[minDistanceKeys.target].x,
-            targetSpots[minDistanceKeys.target].y,
-          ];
-        } else res[relClaim.To] = [0, 0, 0, 0];
-      }
-      this.relationWirePointsPart1 = Object.assign({}, res);*/
     },
 
     relationWirePoints() {
@@ -1032,6 +978,8 @@ export default {
     "entityData.source"() {
       if (this.entityData.source.Label)
         this.entityLabel = this.entityData.source.Label;
+      // todo: watch relation claims. check if the canvas has the relation already.
+      // if not emit to canvas so it can add it to know relations
     },
     entityLabel() {
       // doing: updating node's bounding box width and height
@@ -1119,7 +1067,7 @@ export default {
 </script>
 
 <style scoped>
-.relSpots {
+.selfSpot {
   border-radius: 50%;
   position: absolute;
 }

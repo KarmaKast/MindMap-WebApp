@@ -158,6 +158,7 @@ export default {
         left: "0px",
         overflow: "hidden",
         backgroundColor: "inherit",
+        cursor: this.canvas.dragging.state ? "grabbing" : "crosshair",
       };
     },
     gridStylePart1: function () {
