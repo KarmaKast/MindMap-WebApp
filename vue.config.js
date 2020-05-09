@@ -9,6 +9,12 @@ const Renderer = PrerenderSPAPlugin.PuppeteerRenderer;
 const productionPlugins = [
   new PrerenderSPAPlugin({
     staticDir: path.join(__dirname, "prerender"),
+    indexPath: path.join(
+      __dirname,
+      "prerender",
+      "MindMap-WebApp",
+      "index.html"
+    ),
     outputDir: path.join(__dirname, "dist"),
     routes: ["/"],
     //routes: [process.env.NODE_ENV === "production" ? "/" : "/"],
@@ -31,9 +37,11 @@ const productionPlugins = [
 //console.log(process.env);
 
 module.exports = {
-  publicPath:
-    process.env.BUILD_MODE === "deployment" ? "/MindMap-WebApp/" : "/",
-  outputDir: process.env.BUILD_MODE === "prerender" ? "./prerender" : "./dist",
+  publicPath: process.env.NODE_ENV === "production" ? "/MindMap-WebApp/" : "/",
+  outputDir:
+    process.env.BUILD_MODE === "prerender"
+      ? "./prerender/MindMap-WebApp/"
+      : "./dist",
   //publicPath: process.env.NODE_ENV === "production" ? "/" : "/",
   configureWebpack: {
     devtool: process.env.NODE_ENV === "development" ? "source-map" : false,
