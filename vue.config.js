@@ -8,8 +8,10 @@ const Renderer = PrerenderSPAPlugin.PuppeteerRenderer;
 
 const productionPlugins = [
   new PrerenderSPAPlugin({
-    staticDir: path.join(__dirname, "dist"),
+    staticDir: path.join(__dirname, "prerender"),
+    outputDir: path.join(__dirname, "dist"),
     routes: ["/"],
+    //routes: [process.env.NODE_ENV === "production" ? "/" : "/"],
     renderer: new Renderer({
       // We need to inject a value so we're able to
       // detect if the page is currently pre-rendered.
@@ -17,27 +19,25 @@ const productionPlugins = [
       inject: {
         prerendered: true,
       },
-      postProcess(renderedRoute) {
-        // Ignore any redirects.
-        renderedRoute.route = renderedRoute.originalRoute;
-
-        return renderedRoute;
-      },
-      // Our view component is rendered after the API
-      // request has fetched all the necessary data,
-      // so we create a snapshot of the page after the
-      // `data-view` attribute exists in the DOM.
-      renderAfterElementExists: "#app",
-      //renderAfterDocumentEvent: "app.rendered",
+      //renderAfterElementExists: ".MindMapModule",
+      renderAfterDocumentEvent: "app-rendered",
+      //renderAfterTime: 5000,
+      headless: false,
     }),
   }),
 ];
 
+console.log(process.env.NODE_ENV);
+console.log(process.env);
+
 module.exports = {
-  publicPath: process.env.NODE_ENV === "production" ? "/MindMap-WebApp/" : "/",
+  publicPath:
+    process.env.BUILD_MODE === "deployment" ? "/MindMap-WebApp/" : "/",
+  outputDir: process.env.BUILD_MODE === "prerender" ? "./prerender" : "./dist",
+  //publicPath: process.env.NODE_ENV === "production" ? "/" : "/",
   configureWebpack: {
     devtool: process.env.NODE_ENV === "development" ? "source-map" : false,
-    plugins: process.env.NODE_ENV === "production" ? productionPlugins : [],
+    plugins: process.env.BUILD_MODE === "prerender" ? productionPlugins : [],
   },
   pwa: {
     display: "fullscreen",

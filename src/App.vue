@@ -87,6 +87,11 @@ export default {
   created: function () {
     window.addEventListener("resize", this.handleResize);
   },
+  mounted() {
+    setTimeout(() => {
+      document.dispatchEvent(new Event("app-rendered"));
+    }, 500);
+  },
   destroyed: function () {
     window.removeEventListener("resize", this.handleResize);
   },
