@@ -22,13 +22,13 @@ const productionPlugins = [
       //renderAfterElementExists: ".MindMapModule",
       renderAfterDocumentEvent: "app-rendered",
       //renderAfterTime: 5000,
-      headless: false,
+      headless: true,
     }),
   }),
 ];
 
-console.log(process.env.NODE_ENV);
-console.log(process.env);
+//console.log(process.env.NODE_ENV);
+//console.log(process.env);
 
 module.exports = {
   publicPath:
