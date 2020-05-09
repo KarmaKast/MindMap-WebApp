@@ -1,10 +1,10 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "c57d04459388d4e2d9a1",
+    "revision": "8bf4a1985b07dad1deb3",
     "url": "/MindMap-WebApp/css/app.07202247.css"
   },
   {
-    "revision": "c468a873761f090d28fc",
+    "revision": "ebbcd26b7ff014f4ba71",
     "url": "/MindMap-WebApp/css/chunk-ceaed5fa.94f90042.css"
   },
   {
@@ -12,32 +12,32 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/MindMap-WebApp/img/ic_chevron_left_48px.5bbac221.svg"
   },
   {
-    "revision": "88648420fa9e85d23068551bab7e96cb",
+    "revision": "2e8fdd660f99d0ecb91b0e45ae92a952",
     "url": "/MindMap-WebApp/index.html"
   },
   {
-    "revision": "c57d04459388d4e2d9a1",
-    "url": "/MindMap-WebApp/js/app.0278469f.js"
+    "revision": "8bf4a1985b07dad1deb3",
+    "url": "/MindMap-WebApp/js/app.3e29f8f2.js"
   },
   {
-    "revision": "6ce9b3c13eda29d4c18e",
-    "url": "/MindMap-WebApp/js/chunk-2d0c1612.56d850ce.js"
+    "revision": "3534fed388c9a2bdaca3",
+    "url": "/MindMap-WebApp/js/chunk-2d0c1612.d2c4c8aa.js"
   },
   {
-    "revision": "ed2f3d23c9a7467ad81c",
-    "url": "/MindMap-WebApp/js/chunk-2d0db2d4.ab04ac05.js"
+    "revision": "5ca5d3d1c464e2b27f3d",
+    "url": "/MindMap-WebApp/js/chunk-2d0db2d4.b8f99cd7.js"
   },
   {
-    "revision": "99cb9cea2ee45182b316",
-    "url": "/MindMap-WebApp/js/chunk-3fc4564a.ae044ff3.js"
+    "revision": "42556d810720abdfafbc",
+    "url": "/MindMap-WebApp/js/chunk-3fc4564a.2a6e76ee.js"
   },
   {
-    "revision": "912c4010660afe42cbbd",
-    "url": "/MindMap-WebApp/js/chunk-8e4d1506.aafec27a.js"
+    "revision": "34e14c2f5dfd514231db",
+    "url": "/MindMap-WebApp/js/chunk-8e4d1506.2b62a017.js"
   },
   {
-    "revision": "c468a873761f090d28fc",
-    "url": "/MindMap-WebApp/js/chunk-ceaed5fa.53b4c728.js"
+    "revision": "ebbcd26b7ff014f4ba71",
+    "url": "/MindMap-WebApp/js/chunk-ceaed5fa.5cde05b4.js"
   },
   {
     "revision": "b1c285ce50ba856cfcea",
