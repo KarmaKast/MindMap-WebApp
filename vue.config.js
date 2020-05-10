@@ -6,6 +6,8 @@ const path = require("path");
 const PrerenderSPAPlugin = require("prerender-spa-plugin");
 const Renderer = PrerenderSPAPlugin.PuppeteerRenderer;
 
+const CopyPlugin = require("copy-webpack-plugin");
+
 const productionPlugins = [
   new PrerenderSPAPlugin({
     staticDir: path.join(__dirname, "prerender"),
@@ -15,7 +17,7 @@ const productionPlugins = [
       "MindMap-WebApp",
       "index.html"
     ),
-    outputDir: path.join(__dirname, "dist"),
+    outputDir: path.join(__dirname, "prerender/MindMap-WebApp"),
     routes: ["/"],
     //routes: [process.env.NODE_ENV === "production" ? "/" : "/"],
     renderer: new Renderer({
@@ -31,13 +33,26 @@ const productionPlugins = [
       headless: true,
     }),
   }),
+  new CopyPlugin(
+    [
+      {
+        from: path.join(__dirname, "prerender", "MindMap-WebApp"),
+        to: path.join(__dirname, "dist"),
+        toType: "dir",
+      },
+    ],
+    {}
+  ),
 ];
 
+console.log(__dirname);
 //console.log(process.env.NODE_ENV);
 //console.log(process.env);
+//console.log(process.env.BASE_URL);
 
 module.exports = {
   publicPath: process.env.NODE_ENV === "production" ? "/MindMap-WebApp/" : "/",
+  //outputDir: process.env.BUILD_MODE === "prerender" ? "./dist" : "./dist",
   outputDir:
     process.env.BUILD_MODE === "prerender"
       ? "./prerender/MindMap-WebApp/"
