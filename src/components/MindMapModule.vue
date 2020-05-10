@@ -14,12 +14,6 @@
     ></mind-map-canvas>
 
     <div
-      class="debug"
-      v-html="this.debugMsg"
-      style="display: block; position: relative; bottom: 0px; margin: 0px auto;"
-    ></div>
-
-    <div
       id="UI"
       :style="{
         position: 'absolute',
@@ -147,7 +141,6 @@ export default {
   },
   data: function () {
     return {
-      debugMsg: "",
       menuLoaded: false,
       showMenu: false,
       apiUrl: "",
@@ -369,8 +362,8 @@ export default {
     getCollection() {
       let url_ = this.apiUrl;
       this.entities = [];
-      // todo: get a list of nodeIDs and create a list of nodes in the canvas
-      console.log(`getting list of nodes\n${url_}`);
+      // todo: get a list of entityIDs and create a list of entitys in the canvas
+      console.log(`getting list of entitys\n${url_}`);
       axios
         .get(url_ + "/collection/get")
         .then((response) => {
@@ -394,8 +387,8 @@ export default {
     },
     createCollection() {
       let url_ = this.apiUrl;
-      // todo: get a list of nodeIDs and create a list of nodes in the canvas
-      console.log(`getting list of nodes\n${url_}`);
+      // todo: get a list of entityIDs and create a list of entitys in the canvas
+      console.log(`getting list of entitys\n${url_}`);
       axios({
         method: "POST",
         url: url_ + "/collection/create",
@@ -413,12 +406,12 @@ export default {
     },
     clearCollection() {
       let url_ = this.apiUrl;
-      this.$axios.post(url_ + "/collection/clear");
+      axios.post(url_ + "/collection/clear");
       this.getCollection();
     },
     saveCollection() {
       let url_ = this.apiUrl;
-      this.$axios.post(url_ + "/collection/save");
+      axios.post(url_ + "/collection/save");
     },
     toggleMenu() {
       if (this.showMenu) {
@@ -432,7 +425,9 @@ export default {
       if (!this.apiValidity) {
         alert("Connect to API");
       } else if (!this.entities.length >= this.entityLimit) {
-        alert(`Sorry! Max nodes are limited to : ${this.entityLimit} for now.`);
+        alert(
+          `Sorry! Max entitys are limited to : ${this.entityLimit} for now.`
+        );
       } else {
         axios({
           method: "POST",
@@ -451,7 +446,7 @@ export default {
           .then((response) => {
             //console.log("getting response");
             console.log(response);
-            //this.node_ID = response.data.entityID;
+            //this.entity_ID = response.data.entityID;
             this.entities.push({
               ID: response.data.entityID,
               entityLocationDef: entityLocationDef_,

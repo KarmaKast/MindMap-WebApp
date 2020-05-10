@@ -38,10 +38,10 @@
         <br />
         - setup
         <a
-          href="https://github.com/KarmaKast/nodeAPI/"
+          href="https://github.com/KarmaKast/entityAPI/"
           :style="{ pointerEvents: 'initial' }"
           target="_blank"
-          >nodeAPI</a
+          >entityAPI</a
         >
         (runs at localhost:3000)
       </p>

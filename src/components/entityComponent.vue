@@ -52,13 +52,13 @@
           </v-group>
         </v-layer>
       </v-stage>
-      <div class="relationLabelsContainer">
-        <div
-          class="relationLabel"
-          v-for="(relClaim, index) in entityData.source.RelationClaims"
-          :key="index"
-        ></div>
-      </div>
+    </div>
+    <div class="relationLabelsContainer">
+      <div
+        class="relationLabel"
+        v-for="(relClaim, index) in entityData.source.RelationClaims"
+        :key="index"
+      ></div>
     </div>
     <div
       v-show="entitySelectedFinal"
@@ -252,8 +252,8 @@ export default {
       return {
         minWidth: `${this.entityLabel === "" ? this.minWidth : 0}px`,
         minHeight: `${this.entityLabel === "" ? this.minHeight : 0}px`,
-        cursor: this.dragging.state ? "grabbing" : "grab",
-        zIndex: this.dragging.state ? "5000" : "initial",
+        zIndex:
+          this.dragging.state || this.entitySelectedFinal ? "5000" : "initial",
         /*backgroundColor:
           this.editingLabel && this.entitySelectedFinal
             ? "white"
@@ -306,6 +306,7 @@ export default {
         borderRadius: "inherit",
         border: `1px solid hsla(${this.entityColor.h},${this.entityColor.s}%, ${this.entityColor.l}%, 0.8)`,
         backdropFilter: "blur(2px)",
+        cursor: this.dragging.state ? "grabbing" : "grab",
         backgroundColor: CSS.supports("backdrop-filter: blur(3px)")
           ? this.editingLabel && this.entitySelectedFinal
             ? `white`
@@ -673,7 +674,7 @@ export default {
   },
   methods: {
     startdrag(event) {
-      //console.log("drag started at node");
+      //console.log("drag started at entity");
       // doing: calculating draggingDeltas
       if ([1].includes(event.which) || event.type === "touchstart") {
         if (!this.pressed.state) {
@@ -699,7 +700,7 @@ export default {
       }
     },
     getEntityData() {
-      // doing: get node data from api
+      // doing: get entity data from api
       // todo: check api url validity
       axios({
         method: "GET",
@@ -740,7 +741,7 @@ export default {
       });
     },
     updateEntityBoundaryBox(time = 100) {
-      // doing: updating node's bounding box width and height
+      // doing: updating entity's bounding box width and height
       setTimeout(() => {
         var boundingBox = this.$refs.entityContainer.getBoundingClientRect();
 
@@ -772,7 +773,7 @@ export default {
         targetID: this.relClaimMode.targetID,
         claimantID: this.entityID,
       });
-      //console.log("starting relclaim mode on node : ", this.entityID);
+      //console.log("starting relclaim mode on entity : ", this.entityID);
     },
     confirmRelClaimTarget(event) {
       event.preventDefault();
@@ -932,7 +933,7 @@ export default {
       });
     },
     entityLocation_() {
-      // todo: save node location to database on drag end
+      // todo: save entity location to database on drag end
 
       this.$emit("setSelfRelSpots", this.relationSpots);
       if (!this.dragging.state) {
@@ -982,10 +983,10 @@ export default {
       // if not emit to canvas so it can add it to know relations
     },
     entityLabel() {
-      // doing: updating node's bounding box width and height
+      // doing: updating entity's bounding box width and height
       this.updateEntityBoundaryBox();
       this.$emit("setSelfRelSpots", this.relationSpots);
-      // todo: save node Label to API
+      // todo: save entity Label to API
       if (this.apiValidity) {
         // todo: also set it to true when api disconnects
         axios({
@@ -1001,7 +1002,7 @@ export default {
           //this.getEntityData();
           if (this.autoSave) {
             // doing: ask server save state to file
-            this.$axios.post(this.apiUrl + "/collection/save");
+            axios.post(this.apiUrl + "/collection/save");
           }
         });
       }
@@ -1042,7 +1043,7 @@ export default {
   mounted: function () {
     if (this.entityID !== undefined) {
       console.log(`@ mounted ${this.entityID}`);
-      // todo: get node_label, relation_claims, data from the API using the nodeID
+      // todo: get entity_label, relation_claims, data from the API using the entityID
     }
     this.getEntityData();
 
