@@ -1,6 +1,6 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "bbd8ac2e64ba73de368a",
+    "revision": "e10808fc57de3650e6d7",
     "url": "/MindMap-WebApp/css/app.f7e03dbc.css"
   },
   {
@@ -12,12 +12,12 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/MindMap-WebApp/img/ic_chevron_left_48px.5bbac221.svg"
   },
   {
-    "revision": "a81f76fd7679b8afc7d67c89c543f719",
+    "revision": "a8d716ca7db031f097b4777ed1b1a0f1",
     "url": "/MindMap-WebApp/index.html"
   },
   {
-    "revision": "bbd8ac2e64ba73de368a",
-    "url": "/MindMap-WebApp/js/app.6f69f6ff.js"
+    "revision": "e10808fc57de3650e6d7",
+    "url": "/MindMap-WebApp/js/app.0b8d5588.js"
   },
   {
     "revision": "937f1480c35c6f08b4f9",
@@ -36,8 +36,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/MindMap-WebApp/js/chunk-3fc4564a.6359672a.js"
   },
   {
-    "revision": "4c402275b89d883a92e7",
-    "url": "/MindMap-WebApp/js/chunk-8e4d1506.f25ca977.js"
+    "revision": "b1b09a846417f3da9888",
+    "url": "/MindMap-WebApp/js/chunk-8e4d1506.9d09c3a5.js"
   },
   {
     "revision": "b1c285ce50ba856cfcea",
