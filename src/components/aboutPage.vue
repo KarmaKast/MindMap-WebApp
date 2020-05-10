@@ -38,10 +38,10 @@
         <br />
         - setup
         <a
-          href="https://github.com/KarmaKast/entityAPI/"
+          href="https://github.com/KarmaKast/morph-dbms-API/"
           :style="{ pointerEvents: 'initial' }"
           target="_blank"
-          >entityAPI</a
+          >morph-dbms-API</a
         >
         (runs at localhost:3000)
       </p>

@@ -5,7 +5,7 @@
 - do any of these
   - get your appropriate latest [release](https://github.com/KarmaKast/MindMap-WebApp/releases)
   - Or Use/install the latest stable PWA [gh-page](https://karmakast.github.io/MindMap-WebApp/)
-- setup [nodeAPI](https://github.com/KarmaKast/nodeAPI/)
+- setup [morph-dbms-API](https://github.com/KarmaKast/morph-dbms-API/)
 
 Note: start/run your local nodeAPI before using MapThyMind App.
 
