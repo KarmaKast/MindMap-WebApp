@@ -413,12 +413,12 @@ export default {
     },
     clearCollection() {
       let url_ = this.apiUrl;
-      this.$axios.post(url_ + "/collection/clear");
+      axios.post(url_ + "/collection/clear");
       this.getCollection();
     },
     saveCollection() {
       let url_ = this.apiUrl;
-      this.$axios.post(url_ + "/collection/save");
+      axios.post(url_ + "/collection/save");
     },
     toggleMenu() {
       if (this.showMenu) {

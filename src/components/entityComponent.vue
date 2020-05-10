@@ -1001,7 +1001,7 @@ export default {
           //this.getEntityData();
           if (this.autoSave) {
             // doing: ask server save state to file
-            this.$axios.post(this.apiUrl + "/collection/save");
+            axios.post(this.apiUrl + "/collection/save");
           }
         });
       }
