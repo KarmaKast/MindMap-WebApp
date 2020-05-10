@@ -78,7 +78,7 @@ export default {
     entities: Array,
     entityLimit: {
       // context: setting this to 10. With some optimizations should be increased to 100
-      // or extra nodes could be loaded with minimum memory usage.
+      // or extra entitys could be loaded with minimum memory usage.
       default: 10,
       type: Number,
     },
@@ -159,7 +159,7 @@ export default {
         left: "0px",
         overflow: "hidden",
         backgroundColor: "inherit",
-        cursor: this.canvas.dragging.state ? "grabbing" : "crosshair",
+        cursor: this.canvas.dragging.state ? "grabbing" : "move",
       };
     },
     gridStylePart1: function () {
@@ -305,7 +305,7 @@ export default {
 
       let diffEntity = this.activeEntity.entityID !== ID;
       this.activeEntity.entityID = ID;
-      //console.log("node pressed");
+      //console.log("entity pressed");
       this.activeEntity.pressed.state = true;
 
       setTimeout(() => {
@@ -344,8 +344,8 @@ export default {
               });
           }
         } else {
-          // context: this is for the node
-          //console.log("node unpressed");
+          // context: this is for the entity
+          //console.log("entity unpressed");
           if (this.$refs.canvasContainer !== event.target) {
             this.activeEntity.pressed.state = false;
             if (this.activeEntity.dragging.state) {
@@ -358,7 +358,7 @@ export default {
     },
     getMousePos(event) {
       if (this.activeEntity.dragging.state === true) {
-        // todo: if dragging pass canvasMousePos to nodes else pass undefined
+        // todo: if dragging pass canvasMousePos to entitys else pass undefined
       }
       if (this.activeEntity.dragging.state || this.canvas.dragging.state) {
         if (event.type === "mousemove") {
@@ -414,7 +414,7 @@ export default {
       event.which === 2 is for middle click
        */
       if (
-        ((event.type.startsWith("mouse") && event.which === 2) ||
+        ((event.type.startsWith("mouse") && event.which === 1) ||
           ["touchend", "touchstart"].includes(event.type)) &&
         !(
           this.canvas.dragging.state === false &&
@@ -456,10 +456,12 @@ export default {
             this.canvasContainerBoxLoc.y;
         }
       }
+      /*if (event.type.startsWith("mouse") && event.which === 3)
+        console.log("canvas right click detected");*/
     },
     endCanvasDragging(event) {
       if (
-        ((event.type.startsWith("mouse") && event.which === 2) ||
+        ((event.type.startsWith("mouse") && event.which === 1) ||
           ["touchend", "touchstart"].includes(event.type)) &&
         !(
           this.canvas.dragging.state === false &&
@@ -567,7 +569,7 @@ export default {
       }).then((response) => {
         //console.log(response.data.claimantIDs);
         this.$emit("dropEntity", entityID, response.data.claimantIDs);
-        // for all entities with claimantIDs, update node_data
+        // for all entities with claimantIDs, update entity_data
         this.entitiesToUpdate = response.data.claimantIDs;
       });
     },
@@ -632,7 +634,7 @@ export default {
     entities: {
       handler() {
         this.initiateProcessedEntities();
-        //console.log("i should appear when creating new node");
+        //console.log("i should appear when creating new entity");
       },
       deep: true,
     },
