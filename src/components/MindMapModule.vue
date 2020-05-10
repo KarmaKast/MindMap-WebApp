@@ -14,12 +14,6 @@
     ></mind-map-canvas>
 
     <div
-      class="debug"
-      v-html="this.debugMsg"
-      style="display: block; position: relative; bottom: 0px; margin: 0px auto;"
-    ></div>
-
-    <div
       id="UI"
       :style="{
         position: 'absolute',
@@ -147,7 +141,6 @@ export default {
   },
   data: function () {
     return {
-      debugMsg: "",
       menuLoaded: false,
       showMenu: false,
       apiUrl: "",

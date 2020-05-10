@@ -12,21 +12,91 @@
     v-touch:tap.self="handleCanvasTap"
   >
     <div
-      v-if="grid.show && grid.opacity > 0 && grid.size > 1 && grid.width > 0"
-      id="grid"
-      :style="gridStyle"
-    ></div>
-    <div
-      v-if="grid.show && grid.opacity > 0 && grid.size > 1 && grid.width > 0"
-      id="gridCenterTop"
-      :style="gridCenterTopStyle"
-    ></div>
-    <div
-      v-if="grid.show && grid.opacity > 0 && grid.size > 1 && grid.width > 0"
-      id="gridCenterHor"
-      :style="gridCenterHorStyle"
-    ></div>
-    <!--<div class="gridBetter" :style="gridBetterStyle"></div>-->
+      class="canvas-grid"
+      :style="{ pointerEvents: 'none', position: 'absolute' }"
+    >
+      <v-stage
+        :config="{
+          width: canvasSize.width,
+          height: canvasSize.height,
+        }"
+      >
+        <v-layer>
+          <v-group :config="canvasGridStyle">
+            <v-line
+              v-for="(value, index) in new Array(
+                parseInt(canvasSize.width / grid.size)
+              )"
+              :key="index + 'vertical'"
+              :config="{
+                points: [
+                  index * grid.size * 2,
+                  0,
+                  index * grid.size * 2,
+                  canvasSize.height + grid.size * 2 * 2,
+                ],
+                stroke: canvasGridColors[0],
+                strokeWidth: grid.width,
+                lineCap: 'round',
+                lineJoin: 'round',
+                // currently only starting and endling points are used. for bezier to work some points in the middle maybe needed
+                //tension: 5,
+                //bezier: true,
+                draggable: false,
+                closed: false,
+              }"
+            ></v-line>
+            <v-line
+              v-for="(value, index) in new Array(
+                parseInt(canvasSize.width / grid.size)
+              )"
+              :key="index + 'horizontal'"
+              :config="{
+                points: [
+                  0,
+                  index * grid.size * 2,
+                  canvasSize.width + grid.size * 2 * 2,
+                  index * grid.size * 2,
+                ],
+                stroke: canvasGridColors[0],
+                strokeWidth: grid.width,
+                lineCap: 'round',
+                lineJoin: 'round',
+                // currently only starting and endling points are used. for bezier to work some points in the middle maybe needed
+                //tension: 5,
+                //bezier: true,
+                draggable: false,
+                closed: false,
+              }"
+            ></v-line>
+          </v-group>
+          <v-line
+            :config="{
+              points: [
+                canvasSize.width / 2,
+                0,
+                canvasSize.width / 2,
+                canvasSize.height,
+              ],
+              stroke: canvasGridColors[1],
+              x: this.canvasLocation.x,
+            }"
+          ></v-line>
+          <v-line
+            :config="{
+              points: [
+                0,
+                canvasSize.height / 2,
+                canvasSize.width,
+                canvasSize.height / 2,
+              ],
+              stroke: canvasGridColors[2],
+              y: this.canvasLocation.y,
+            }"
+          ></v-line>
+        </v-layer>
+      </v-stage>
+    </div>
     <div id="entities">
       <entityComponent
         v-for="(value, key_) in processedEntitiesBetter"
@@ -162,33 +232,16 @@ export default {
         cursor: this.canvas.dragging.state ? "grabbing" : "move",
       };
     },
-    gridStylePart1: function () {
-      // todo: move color processing functionality to vuex store
-      let processedColor = `hsla(${this.colors["theme_light"].h}, ${
-        this.colors["theme_light"].s
-      }%, ${this.colors["theme_light"].l}%, ${this.grid.opacity / 1.4})`;
-      let size_ = this.grid.size * 2;
-      /*const part = `transparent, ${processedColor} 0px, ${processedColor} ${
-        this.grid.width / 2
-      }px, transparent ${this.grid.width / 2}px, transparent ${
-        size_ - this.grid.width / 2
-      }px, ${processedColor} ${
-        size_ - this.grid.width / 2
-      }px, ${processedColor}  ${size_}px `;*/
-      const part = `transparent, ${processedColor} 0px, ${processedColor} ${parseInt(
-        this.grid.width / 2
-      )}px, transparent ${this.grid.width / 2}px, transparent ${parseInt(
-        size_ - this.grid.width / 2
-      )}px, ${processedColor} ${parseInt(
-        size_ - this.grid.width / 2
-      )}px, ${processedColor}  ${size_}px `;
-      return {
-        position: "absolute",
-        backgroundImage: `repeating-linear-gradient( ${part} ), repeating-linear-gradient(90deg, ${part} )`,
-        pointerEvents: "none",
-      };
+    canvasGridColors: function () {
+      return [
+        `hsla(${this.colors["theme_light"].h}, ${
+          this.colors["theme_light"].s
+        }%, ${this.colors["theme_light"].l}%, ${this.grid.opacity / 1.4})`,
+        ` hsla(183, 91%, 35%,${this.grid.opacity * 2})`,
+        `hsla(19, 100%, 35%, ${this.grid.opacity * 2})`,
+      ];
     },
-    gridStylePart2: function () {
+    canvasGridStyle: function () {
       let size_ = this.grid.size * 2;
       let height = this.canvasSize.height + size_ * 2;
       let width = this.canvasSize.width + size_ * 2;
@@ -198,82 +251,11 @@ export default {
       /*const left =
         ((this.canvasSize.width / 2 + this.canvasLocation.x) % size_) - size_;*/
       const left = ((width / 2 + this.canvasLocation.x) % size_) - size_ * 1;
-      if (Math.abs(left) > size_ || Math.abs(top) > size_)
-        console.log("This shouldnt have happened");
       return {
-        height: `${height}px`,
-        width: `${width}px`,
-        top: `${top}px`,
-        left: `${left}px`,
-      };
-    },
-    gridStyle: function () {
-      return Object.assign({}, this.gridStylePart1, this.gridStylePart2);
-    },
-    gridCenterTopStylePart1: function () {
-      return {
-        left: `${this.canvasLocation.x}px`,
-      };
-    },
-    gridCenterTopStylePart2: function () {
-      return {
-        height: "100%",
-        width: "100%",
-        position: "absolute",
-        top: "0px",
-        backgroundImage: `linear-gradient(to right, transparent calc(50% - ${
-          this.grid.width / 2
-        }px), hsla(183, 91%, 35%,${this.grid.opacity * 2}) calc(50% - ${
-          this.grid.width / 2
-        }px), hsla(183, 91%, 35%, ${this.grid.opacity * 2}) calc(50% + ${
-          this.grid.width / 2
-        }px) , transparent calc(50% + ${this.grid.width / 2}px))`,
-        pointerEvents: "none",
-      };
-    },
-    gridCenterTopStyle: function () {
-      return Object.assign(
-        {},
-        this.gridCenterTopStylePart2,
-        this.gridCenterTopStylePart1
-      );
-    },
-    gridCenterHorStylePart1: function () {
-      return {
-        top: `${this.canvasLocation.y}px`,
-      };
-    },
-    gridCenterHorStylePart2: function () {
-      return {
-        height: "100%",
-        width: "100%",
-        position: "absolute",
-        left: "0px",
-        backgroundImage: `linear-gradient(to bottom, transparent calc(50% - ${
-          this.grid.width / 2
-        }px), hsla(19, 100%, 35%,${this.grid.opacity * 2}) calc(50% - ${
-          this.grid.width / 2
-        }px), hsla(19, 100%, 35%, ${this.grid.opacity * 2}) calc(50% + ${
-          this.grid.width / 2
-        }px) , transparent calc(50% + ${this.grid.width / 2}px))`,
-        pointerEvents: "none",
-      };
-    },
-    gridCenterHorStyle: function () {
-      return Object.assign(
-        {},
-        this.gridCenterHorStylePart1,
-        this.gridCenterHorStylePart2
-      );
-    },
-    gridBetterStyle: function () {
-      return {
-        position: "absolute",
-        top: "-50%",
-        left: "-50%",
-
-        height: "200%",
-        width: "200%",
+        width: this.canvasSize.width + this.grid.size * 2 * 2,
+        height: this.canvasSize.height + this.grid.size * 2 * 2,
+        y: top,
+        x: left,
       };
     },
   },
