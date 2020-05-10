@@ -10,7 +10,7 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build --mode production --target app --modern",
-    "build:prerender": "rimraf dist && vue-cli-service build --mode prerender --target app --modern && echo '---prerender build completed---'",
+    "build:prerender": "rimraf dist && vue-cli-service build --mode prerender --target app --modern && cp -r './prerender/MindMap-WebApp' './dist' && echo '---prerender build completed---'",
     "build:deployment": "vue-cli-service build --mode deployment --target app --modern",
     "build:serve": "serve ./dist",
     "build:deploy": "bash deploy.sh",
