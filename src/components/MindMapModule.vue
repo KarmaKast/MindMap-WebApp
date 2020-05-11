@@ -375,13 +375,8 @@ export default {
           this.refreshCanvas();
           this.$store.commit("update_apiUrlValidity", true);
           this.apiValidity = true;
-          if (
-            !(
-              localStorage.getItem("apiUrl") &&
-              localStorage.getItem("apiUrl") === url_
-            )
-          )
-            localStorage.setItem("apiUrl", url_);
+          const apiUrl = localStorage.getItem("apiUrl");
+          if (!apiUrl || apiUrl !== url_) localStorage.setItem("apiUrl", url_);
         })
         .catch((err) => this.loadCollection());
     },
@@ -507,9 +502,10 @@ export default {
     });
   },
   mounted: function () {
-    if (localStorage.getItem("apiUrl")) {
-      this.apiUrl = localStorage.getItem("apiUrl");
-      this.$store.commit("update_apiUrl", this.apiUrl);
+    const apiUrl = localStorage.getItem("apiUrl");
+    if (apiUrl) {
+      this.apiUrl = apiUrl;
+      this.$store.commit("update_apiUrl", apiUrl);
       //this.apiValidity = true;
     }
   },
@@ -518,14 +514,7 @@ export default {
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped lang="scss">
-/*
-* 
-*/
-:root {
-  --module-background-color: hsla(0, 0%, 95%, 1);
-}
-
+<style scoped lang="css">
 .MindMapModule {
   height: 100%;
   width: 100%;

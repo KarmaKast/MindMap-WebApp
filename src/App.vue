@@ -22,7 +22,7 @@ import MindMapModuleLoading from "./components/loading/MindMapModule.vue";
 export default {
   name: "app",
   metaInfo: {
-    title: process.env.VUE_APP_NAME + " Prototype",
+    title: process.env.VUE_APP_NAME + " Prototype | KarmaKast",
     meta: [
       {
         name: "description",
@@ -76,17 +76,14 @@ export default {
         marginTop: "0px",
         marginLeft: "0px",
         boxSizing: "border-box",
-        borderRadius:
-          this.APP_MODE === "development" ? "15px 15px 10px 10px" : "unset",
-        padding: this.APP_MODE === "development" ? "20px" : "0px",
+        borderRadius: "15px 15px 10px 10px",
+        padding: this.APP_MODE === "development" ? "20px" : "2px",
       };
     },
   },
   methods: {
     handleResize() {
       this.$store.dispatch("update_window_size");
-      //this.$store.commit("update_window_width");
-      //this.$store.commit("update_window_height");
     },
   },
   created: function () {
