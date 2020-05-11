@@ -155,6 +155,7 @@ export default {
         fontSize: "10px",
         pointerEvents: "initial",
         cursor: "text",
+        color: this.colorsProcessed["theme"],
       };
     },
     testButtonStyle: function () {
