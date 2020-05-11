@@ -44,7 +44,8 @@ module.exports = {
           //renderAfterElementExists: ".MindMapModule",
           renderAfterDocumentEvent: "app-rendered",
           //renderAfterTime: 5000,
-          headless: true,
+          headless: true, // commit this
+          //headless: false, // don't commit this
         }),
       },
     ]);

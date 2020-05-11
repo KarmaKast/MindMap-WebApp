@@ -1,0 +1,6 @@
+{
+    "redirects": [
+        { "source": "/MindMap-WebApp/:chunk", "destination": "/:chunk" },
+        { "source": "/MindMap-WebApp/:path/:chunk", "destination": "/:path/:chunk" }
+    ]
+}

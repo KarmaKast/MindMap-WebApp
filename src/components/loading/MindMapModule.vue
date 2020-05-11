@@ -15,6 +15,7 @@ export default {
   cursor: wait;
   border: 2px solid grey;
   border-radius: inherit;
+  box-sizing: border-box;
 }
 .mind-map-module-loading p {
   font-size: large;

@@ -8,7 +8,7 @@
         backgroundColor: 'blue',
       }"
     ></div>
-    <div id="mindMapContainer" :style="mindMapContainerStyle">
+    <div v-if="!prerender" id="mindMapContainer" :style="mindMapContainerStyle">
       <!-- <MindMapModule :colors="MindMapColors" :entityLimit="entityLimit" />-->
       <mind-map-module :entityLimit="entityLimit" />
     </div>
@@ -66,6 +66,9 @@ export default {
       },
       entityLimit: 20,
       APP_MODE: process.env.VUE_APP_MODE,
+      prerender: window.__PRERENDER_INJECTED
+        ? window.__PRERENDER_INJECTED.prerendered
+        : false,
     };
   },
   computed: {
@@ -90,9 +93,11 @@ export default {
     window.addEventListener("resize", this.handleResize);
   },
   mounted() {
-    setTimeout(() => {
-      document.dispatchEvent(new Event("app-rendered"));
-    }, 500);
+    console.log({ __PRERENDER_INJECTED: window.__PRERENDER_INJECTED });
+    if (window.__PRERENDER_INJECTED)
+      setTimeout(() => {
+        document.dispatchEvent(new Event("app-rendered"));
+      }, 500);
   },
   destroyed: function () {
     window.removeEventListener("resize", this.handleResize);
