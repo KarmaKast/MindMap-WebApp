@@ -1,10 +1,10 @@
 <template>
-  <div class="MindMapModule" :style="this.containerStyle">
+  <div class="MindMapModule" :style="containerStyle">
     <mind-map-canvas
       v-if="!canvasForceUpdate"
-      :colors="this.colorsFinal"
+      :colors="colorsFinal"
       :colorsProcessed="colorsProcessed"
-      :apiUrl="this.apiUrl"
+      :apiUrl="apiUrl"
       :entities="entities"
       :entityLimit="entityLimit"
       :apiValidity="apiValidity"
@@ -44,14 +44,14 @@
             iconName="Main Menu"
             :iconColor="colorsProcessed['theme']"
             role="button"
-            :aria="{ ['aria-pressed']: `${this.showMenu}` }"
+            :aria="{ ['aria-pressed']: `${showMenu}` }"
             ><icon-hamburger1
           /></icon-base>
         </button>
         <div v-if="menuLoaded">
-          <div v-show="showMenu" id="menuItems" :style="this.menuItemsStyle">
+          <div v-show="showMenu" id="menuItems" :style="menuItemsStyle">
             <button-one
-              :validity="this.apiValidity"
+              :validity="apiValidity"
               :colors="colorsFinal"
               :colorsProcessed="colorsProcessed"
               :style="{ order: 0 }"

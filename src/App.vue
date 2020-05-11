@@ -16,7 +16,8 @@
 </template>
 
 <script>
-import MindMapModule from "./components/MindMapModule.vue";
+//import MindMapModule from "./components/MindMapModule.vue";
+import MindMapModuleLoading from "./components/loading/MindMapModule.vue";
 
 export default {
   name: "app",
@@ -43,10 +44,14 @@ export default {
     ],
     link: [
       { rel: "canonical", href: "https://karmakast.github.io/MindMap-WebApp/" },
+      //{ rel: "icon", href: "<%= BASE_URL %>favicon.ico" },
     ],
   },
   components: {
-    MindMapModule,
+    MindMapModule: () => ({
+      component: import("./components/MindMapModule.vue"),
+      loading: MindMapModuleLoading,
+    }),
   },
   data: function () {
     return {

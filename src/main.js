@@ -13,7 +13,6 @@ if ("serviceWorker" in navigator) {
 }
 
 Vue.config.productionTip = false;
-//Vue.prototype.$axios = axios;
 Vue.use(VueMeta);
 Vue.use(VueKonva);
 Vue.use(Vue2TouchEvents, {});

@@ -8,19 +8,31 @@
         @mouseover="isHovered = true"
         @mouseout="isHovered = false"
       >
-        <img
+        <!--<img
           src="../assets/ic_chevron_left_48px.svg"
           :style="{ height: '100%', width: '100%', borderRadius: 'inherit' }"
-        />
+        />-->
+        <icon-base
+          iconName="Back"
+          :iconColor="colorsProcessed['theme']"
+          height="100%"
+          width="100%"
+          role="button"
+          viewBox="0 0 48 48"
+          ><icon-direction-left />
+        </icon-base>
       </button>
 
       <p :style="pStyle">
         <span :style="{ fontSize: '20px' }"
           ><a
             href="https://github.com/KarmaKast/MindMap-WebApp"
-            :style="{ pointerEvents: 'initial' }"
+            :style="{
+              pointerEvents: 'initial',
+              color: colorsProcessed['theme_light'],
+            }"
             target="_blank"
-            >{{ appName }}</a
+            ><icon-base><icon-open-in-new /> </icon-base> {{ appName }}</a
           >
           - v{{ version }}</span
         >
@@ -29,9 +41,12 @@
         A Mindmap web app that uses
         <a
           href="https://github.com/KarmaKast/morph-dbms-core"
-          :style="{ pointerEvents: 'initial' }"
+          :style="{
+            pointerEvents: 'initial',
+            color: colorsProcessed['theme_light'],
+          }"
           target="_blank"
-          >morph-dbms-core</a
+          ><icon-base><icon-open-in-new /> </icon-base> morph-dbms-core</a
         >
         . Currently everything is in prototyping state. <br />
         <br />
@@ -39,9 +54,12 @@
         - setup
         <a
           href="https://github.com/KarmaKast/morph-dbms-API/"
-          :style="{ pointerEvents: 'initial' }"
+          :style="{
+            pointerEvents: 'initial',
+            color: colorsProcessed['theme_light'],
+          }"
           target="_blank"
-          >morph-dbms-API</a
+          ><icon-base><icon-open-in-new /> </icon-base> morph-dbms-API</a
         >
         (runs at localhost:3000)
       </p>
@@ -51,6 +69,11 @@
 <script>
 export default {
   name: "aboutPage",
+  components: {
+    iconBase: () => import("./icons/iconBase"),
+    iconOpenInNew: () => import("./icons/iconOpenInNew"),
+    iconDirectionLeft: () => import("./icons/iconDirectionLeft"),
+  },
   props: {
     colors: Object,
     colorsProcessed: Object,
@@ -86,7 +109,7 @@ export default {
         padding: "15px",
         height: "fit-content",
         maxWidth: "400px",
-        minWidth: "280px",
+        minWidth: "300px",
         width: "20%",
         border: `1px dashed ${this.colorsProcessed["theme"]}`,
         boxSizing: "border-box",

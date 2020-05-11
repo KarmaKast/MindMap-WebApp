@@ -53,7 +53,7 @@
         </v-layer>
       </v-stage>
     </div>
-    <div class="relationLabelsContainer">
+    <div class="relationLabelsContainer" :style="{ position: 'absolute' }">
       <div
         class="relationLabel"
         v-for="(relClaim, index) in entityData.source.RelationClaims"
