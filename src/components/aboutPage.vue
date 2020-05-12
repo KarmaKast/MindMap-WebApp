@@ -32,7 +32,13 @@
               color: colorsProcessed['theme_light'],
             }"
             target="_blank"
-            ><icon-base><icon-open-in-new /> </icon-base> {{ appName }}</a
+            ><icon-base
+              :style="{ display: 'inline' }"
+              iconName="open in new Tab"
+              viewBox="0 0 24 24"
+              ><icon-open-in-new />
+            </icon-base>
+            {{ appName }}</a
           >
           - v{{ version }}</span
         >
@@ -46,7 +52,13 @@
             color: colorsProcessed['theme_light'],
           }"
           target="_blank"
-          ><icon-base><icon-open-in-new /> </icon-base> morph-dbms-core</a
+          ><icon-base
+            :style="{ display: 'inline' }"
+            iconName="open in new Tab"
+            viewBox="0 0 24 24"
+            ><icon-open-in-new />
+          </icon-base>
+          morph-dbms-core</a
         >
         . Currently everything is in prototyping state. <br />
         <br />
@@ -59,7 +71,13 @@
             color: colorsProcessed['theme_light'],
           }"
           target="_blank"
-          ><icon-base><icon-open-in-new /> </icon-base> morph-dbms-API</a
+          ><icon-base
+            :style="{ display: 'inline' }"
+            iconName="open in new Tab"
+            viewBox="0 0 24 24"
+            ><icon-open-in-new />
+          </icon-base>
+          morph-dbms-API</a
         >
         (runs at localhost:3000)
       </p>
@@ -123,10 +141,10 @@ export default {
     closeButtonStyle: function () {
       return {
         background: this.isHovered
-          ? "rgba(255, 255, 255, 0.8)"
-          : "rgba(255, 255, 255, 0.4)",
+          ? `${this.colorsProcessed["backgroundShade2"]}`
+          : `${this.colorsProcessed["background"]}`,
         border: `0.5px dashed ${this.colorsProcessed["theme"]}`,
-        boxShadow: "0px 0px 2px 1px hsla(0, 0%, 0%, 0.1882)",
+        //boxShadow: `0px 0px 1px 2px ${this.colorsProcessed["backgroundShade1"]}`,
         boxSizing: "border-box",
         borderRadius: "100%",
         gridArea: "1 / 1 / 2 / 2",

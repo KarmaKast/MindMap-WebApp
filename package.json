@@ -1,7 +1,7 @@
 {
   "name": "map-thy-mind",
   "description": "A fresh take on mindmap. Currently in early development.",
-  "version": "0.6.14",
+  "version": "0.7.0",
   "private": true,
   "author": {
     "name": "Sree Chandan",
@@ -12,7 +12,7 @@
     "build": "vue-cli-service build --mode production --target app --modern",
     "build:prerender": "rimraf dist && vue-cli-service build --mode prerender --target app --modern && cp -r './prerender/MindMap-WebApp' './dist' && echo '---prerender build completed---'",
     "build:deployment": "vue-cli-service build --mode deployment --target app --modern",
-    "build:serve": "serve ./prerender/MindMap-WebApp --config '../../serve-config.json'",
+    "build:serve": "serve ./dist --config '../serve-config.json'",
     "test:e2e": "vue-cli-service test:e2e",
     "lint": "vue-cli-service lint",
     "electron:build": "vue-cli-service electron:build",

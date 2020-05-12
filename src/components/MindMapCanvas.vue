@@ -97,7 +97,7 @@
         </v-layer>
       </v-stage>
     </div>
-    <div id="entities">
+    <div id="entities" :style="entitiesStyle">
       <entityComponent
         v-for="(value, key_) in processedEntitiesBetter"
         :key="key_"
@@ -218,6 +218,14 @@ export default {
       return {
         height: height ? height : 0,
         width: width ? width : 0,
+      };
+    },
+    entitiesStyle: function () {
+      return {
+        transform: `translate(
+          ${this.canvasLocation.x + "px"},
+          ${this.canvasLocation.y + "px"}
+        )`,
       };
     },
     canvasContainerStyle: function () {
