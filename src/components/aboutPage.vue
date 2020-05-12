@@ -123,10 +123,10 @@ export default {
     closeButtonStyle: function () {
       return {
         background: this.isHovered
-          ? "rgba(255, 255, 255, 0.8)"
-          : "rgba(255, 255, 255, 0.4)",
+          ? `${this.colorsProcessed["backgroundShade2"]}`
+          : `${this.colorsProcessed["background"]}`,
         border: `0.5px dashed ${this.colorsProcessed["theme"]}`,
-        boxShadow: "0px 0px 2px 1px hsla(0, 0%, 0%, 0.1882)",
+        //boxShadow: `0px 0px 1px 2px ${this.colorsProcessed["backgroundShade1"]}`,
         boxSizing: "border-box",
         borderRadius: "100%",
         gridArea: "1 / 1 / 2 / 2",
