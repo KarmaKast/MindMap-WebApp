@@ -47,6 +47,7 @@
           <v-group
             v-for="(relClaim, index) in entityData.source.RelationClaims"
             :key="index"
+            :config="relationWiresGroupConfig"
           >
             <v-line :config="relationLineConfigs[relClaim.To]"></v-line>
           </v-group>
@@ -305,13 +306,7 @@ export default {
         {},
         this.entityContainerStylePartStatic,
         this.entityContainerStylePart1,
-        this.entityContainerStylePart2,
-        {
-          transform: `translate(
-          ${this.canvasLocation.x + "px"},
-          ${this.canvasLocation.y + "px"}
-        )`,
-        }
+        this.entityContainerStylePart2
       );
     },
     entityStyle: function () {
@@ -586,30 +581,18 @@ export default {
         );
       return res;
     },
-    relationWirePointsPart3: function () {
+    relationWiresGroupConfig: function () {
       // doing: accounting for canvas location changes
-      //relationWireTargetPoints
-      // a circle of radius this.relationSpotsOffset is created. and the target line should stop at the that circle
-      // so the end points needs to calculation by removing a length of that radius * 2
-      const res = {};
-      if (this.relationWirePointsPart2)
-        Object.entries(this.relationWirePointsPart2).forEach(
-          ([entityID, relationWirePoints]) => {
-            res[entityID] = [
-              relationWirePoints[0] + this.canvasLocation.x,
-              relationWirePoints[1] + this.canvasLocation.y,
-              relationWirePoints[2] + this.canvasLocation.x,
-              relationWirePoints[3] + this.canvasLocation.y,
-            ];
-          }
-        );
-      return res;
+      return {
+        x: this.canvasLocation.x,
+        y: this.canvasLocation.y,
+      };
     },
     relationWirePoints: function () {
       // doing: accounting for canvas resize
       const res = {};
-      if (this.relationWirePointsPart3)
-        Object.entries(this.relationWirePointsPart3).forEach(
+      if (this.relationWirePointsPart2)
+        Object.entries(this.relationWirePointsPart2).forEach(
           ([entityID, relationWirePoints]) => {
             res[entityID] = [
               relationWirePoints[0] + this.canvasSize.width / 2,
