@@ -7,6 +7,7 @@
     :aria-labelledby="iconName"
     :role="role"
     v-bind="aria"
+    :style="{ margin: '0px' }"
   >
     <title :id="iconName" lang="en">{{ iconName }}</title>
     <g :fill="iconColor">

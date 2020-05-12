@@ -245,6 +245,20 @@ export default {
     };
   },
   computed: {
+    entityOutOfCanvas: function () {
+      if (this.entityLocation_)
+        if (
+          Math.abs(this.entityLocation_.x + this.canvasLocation.x) >
+          this.canvasSize.width / 2
+        )
+          return true;
+        else if (
+          Math.abs(this.entityLocation_.y + this.canvasLocation.y) >
+          this.canvasSize.height / 2
+        )
+          return true;
+      return false;
+    },
     relWireColor: function () {
       return `hsla(${this.colors["backgroundShade1"].h},${this.colors["backgroundShade1"].s}%,${this.colors["backgroundShade1"].l}%, 1)`;
     },
