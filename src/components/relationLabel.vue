@@ -1,12 +1,13 @@
 <template>
   <div class="relationLabelContainer" :style="relationLabelContainerStyle">
-    <p class="relationLabel" v-touch:tap="toggleSelectedState">
-      {{ label }}
-    </p>
     <button
       class="removeRelationClaimBttn"
       v-touch:tap="emitremoveRelationClaim"
     ></button>
+    <p class="relationLabel" v-touch:tap="toggleSelectedState">
+      {{ label }}
+    </p>
+    <div class="direction">{{ direction }}</div>
   </div>
 </template>
 
@@ -19,6 +20,7 @@ export default {
     colorsProcessed: Object,
     relWireColor: String,
     label: String,
+    direction: String,
   },
   data: function () {
     return {
@@ -40,7 +42,7 @@ export default {
           CSS.supports("backdrop-filter", "blur(6px)") ? 0.5 : 1
         })`,
         backdropFilter: "blur(6px)",
-        gridTemplateColumns: "auto 20px",
+        gridTemplateColumns: "20px auto 20px",
       });
     },
   },
@@ -63,7 +65,6 @@ export default {
 <style scoped>
 .relationLabelContainer {
   position: absolute;
-  max-width: 80px;
   display: grid;
 
   border-radius: 20px;
@@ -75,14 +76,21 @@ export default {
 .relationLabel {
   margin: 0px;
   min-width: 45px;
+  max-width: 80px;
   text-overflow: ellipsis;
   padding: 2px;
-  margin-left: 4px;
+  margin-right: 4px;
   font-size: 80%;
   box-sizing: border-box;
   cursor: pointer;
 }
 .removeRelationClaimBttn {
+  border: 1px solid rgb(139, 139, 139);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.486);
+  cursor: pointer;
+}
+.direction {
   border: 1px solid rgb(139, 139, 139);
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.486);

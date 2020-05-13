@@ -68,6 +68,7 @@
             ? relationLabels[relClaim.Relation]
             : 'Error !'
         "
+        :direction="relClaim.Direction"
       />
     </div>
     <div
