@@ -599,7 +599,7 @@ export default {
             value.selfSpot === "bottom" ? "0%" : "-50%"
           }) rotate(${(Math.atan(slope) * 180) / Math.PI}deg)`,*/
           transform: `translate(-50%,-50%) rotate(${
-            (Math.atan(slope) * 180) / Math.PI
+            ((Math.atan(slope) * 180) / Math.PI) % 180
           }deg)`,
         };
       });
