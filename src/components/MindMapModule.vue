@@ -104,15 +104,23 @@ import relationLabel from "./relationLabel";*/
 export default {
   name: "MindMapModule",
   components: {
-    MindMapCanvas: () => import("./MindMapCanvas"),
+    MindMapCanvas: () =>
+      import(/* webpackChunkName: "chunk-mindmap-canvas" */ "./MindMapCanvas"),
     statusBar,
-    aboutPage: () => import("./aboutPage"),
+    aboutPage: () =>
+      import(/* webpackChunkName: "chunk-about-page" */ "./aboutPage"),
 
-    buttonOne: () => import("./button1"),
-    buttonTwo: () => import("./button2"),
+    buttonOne: () =>
+      import(/* webpackChunkName: "chunk-button1" */ "./button1"),
+    buttonTwo: () =>
+      import(/* webpackChunkName: "chunk-button2" */ "./button2"),
 
-    iconBase: () => import("./icons/iconBase"),
-    IconHamburger1: () => import("./icons/IconHamburger1"),
+    iconBase: () =>
+      import(/* webpackChunkName: "chunk-icon-base" */ "./icons/iconBase"),
+    IconHamburger1: () =>
+      import(
+        /* webpackChunkName: "chunk-icon-Hamburger1" */ "./icons/IconHamburger1"
+      ),
   },
   props: {
     // locationHor: {'left':value} or {'right':value}

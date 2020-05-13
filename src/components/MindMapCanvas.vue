@@ -130,8 +130,6 @@
 </template>
 <script>
 import Vue from "vue";
-//import entityComponent from "./entityComponent";
-const entityComponent = () => import("./entityComponent");
 
 import axios from "axios";
 import qs from "querystring";
@@ -141,7 +139,10 @@ import lodashIsEqual from "lodash/isEqual";
 export default {
   name: "MindMapCanvas",
   components: {
-    entityComponent,
+    entityComponent: () =>
+      import(
+        /* webpackChunkName: "chunk-entity-component" */ "./entityComponent"
+      ),
   },
   props: {
     colors: Object,

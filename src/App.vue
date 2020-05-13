@@ -38,18 +38,20 @@ export default {
       },
       {
         property: "og:url",
-        content: "https://karmakast.github.io/MindMap-WebApp/",
+        content: window.location.origin,
         //content: `${process.env.BASE_URL}`,
       },
     ],
     link: [
-      { rel: "canonical", href: "https://karmakast.github.io/MindMap-WebApp/" },
+      { rel: "canonical", href: window.location.origin },
       //{ rel: "icon", href: "<%= BASE_URL %>favicon.ico" },
     ],
   },
   components: {
     MindMapModule: () => ({
-      component: import("./components/MindMapModule.vue"),
+      component: import(
+        /* webpackChunkName: "chunk-mindmap-module" */ "./components/MindMapModule.vue"
+      ),
       loading: MindMapModuleLoading,
     }),
   },

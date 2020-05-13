@@ -17,6 +17,9 @@ module.exports = {
   outputDir: process.env.BUILD_MODE === "prerender" ? "./dist" : "./dist",
   configureWebpack: {
     devtool: process.env.NODE_ENV === "development" ? "source-map" : false,
+    output: {
+      //chunkFilename: "js/[name].[chunkhash].js"
+    },
   },
   chainWebpack: (config) => {
     config.plugin("PrerenderSPAPlugin").use(PrerenderSPAPlugin, [

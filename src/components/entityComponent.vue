@@ -161,7 +161,8 @@ export default {
   name: "entityComponent",
   components: {
     //ColorPicker,
-    relationLabel: () => import("./relationLabel"),
+    relationLabel: () =>
+      import(/* webpackChunkName: "chunk-relation-label" */ "./relationLabel"),
   },
   props: {
     colors: Object,
