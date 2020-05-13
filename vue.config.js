@@ -14,26 +14,31 @@ console.log(__dirname);
 module.exports = {
   publicPath: process.env.NODE_ENV === "production" ? "/MindMap-WebApp/" : "/",
   //outputDir: process.env.BUILD_MODE === "prerender" ? "./dist" : "./dist",
-  outputDir:
-    process.env.BUILD_MODE === "prerender"
-      ? "./prerender/MindMap-WebApp/"
-      : "./dist",
+  outputDir: process.env.BUILD_MODE === "prerender" ? "./dist" : "./dist",
   configureWebpack: {
     devtool: process.env.NODE_ENV === "development" ? "source-map" : false,
   },
   chainWebpack: (config) => {
     config.plugin("PrerenderSPAPlugin").use(PrerenderSPAPlugin, [
       {
-        staticDir: path.join(__dirname, "prerender"),
-        indexPath: path.join(
-          __dirname,
-          "prerender",
-          "MindMap-WebApp",
-          "index.html"
-        ),
-        outputDir: path.join(__dirname, "prerender/MindMap-WebApp"),
+        staticDir: path.join(__dirname, "dist"),
+        //indexPath: path.join(__dirname, "dist", "index.html"),
+        outputDir: path.join(__dirname, "dist"),
         routes: ["/"],
         //routes: [process.env.NODE_ENV === "production" ? "/" : "/"],
+        server: {
+          proxy: {
+            "/MindMap-WebApp": {
+              target: "http://localhost:8000",
+              router: function (req) {
+                return "http://" + req.headers.host;
+              },
+              pathRewrite: {
+                "^/MindMap-WebApp": "",
+              },
+            },
+          },
+        },
         renderer: new Renderer({
           // We need to inject a value so we're able to
           // detect if the page is currently pre-rendered.
