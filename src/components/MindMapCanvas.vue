@@ -115,6 +115,7 @@
         :entitySelected="value.entitySelected"
         :entityLocationDef="value.entityLocationDef"
         :grid="grid"
+        :relationLabels="collection.Relations"
         :targetRelSpots="value.targetRelSpots"
         :updateEntityData="value.updateEntityData"
         @prevActiveEntityID="setPrevActiveEntityID"
@@ -145,7 +146,7 @@ export default {
   props: {
     colors: Object,
     colorsProcessed: Object,
-    entities: Array,
+    collection: Object,
     entityLimit: {
       // context: setting this to 10. With some optimizations should be increased to 100
       // or extra entitys could be loaded with minimum memory usage.
@@ -559,19 +560,19 @@ export default {
       }).then((response) => {
         //console.log(response.data.claimantIDs);
         this.$emit("dropEntity", entityID, response.data.claimantIDs);
-        // for all entities with claimantIDs, update entity_data
+        // for all collection.Entities with claimantIDs, update entity_data
         this.entitiesToUpdate = response.data.claimantIDs;
       });
     },
     initiateProcessedEntities() {
       Object.keys(this.processedEntitiesBetter).forEach((entityID, index) => {
-        if (!this.entities.some((x) => x.ID === entityID)) {
+        if (!this.collection.Entities.some((x) => x.ID === entityID)) {
           //console.log("to delete : ", entityID);
           Vue.delete(this.processedEntitiesBetter, entityID);
           Vue.delete(this.relClaimTargetSpots, entityID);
         }
       });
-      this.entities.forEach((value, index) => {
+      this.collection.Entities.forEach((value, index) => {
         if (!Object.keys(this.processedEntitiesBetter).includes(value.ID))
           Vue.set(this.processedEntitiesBetter, value.ID, {
             dragging: {
@@ -593,9 +594,12 @@ export default {
                 : undefined
               : undefined,
             entityLocationDef:
-              this.entities[index]["entityLocationDef"] === undefined
+              this.collection.Entities[index]["entityLocationDef"] === undefined
                 ? { x: 0, y: 0 }
-                : Object.assign({}, this.entities[index]["entityLocationDef"]),
+                : Object.assign(
+                    {},
+                    this.collection.Entities[index]["entityLocationDef"]
+                  ),
             targetRelSpots: Object.assign(
               {},
               this.relClaimTargetSpots[value.ID]
@@ -621,7 +625,7 @@ export default {
         }, 50);
       }
     },
-    entities: {
+    "collection.Entities": {
       handler() {
         this.initiateProcessedEntities();
         //console.log("i should appear when creating new entity");

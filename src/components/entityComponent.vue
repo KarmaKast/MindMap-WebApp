@@ -55,11 +55,19 @@
       </v-stage>
     </div>
     <div class="relationLabelsContainer" :style="{ position: 'absolute' }">
-      <div
-        class="relationLabel"
+      <relation-label
         v-for="(relClaim, index) in entityData.source.RelationClaims"
         :key="index"
-      ></div>
+        :stylePart="relationLabelsStyle[relClaim.To]"
+        :colors="colors"
+        :colorsProcessed="colorsProcessed"
+        :label="
+          relationLabels &&
+          Object.keys(relationLabels).includes(relClaim.Relation)
+            ? relationLabels[relClaim.Relation]
+            : ''
+        "
+      />
     </div>
     <div
       v-show="entitySelectedFinal"
@@ -153,6 +161,7 @@ export default {
   name: "entityComponent",
   components: {
     //ColorPicker,
+    relationLabel: () => import("./relationLabel"),
   },
   props: {
     colors: Object,
@@ -199,6 +208,7 @@ export default {
       },
       type: Object,
     },
+    relationLabels: Object,
     targetRelSpots: Object,
     updateEntityData: {
       default: false,
@@ -556,6 +566,40 @@ export default {
           res[value.selfSpot] = true;
         }
       );
+      return res;
+    },
+    relationLabelsStyle: function () {
+      const res = {};
+      Object.entries(this.relationWirePointsPart1).forEach(([key, value]) => {
+        //
+        const radiusOffset = 60; // might be different to relationSpotsOffset in future
+        const temp = value.points;
+        const totalDist = Math.sqrt(
+          Math.pow(temp[2] - temp[0], 2) + Math.pow(temp[3] - temp[1], 2)
+        );
+        const distanceRatio = radiusOffset / totalDist;
+        const slope = (temp[3] - temp[1]) / (temp[2] - temp[0]);
+        res[key] = {
+          left:
+            (1 - distanceRatio) * temp[0] +
+            distanceRatio * temp[2] -
+            this.entityLocation_.x +
+            this.entityBoundingBoxSize.width / 2 +
+            "px",
+          top:
+            (1 - distanceRatio) * temp[1] +
+            distanceRatio * temp[3] -
+            this.entityLocation_.y +
+            this.entityBoundingBoxSize.height / 2 +
+            "px",
+          /*transform: `translate(${value.selfSpot === "left" ? "-50%" : "0%"}, ${
+            value.selfSpot === "bottom" ? "0%" : "-50%"
+          }) rotate(${(Math.atan(slope) * 180) / Math.PI}deg)`,*/
+          transform: `translate(-50%,-50%) rotate(${
+            (Math.atan(slope) * 180) / Math.PI
+          }deg)`,
+        };
+      });
       return res;
     },
     relationWirePointsPart2: function () {
@@ -978,6 +1022,14 @@ export default {
         this.entityLabel = this.entityData.source.Label;
       // todo: watch relation claims. check if the canvas has the relation already.
       // if not emit to canvas so it can add it to know relations
+      /*if (this.relationLabels && this.entityData.source.RelationClaims) {
+        //
+        Object.entries(this.entityData.source.RelationClaims).forEach(
+          (key, value) => {
+            //
+          }
+        );
+      }*/
     },
     entityLabel() {
       // doing: updating entity's bounding box width and height
