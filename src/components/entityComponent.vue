@@ -61,11 +61,12 @@
         :stylePart="relationLabelsStyle[relClaim.To]"
         :colors="colors"
         :colorsProcessed="colorsProcessed"
+        :relWireColor="relWireColor"
         :label="
           relationLabels &&
           Object.keys(relationLabels).includes(relClaim.Relation)
             ? relationLabels[relClaim.Relation]
-            : ''
+            : 'Error !'
         "
       />
     </div>
@@ -166,6 +167,7 @@ export default {
   },
   props: {
     colors: Object,
+    colorsProcessed: Object,
     entityID: { type: String, required: true },
     apiUrl: String,
     apiValidity: Boolean,

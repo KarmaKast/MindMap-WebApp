@@ -1,6 +1,6 @@
 <template>
-  <div class="relationLabel" :style="relationLabelStyle">
-    <p><slot></slot></p>
+  <div class="relationLabelContainer" :style="relationLabelContainerStyle">
+    <p class="relationLabel">{{ label }}</p>
   </div>
 </template>
 
@@ -11,11 +11,20 @@ export default {
     stylePart: Object,
     colors: Object,
     colorsProcessed: Object,
+    relWireColor: String,
+    label: String,
   },
   computed: {
-    relationLabelStyle: function () {
+    relationLabelContainerStyle: function () {
       return Object.assign({}, this.stylePart, {
         //
+        border: `1px solid ${this.relWireColor}`,
+        backgroundColor: `hsla(${this.colors["background"].h},${
+          this.colors["background"].s
+        }%,${this.colors["background"].l}%,${
+          CSS.supports("backdrop-filter", "blur(6px)") ? 0.5 : 1
+        })`,
+        backdropFilter: "blur(6px)",
       });
     },
   },
@@ -23,19 +32,19 @@ export default {
 </script>
 
 <style scoped>
-.relationLabel {
+.relationLabelContainer {
   position: absolute;
   min-width: 45px;
   max-width: 80px;
   height: 12px;
+  display: grid;
 
   border-radius: 20px;
   padding: 5px;
-  border: 1px solid rgba(255, 0, 0, 0.466);
-  background-color: rgb(87, 87, 87);
+
   color: white;
 }
-.relationLabel p {
+.relationLabel {
   margin: 0px;
 
   text-overflow: ellipsis;

@@ -80,6 +80,8 @@
               ],
               stroke: canvasGridColors[1],
               x: this.canvasLocation.x,
+              draggable: false,
+              closed: false,
             }"
           ></v-line>
           <v-line
@@ -92,6 +94,8 @@
               ],
               stroke: canvasGridColors[2],
               y: this.canvasLocation.y,
+              draggable: false,
+              closed: false,
             }"
           ></v-line>
         </v-layer>
@@ -102,6 +106,7 @@
         v-for="(value, key_) in processedEntitiesBetter"
         :key="key_"
         :colors="colors"
+        :colorsProcessed="colorsProcessed"
         :entityID="key_"
         :apiUrl="apiUrl"
         :autoSave="false"

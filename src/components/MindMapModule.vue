@@ -96,11 +96,6 @@ import axios from "axios";
 import qs from "querystring";
 //import * as morphCore from "@karmakast/morph-dbms-core";
 
-//import icon1 from "../assets/ic_more_vert_18px.svg";
-/*import iconBase from "./icons/iconBase";
-import IconHamburger1 from "./icons/IconHamburger1";
-import relationLabel from "./relationLabel";*/
-
 export default {
   name: "MindMapModule",
   components: {
