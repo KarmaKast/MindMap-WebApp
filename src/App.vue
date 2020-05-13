@@ -8,9 +8,10 @@
         backgroundColor: 'blue',
       }"
     ></div>
-    <div v-if="!prerender" id="mindMapContainer" :style="mindMapContainerStyle">
+    <div id="mindMapContainer" :style="mindMapContainerStyle">
       <!-- <MindMapModule :colors="MindMapColors" :entityLimit="entityLimit" />-->
-      <mind-map-module :entityLimit="entityLimit" />
+      <mind-map-module v-if="!prerender" :entityLimit="entityLimit" />
+      <mind-map-module-loading v-if="prerender" />
     </div>
   </div>
 </template>
@@ -38,12 +39,12 @@ export default {
       },
       {
         property: "og:url",
-        content: window.location.origin,
+        content: "https://karmakast.github.io/MindMap-WebApp/",
         //content: `${process.env.BASE_URL}`,
       },
     ],
     link: [
-      { rel: "canonical", href: window.location.origin },
+      { rel: "canonical", href: "https://karmakast.github.io/MindMap-WebApp/" },
       //{ rel: "icon", href: "<%= BASE_URL %>favicon.ico" },
     ],
   },
@@ -54,6 +55,7 @@ export default {
       ),
       loading: MindMapModuleLoading,
     }),
+    MindMapModuleLoading,
   },
   data: function () {
     return {
