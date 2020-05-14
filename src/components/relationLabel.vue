@@ -1,6 +1,12 @@
 <template>
   <div class="relationLabelContainer" :style="relationLabelContainerStyle">
-    <div class="direction">{{ direction === "-&gt;" ? "&lt;-" : "-&gt;" }}</div>
+    <button
+      class="direction"
+      v-touch:tap="emitSwitchDirection"
+      :style="directionStyle"
+    >
+      {{ direction === "-&gt;" ? "&lt;-" : "-&gt;" }}
+    </button>
     <p
       class="relationLabel"
       v-touch:tap="toggleSelectedState"
@@ -11,7 +17,10 @@
     <button
       class="removeRelationClaimBttn"
       v-touch:tap="emitremoveRelationClaim"
-    ></button>
+      :style="removeRelationClaimBttnStyle"
+    >
+      X
+    </button>
   </div>
 </template>
 
@@ -52,12 +61,28 @@ export default {
     relationLabelStyle: function () {
       return {
         transform: `rotate(${this.stylePart.__angle}deg)`,
+        color: this.colorsProcessed["text"],
+      };
+    },
+    removeRelationClaimBttnStyle: function () {
+      return {
+        background: this.colorsProcessed["backgroundShade2"],
+        color: this.colorsProcessed["text"],
+      };
+    },
+    directionStyle: function () {
+      return {
+        background: this.colorsProcessed["backgroundShade2"],
+        color: this.colorsProcessed["text"],
       };
     },
   },
   methods: {
     emitremoveRelationClaim() {
       this.$emit("emitremoveRelationClaim");
+    },
+    emitSwitchDirection() {
+      this.$emit("emitSwitchDirection");
     },
     toggleSelectedState() {
       this.labelSelected = !this.labelSelected;
@@ -80,7 +105,7 @@ export default {
   box-sizing: border-box;
   padding: 2px;
 
-  color: white;
+  user-select: none;
 }
 .relationLabel {
   margin: 0px;
@@ -94,15 +119,15 @@ export default {
   cursor: pointer;
 }
 .removeRelationClaimBttn {
+  padding: 0px;
   border: 1px solid rgb(139, 139, 139);
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.486);
   cursor: pointer;
 }
 .direction {
+  padding: 0px;
   border: 1px solid rgb(139, 139, 139);
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.486);
   cursor: pointer;
 }
 </style>
