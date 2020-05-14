@@ -99,7 +99,9 @@ export default {
 .relationLabelContainer {
   position: absolute;
   display: grid;
-  grid-template-columns: calc(1em + 12px - 2px) auto calc(1em + 12px - 2px);
+  grid-template-columns: calc(1em + 12px - 2px) max-content calc(
+      1em + 12px - 2px
+    );
 
   border-radius: 20px;
   box-sizing: border-box;
@@ -110,8 +112,7 @@ export default {
 .relationLabel {
   display: inline-block;
   margin: 0px;
-  min-width: 45px;
-  max-width: 120px;
+  max-width: 90px;
   height: calc(1em + 12px);
   padding: 6px;
 

@@ -605,7 +605,9 @@ export default {
             this.entityBoundingBoxSize.height / 2 +
             "px",
 
-          transform: `translate(-50%,-50%) rotate(${theta_radians}deg)`,
+          /*transform: `translate(-50%,-50%) rotate(${theta_radians}deg)`,
+          __angle: angle - theta_radians,*/
+          transform: `translate(-0%,-0%) rotate(${theta_radians}deg)`,
           __angle: angle - theta_radians,
         };
       });
