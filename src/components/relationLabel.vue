@@ -5,7 +5,7 @@
       v-touch:tap="emitSwitchDirection"
       :style="directionStyle"
     >
-      {{ direction === "-&gt;" ? "&lt;-" : "-&gt;" }}
+      {{ direction ? (direction === "-&gt;" ? "&lt;-" : "-&gt;") : "!" }}
     </button>
     <p
       class="relationLabel"

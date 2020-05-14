@@ -128,6 +128,7 @@
         @entityActivated="entityActivated"
         @setSelfRelSpots="setSelfRelSpots(key_, $event)"
         @assignTargetRelSpots="assignTargetRelSpots(key_, $event)"
+        @getRelation="emitGetRelation"
       >
       </entityComponent>
     </div>
@@ -614,6 +615,10 @@ export default {
           });
       });
     },
+    emitGetRelation(relationID) {
+      console.log({ relationID });
+      this.$emit("getRelation", relationID);
+    },
   },
   watch: {
     windowSize() {
@@ -758,7 +763,11 @@ export default {
                 y: this.canvasMousePos.y - this.canvasLocation.y,
               }
             );
-          else {
+          else if (
+            Object.keys(this.processedEntitiesBetter).includes(
+              this.prevActiveEntityID
+            )
+          ) {
             Vue.set(
               this.processedEntitiesBetter[this.prevActiveEntityID],
               "canvasMousePos",

@@ -11,6 +11,7 @@
       :grid="grid"
       @create-new-entity="createNewEntity"
       @dropEntity="dropEntity"
+      @getRelation="getRelation"
     ></mind-map-canvas>
 
     <div
@@ -89,6 +90,7 @@
 </template>
 
 <script>
+import Vue from "vue";
 import statusBar from "./statusBar.vue";
 
 //import {uuidv1} from 'uuid/v1';
@@ -435,10 +437,17 @@ export default {
             //console.log("getting response");
             console.log(response);
             //this.entity_ID = response.data.entityID;
-            this.collection.Entities.push({
+            this.collection.Entities = [
+              ...this.collection.Entities,
+              {
+                ID: response.data.entityID,
+                entityLocationDef: entityLocationDef_,
+              },
+            ];
+            /*this.collection.Entities.push({
               ID: response.data.entityID,
               entityLocationDef: entityLocationDef_,
-            });
+            });*/
           })
           .catch((err) => console.log("Error: ", err));
       }
@@ -456,6 +465,21 @@ export default {
           break;
         }
       }
+    },
+    getRelation(relationID) {
+      //
+      axios({
+        method: "GET",
+        baseURL: this.apiUrl,
+        url: `/collection/getRelation`,
+        data: qs.stringify({
+          relationID,
+        }),
+      }).then((response) => {
+        console.log(response);
+        //this.collection.Relations[relationID] = response.data;
+        Vue.set(this.collection.Relations, relationID, response.data);
+      });
     },
     aboutPageDisplay(showOrHide) {
       this.showAboutPage = showOrHide;

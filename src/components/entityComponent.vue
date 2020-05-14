@@ -864,10 +864,9 @@ export default {
         const temp = this.entityData;
         temp.source.RelationClaims.push(JSON.parse(response.data.relClaim));
         this.entityData = Object.assign({}, temp);
-        this.$emit(
-          "assignTargetRelSpots",
-          JSON.parse(response.data.relClaim).To
-        );
+        const relClaim = JSON.parse(response.data.relClaim);
+        this.$emit("assignTargetRelSpots", relClaim.To);
+        this.$emit("getRelation", relClaim.Relation);
       });
     },
   },
