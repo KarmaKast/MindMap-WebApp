@@ -22,41 +22,42 @@ module.exports = {
     },
   },
   chainWebpack: (config) => {
-    config.plugin("PrerenderSPAPlugin").use(PrerenderSPAPlugin, [
-      {
-        staticDir: path.join(__dirname, "dist"),
-        //indexPath: path.join(__dirname, "dist", "index.html"),
-        outputDir: path.join(__dirname, "dist"),
-        routes: ["/"],
-        //routes: [process.env.NODE_ENV === "production" ? "/" : "/"],
-        server: {
-          proxy: {
-            "/MindMap-WebApp": {
-              target: "http://localhost:8000",
-              router: function (req) {
-                return "http://" + req.headers.host;
-              },
-              pathRewrite: {
-                "^/MindMap-WebApp": "",
+    if (process.env.NODE_ENV !== "development")
+      config.plugin("PrerenderSPAPlugin").use(PrerenderSPAPlugin, [
+        {
+          staticDir: path.join(__dirname, "dist"),
+          //indexPath: path.join(__dirname, "dist", "index.html"),
+          outputDir: path.join(__dirname, "dist"),
+          routes: ["/"],
+          //routes: [process.env.NODE_ENV === "production" ? "/" : "/"],
+          server: {
+            proxy: {
+              "/MindMap-WebApp": {
+                target: "http://localhost:8000",
+                router: function (req) {
+                  return "http://" + req.headers.host;
+                },
+                pathRewrite: {
+                  "^/MindMap-WebApp": "",
+                },
               },
             },
           },
+          renderer: new Renderer({
+            // We need to inject a value so we're able to
+            // detect if the page is currently pre-rendered.
+            injectProperty: "__PRERENDER_INJECTED",
+            inject: {
+              prerendered: true,
+            },
+            //renderAfterElementExists: ".MindMapModule",
+            renderAfterDocumentEvent: "app-rendered",
+            //renderAfterTime: 5000,
+            headless: true, // commit this
+            //headless: false, // don't commit this
+          }),
         },
-        renderer: new Renderer({
-          // We need to inject a value so we're able to
-          // detect if the page is currently pre-rendered.
-          injectProperty: "__PRERENDER_INJECTED",
-          inject: {
-            prerendered: true,
-          },
-          //renderAfterElementExists: ".MindMapModule",
-          renderAfterDocumentEvent: "app-rendered",
-          //renderAfterTime: 5000,
-          headless: true, // commit this
-          //headless: false, // don't commit this
-        }),
-      },
-    ]);
+      ]);
   },
   pwa: {
     display: "fullscreen",

@@ -1,13 +1,17 @@
 <template>
   <div class="relationLabelContainer" :style="relationLabelContainerStyle">
+    <div class="direction">{{ direction === "-&gt;" ? "&lt;-" : "-&gt;" }}</div>
+    <p
+      class="relationLabel"
+      v-touch:tap="toggleSelectedState"
+      :style="relationLabelStyle"
+    >
+      {{ label }}
+    </p>
     <button
       class="removeRelationClaimBttn"
       v-touch:tap="emitremoveRelationClaim"
     ></button>
-    <p class="relationLabel" v-touch:tap="toggleSelectedState">
-      {{ label }}
-    </p>
-    <div class="direction">{{ direction }}</div>
   </div>
 </template>
 
@@ -45,6 +49,11 @@ export default {
         gridTemplateColumns: "20px auto 20px",
       });
     },
+    relationLabelStyle: function () {
+      return {
+        transform: `rotate(${this.stylePart.__angle}deg)`,
+      };
+    },
   },
   methods: {
     emitremoveRelationClaim() {
@@ -79,7 +88,7 @@ export default {
   max-width: 80px;
   text-overflow: ellipsis;
   padding: 2px;
-  margin-right: 4px;
+
   font-size: 80%;
   box-sizing: border-box;
   cursor: pointer;
