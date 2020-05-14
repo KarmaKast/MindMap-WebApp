@@ -55,7 +55,6 @@ export default {
           CSS.supports("backdrop-filter", "blur(6px)") ? 0.5 : 1
         })`,
         backdropFilter: "blur(6px)",
-        gridTemplateColumns: "20px auto 20px",
       });
     },
     relationLabelStyle: function () {
@@ -100,6 +99,7 @@ export default {
 .relationLabelContainer {
   position: absolute;
   display: grid;
+  grid-template-columns: calc(1em + 12px - 2px) auto calc(1em + 12px - 2px);
 
   border-radius: 20px;
   box-sizing: border-box;
@@ -108,26 +108,44 @@ export default {
   user-select: none;
 }
 .relationLabel {
+  display: inline-block;
   margin: 0px;
   min-width: 45px;
-  max-width: 80px;
+  max-width: 120px;
+  height: calc(1em + 12px);
+  padding: 6px;
+
+  white-space: nowrap;
+  overflow: hidden;
   text-overflow: ellipsis;
-  padding: 2px;
 
   font-size: 80%;
   box-sizing: border-box;
   cursor: pointer;
 }
+.relationLabel:hover {
+  overflow: visible;
+  min-width: unset;
+  width: auto;
+}
 .removeRelationClaimBttn {
   padding: 0px;
+  box-sizing: border-box;
   border: 1px solid rgb(139, 139, 139);
   border-radius: 50%;
   cursor: pointer;
 }
+.removeRelationClaimBttn:hover {
+  border: 1px solid rgb(255, 64, 64);
+}
 .direction {
   padding: 0px;
+  box-sizing: border-box;
   border: 1px solid rgb(139, 139, 139);
   border-radius: 50%;
   cursor: pointer;
+}
+.direction:hover {
+  border: 1px solid rgb(255, 64, 64);
 }
 </style>
