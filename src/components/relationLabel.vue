@@ -106,12 +106,14 @@ export default {
   border-radius: 20px;
   box-sizing: border-box;
   padding: 2px;
+  transform-origin: center;
 
   user-select: none;
 }
 .relationLabel {
   display: inline-block;
   margin: 0px;
+  min-width: 40px;
   max-width: 90px;
   height: calc(1em + 12px);
   padding: 6px;
@@ -126,7 +128,6 @@ export default {
 }
 .relationLabel:hover {
   overflow: visible;
-  min-width: unset;
   width: auto;
 }
 .removeRelationClaimBttn {

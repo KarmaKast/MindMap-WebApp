@@ -574,7 +574,7 @@ export default {
     },
     relationLabelsStyle: function () {
       const res = {};
-      const radiusOffset = 60;
+      const radiusOffset = 100;
       Object.entries(this.relationWirePointsPart1).forEach(([key, value]) => {
         const temp = value.points;
         const totalDist = Math.sqrt(
@@ -591,23 +591,23 @@ export default {
         let theta_radians = (Math.atan2(delta_y, delta_x) * 180) / Math.PI;
         theta_radians = theta_radians < 0 ? 360 + theta_radians : theta_radians;
         //console.log("angle2: ", theta_radians);
+        const left =
+          (1 - distanceRatio) * temp[0] +
+          distanceRatio * temp[2] -
+          this.entityLocation_.x +
+          this.entityBoundingBoxSize.width / 2;
+        const top =
+          (1 - distanceRatio) * temp[1] +
+          distanceRatio * temp[3] -
+          this.entityLocation_.y +
+          this.entityBoundingBoxSize.height / 2;
         res[key] = {
-          left:
-            (1 - distanceRatio) * temp[0] +
-            distanceRatio * temp[2] -
-            this.entityLocation_.x +
-            this.entityBoundingBoxSize.width / 2 +
-            "px",
-          top:
-            (1 - distanceRatio) * temp[1] +
-            distanceRatio * temp[3] -
-            this.entityLocation_.y +
-            this.entityBoundingBoxSize.height / 2 +
-            "px",
+          left: "0px",
+          top: "0px",
 
           /*transform: `translate(-50%,-50%) rotate(${theta_radians}deg)`,
           __angle: angle - theta_radians,*/
-          transform: `translate(-0%,-0%) rotate(${theta_radians}deg)`,
+          transform: `translate(calc(${left}px - 50%),calc(${top}px - 50%)) rotate(${theta_radians}deg)`,
           __angle: angle - theta_radians,
         };
       });
