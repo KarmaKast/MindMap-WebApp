@@ -1,14 +1,11 @@
 <template>
   <div class="relationLabelContainer" :style="relationLabelContainerStyle">
-    <p
-      class="relationLabel"
-      v-touch:tap="toggleSelectedState"
-      :style="relationLabelStyle"
-      v-if="false"
-    >
+    <p class="relationLabel" v-touch:tap="toggleSelectedState">
       {{ labelFinal }}
     </p>
-    <input class="labelInput" v-model="labelFinal" />
+    <div class="labelInputContainer">
+      <input class="labelInput" v-model="labelFinal" :style="labelInputStyle" />
+    </div>
     <button
       class="direction"
       v-touch:tap="emitSwitchDirection"
@@ -61,10 +58,10 @@ export default {
         backdropFilter: "blur(6px)",
       });
     },
-    relationLabelStyle: function () {
+    labelInputStyle: function () {
       return {
         transform: `rotate(${this.stylePart.__angle}deg)`,
-        //color: this.colorsProcessed["text"],
+        color: this.colorsProcessed["text"],
       };
     },
     removeRelationClaimBttnStyle: function () {
@@ -103,12 +100,17 @@ export default {
 </script>
 
 <style scoped>
+:read-only {
+  --padding: 4px;
+  --size: calc(1em + calc(var(--padding) * 2));
+}
 .relationLabelContainer {
   position: absolute;
   display: grid;
-  grid-template-columns: calc(1em + 12px - 2px) max-content calc(
-      1em + 12px - 2px
+  grid-template-columns: calc(var(--size) - 2px) max-content calc(
+      var(--size) - 2px
     );
+  column-gap: 2px;
 
   border-radius: 20px;
   box-sizing: border-box;
@@ -123,7 +125,7 @@ export default {
   margin: 0px;
   min-width: 40px;
   max-width: 90px;
-  height: calc(1em + 12px);
+  height: var(--size);
   padding: 6px;
 
   white-space: nowrap;
@@ -160,25 +162,35 @@ export default {
 .direction:hover {
   border: 1px solid rgb(255, 64, 64);
 }
-
+.labelInputContainer {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  padding-left: calc(var(--size) + 4px);
+  padding-right: calc(var(--size) + 4px);
+  border-radius: inherit;
+  box-sizing: border-box;
+  pointer-events: none;
+}
 .labelInput {
-  order: 2;
+  display: inline-block;
   position: relative;
   background: none;
-  min-width: 40px;
-  max-width: 90px;
-  height: calc(1em + 12px);
-  padding: 6px;
+  margin: 0px;
+  width: 100%;
+  height: 100%;
 
   box-sizing: border-box;
   border: none;
   border-radius: inherit;
-  color: rgb(255, 255, 255);
   pointer-events: all;
 
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+
+  font-size: 80%;
+  box-sizing: border-box;
 }
 .labelInput:hover {
   overflow: visible;
