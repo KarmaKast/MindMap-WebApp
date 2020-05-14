@@ -1,5 +1,14 @@
 <template>
   <div class="relationLabelContainer" :style="relationLabelContainerStyle">
+    <p
+      class="relationLabel"
+      v-touch:tap="toggleSelectedState"
+      :style="relationLabelStyle"
+      v-if="false"
+    >
+      {{ labelFinal }}
+    </p>
+    <input class="labelInput" v-model="labelFinal" />
     <button
       class="direction"
       v-touch:tap="emitSwitchDirection"
@@ -7,13 +16,7 @@
     >
       {{ direction ? (direction === "-&gt;" ? "&lt;-" : "-&gt;") : "!" }}
     </button>
-    <p
-      class="relationLabel"
-      v-touch:tap="toggleSelectedState"
-      :style="relationLabelStyle"
-    >
-      {{ label }}
-    </p>
+
     <button
       class="removeRelationClaimBttn"
       v-touch:tap="emitremoveRelationClaim"
@@ -38,6 +41,7 @@ export default {
   data: function () {
     return {
       labelSelected: false,
+      labelFinal: this.label,
     };
   },
   computed: {
@@ -60,7 +64,7 @@ export default {
     relationLabelStyle: function () {
       return {
         transform: `rotate(${this.stylePart.__angle}deg)`,
-        color: this.colorsProcessed["text"],
+        //color: this.colorsProcessed["text"],
       };
     },
     removeRelationClaimBttnStyle: function () {
@@ -91,6 +95,9 @@ export default {
     canvasClicked() {
       if (this.labelSelected) this.labelSelected = false;
     },
+    labelFinal() {
+      // todo update rel label to api
+    },
   },
 };
 </script>
@@ -111,6 +118,7 @@ export default {
   user-select: none;
 }
 .relationLabel {
+  order: 2;
   display: inline-block;
   margin: 0px;
   min-width: 40px;
@@ -121,6 +129,7 @@ export default {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  color: rgba(240, 248, 255, 0);
 
   font-size: 80%;
   box-sizing: border-box;
@@ -128,9 +137,9 @@ export default {
 }
 .relationLabel:hover {
   overflow: visible;
-  width: auto;
 }
 .removeRelationClaimBttn {
+  order: 3;
   padding: 0px;
   box-sizing: border-box;
   border: 1px solid rgb(139, 139, 139);
@@ -141,6 +150,7 @@ export default {
   border: 1px solid rgb(255, 64, 64);
 }
 .direction {
+  order: 1;
   padding: 0px;
   box-sizing: border-box;
   border: 1px solid rgb(139, 139, 139);
@@ -149,5 +159,28 @@ export default {
 }
 .direction:hover {
   border: 1px solid rgb(255, 64, 64);
+}
+
+.labelInput {
+  order: 2;
+  position: relative;
+  background: none;
+  min-width: 40px;
+  max-width: 90px;
+  height: calc(1em + 12px);
+  padding: 6px;
+
+  box-sizing: border-box;
+  border: none;
+  border-radius: inherit;
+  color: rgb(255, 255, 255);
+  pointer-events: all;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.labelInput:hover {
+  overflow: visible;
 }
 </style>
