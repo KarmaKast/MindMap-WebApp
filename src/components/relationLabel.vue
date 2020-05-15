@@ -5,12 +5,20 @@
     </p>
     <div class="labelInputContainer">
       <input
-        class="labelInput"
+        :class="labelInputClassesFinal"
         type="text"
         v-model="labelFinal"
         :style="labelInputStyle"
+        v-touch:tap="labelInputTapActions"
       />
     </div>
+    <button
+      :class="removeRelationClaimBttnClassesFinal"
+      v-touch:tap="emitremoveRelationClaim"
+      :style="removeRelationClaimBttnStyle"
+    >
+      X
+    </button>
     <button
       class="direction"
       v-touch:tap="emitSwitchDirection"
@@ -18,18 +26,11 @@
     >
       {{ direction ? (direction === "-&gt;" ? "&lt;-" : "-&gt;") : "!" }}
     </button>
-
-    <button
-      class="removeRelationClaimBttn"
-      v-touch:tap="emitremoveRelationClaim"
-      :style="removeRelationClaimBttnStyle"
-    >
-      X
-    </button>
   </div>
 </template>
 
 <script>
+import Vue from "vue";
 import axios from "axios";
 import qs from "querystring";
 
@@ -49,9 +50,26 @@ export default {
     return {
       labelSelected: false,
       labelFinal: this.label,
+      removeRelationClaimBttnClasses: ["removeRelationClaimBttn"],
+      labelInputClasses: ["labelInput"],
     };
   },
   computed: {
+    removeRelationClaimBttnClassesFinal: function () {
+      let res = "";
+      this.removeRelationClaimBttnClasses.forEach((value) => {
+        res += value + " ";
+      });
+      return res;
+    },
+    labelInputClassesFinal: function () {
+      let res = "";
+      this.labelInputClasses.forEach((value) => {
+        res += value + " ";
+      });
+      return res;
+    },
+
     canvasClicked: function () {
       //return false;
       return this.$store.state.canvasClicked;
@@ -99,6 +117,26 @@ export default {
     toggleSelectedState() {
       this.labelSelected = !this.labelSelected;
     },
+    labelInputTapActions() {
+      console.log("I should be called on input click");
+      console.log(this.removeRelationClaimBttnClasses.includes("show"));
+      if (!this.removeRelationClaimBttnClasses.includes("show"))
+        this.removeRelationClaimBttnClasses.push("show");
+      else {
+        Vue.delete(
+          this.removeRelationClaimBttnClasses,
+          this.removeRelationClaimBttnClasses.indexOf("show")
+        );
+      }
+      if (!this.labelInputClasses.includes("resized"))
+        this.labelInputClasses.push("resized");
+      else {
+        Vue.delete(
+          this.labelInputClasses,
+          this.labelInputClasses.indexOf("resized")
+        );
+      }
+    },
   },
   watch: {
     canvasClicked() {
@@ -134,9 +172,7 @@ export default {
 .relationLabelContainer {
   position: absolute;
   display: grid;
-  grid-template-columns: calc(var(--size) - 2px) max-content calc(
-      var(--size) - 2px
-    );
+  grid-template-columns: calc(var(--size) - 2px) max-content auto;
   column-gap: 2px;
 
   border-radius: 20px;
@@ -168,6 +204,8 @@ export default {
   overflow: visible;
 }
 .removeRelationClaimBttn {
+  display: none;
+  width: 0px;
   order: 3;
   padding: 0px;
   box-sizing: border-box;
@@ -177,6 +215,12 @@ export default {
 }
 .removeRelationClaimBttn:hover {
   border: 1px solid rgb(255, 64, 64);
+  display: block;
+  width: calc(var(--size));
+}
+.removeRelationClaimBttn.show {
+  display: block;
+  width: calc(var(--size));
 }
 .direction {
   order: 1;
@@ -200,13 +244,13 @@ export default {
 .labelInput {
   display: inline-block;
   position: absolute;
-  right: 0px;
+  left: 0px;
   top: 0px;
   margin: 0px;
   margin-left: calc(var(--size) + 4px);
-  margin-right: calc(var(--size) + 4px);
-  width: calc(100% - calc(calc(var(--size) + 4px) * 2));
+  width: calc(100% - calc(calc(var(--size) + 4px) * 1));
   height: 100%;
+  padding: var(--padding);
 
   box-sizing: border-box;
   border: none;
@@ -221,7 +265,7 @@ export default {
   box-sizing: border-box;
   background: none;
 }
-.labelInput:active {
-  border: ;
+.labelInput.resized {
+  width: calc(100% - calc(calc(var(--size) + 4px) * 2));
 }
 </style>

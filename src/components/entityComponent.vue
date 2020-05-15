@@ -576,7 +576,7 @@ export default {
     },
     relationLabelsStyle: function () {
       const res = {};
-      const radiusOffset = 100;
+      const radiusOffset = 80;
       Object.entries(this.relationWirePointsPart1).forEach(([key, value]) => {
         const temp = value.points;
         const totalDist = Math.sqrt(
