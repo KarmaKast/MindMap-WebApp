@@ -9,6 +9,7 @@ export default new Vuex.Store({
     window_width: window.innerWidth,
     /*canvas_height: 0,
     canvas_width: 0,*/
+    canvasClicked: false,
     apiUrl: ["", false],
     theme: [],
 

@@ -80,6 +80,8 @@
               ],
               stroke: canvasGridColors[1],
               x: this.canvasLocation.x,
+              draggable: false,
+              closed: false,
             }"
           ></v-line>
           <v-line
@@ -92,6 +94,8 @@
               ],
               stroke: canvasGridColors[2],
               y: this.canvasLocation.y,
+              draggable: false,
+              closed: false,
             }"
           ></v-line>
         </v-layer>
@@ -102,6 +106,7 @@
         v-for="(value, key_) in processedEntitiesBetter"
         :key="key_"
         :colors="colors"
+        :colorsProcessed="colorsProcessed"
         :entityID="key_"
         :apiUrl="apiUrl"
         :autoSave="false"
@@ -115,6 +120,7 @@
         :entitySelected="value.entitySelected"
         :entityLocationDef="value.entityLocationDef"
         :grid="grid"
+        :relationLabels="collection.Relations"
         :targetRelSpots="value.targetRelSpots"
         :updateEntityData="value.updateEntityData"
         @prevActiveEntityID="setPrevActiveEntityID"
@@ -122,6 +128,7 @@
         @entityActivated="entityActivated"
         @setSelfRelSpots="setSelfRelSpots(key_, $event)"
         @assignTargetRelSpots="assignTargetRelSpots(key_, $event)"
+        @getRelation="emitGetRelation"
       >
       </entityComponent>
     </div>
@@ -129,8 +136,6 @@
 </template>
 <script>
 import Vue from "vue";
-//import entityComponent from "./entityComponent";
-const entityComponent = () => import("./entityComponent");
 
 import axios from "axios";
 import qs from "querystring";
@@ -140,12 +145,15 @@ import lodashIsEqual from "lodash/isEqual";
 export default {
   name: "MindMapCanvas",
   components: {
-    entityComponent,
+    entityComponent: () =>
+      import(
+        /* webpackChunkName: "chunk-entity-component" */ "./entityComponent"
+      ),
   },
   props: {
     colors: Object,
     colorsProcessed: Object,
-    entities: Array,
+    collection: Object,
     entityLimit: {
       // context: setting this to 10. With some optimizations should be increased to 100
       // or extra entitys could be loaded with minimum memory usage.
@@ -559,19 +567,19 @@ export default {
       }).then((response) => {
         //console.log(response.data.claimantIDs);
         this.$emit("dropEntity", entityID, response.data.claimantIDs);
-        // for all entities with claimantIDs, update entity_data
+        // for all collection.Entities with claimantIDs, update entity_data
         this.entitiesToUpdate = response.data.claimantIDs;
       });
     },
     initiateProcessedEntities() {
       Object.keys(this.processedEntitiesBetter).forEach((entityID, index) => {
-        if (!this.entities.some((x) => x.ID === entityID)) {
+        if (!this.collection.Entities.some((x) => x.ID === entityID)) {
           //console.log("to delete : ", entityID);
           Vue.delete(this.processedEntitiesBetter, entityID);
           Vue.delete(this.relClaimTargetSpots, entityID);
         }
       });
-      this.entities.forEach((value, index) => {
+      this.collection.Entities.forEach((value, index) => {
         if (!Object.keys(this.processedEntitiesBetter).includes(value.ID))
           Vue.set(this.processedEntitiesBetter, value.ID, {
             dragging: {
@@ -593,9 +601,12 @@ export default {
                 : undefined
               : undefined,
             entityLocationDef:
-              this.entities[index]["entityLocationDef"] === undefined
+              this.collection.Entities[index]["entityLocationDef"] === undefined
                 ? { x: 0, y: 0 }
-                : Object.assign({}, this.entities[index]["entityLocationDef"]),
+                : Object.assign(
+                    {},
+                    this.collection.Entities[index]["entityLocationDef"]
+                  ),
             targetRelSpots: Object.assign(
               {},
               this.relClaimTargetSpots[value.ID]
@@ -603,6 +614,10 @@ export default {
             updateEntityData: false, //this.entitiesToUpdate.includes(value.ID),
           });
       });
+    },
+    emitGetRelation(relationID) {
+      console.log({ relationID });
+      this.$emit("getRelation", relationID);
     },
   },
   watch: {
@@ -621,7 +636,7 @@ export default {
         }, 50);
       }
     },
-    entities: {
+    "collection.Entities": {
       handler() {
         this.initiateProcessedEntities();
         //console.log("i should appear when creating new entity");
@@ -748,7 +763,11 @@ export default {
                 y: this.canvasMousePos.y - this.canvasLocation.y,
               }
             );
-          else {
+          else if (
+            Object.keys(this.processedEntitiesBetter).includes(
+              this.prevActiveEntityID
+            )
+          ) {
             Vue.set(
               this.processedEntitiesBetter[this.prevActiveEntityID],
               "canvasMousePos",

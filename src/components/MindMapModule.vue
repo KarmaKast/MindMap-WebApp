@@ -5,12 +5,13 @@
       :colors="colorsFinal"
       :colorsProcessed="colorsProcessed"
       :apiUrl="apiUrl"
-      :entities="entities"
+      :collection="collection"
       :entityLimit="entityLimit"
       :apiValidity="apiValidity"
       :grid="grid"
       @create-new-entity="createNewEntity"
       @dropEntity="dropEntity"
+      @getRelation="getRelation"
     ></mind-map-canvas>
 
     <div
@@ -89,39 +90,34 @@
 </template>
 
 <script>
-//import MindMapCanvas from "./MindMapCanvas.vue";
-const MindMapCanvas = () => import("./MindMapCanvas");
-
+import Vue from "vue";
 import statusBar from "./statusBar.vue";
-//import aboutPage from "./aboutPage.vue";
-const aboutPage = () => import("./aboutPage");
-
-//import buttonOne from "./button1.vue";
-const buttonOne = () => import("./button1");
-//import buttonTwo from "./button2.vue";
-const buttonTwo = () => import("./button2");
 
 //import {uuidv1} from 'uuid/v1';
 import axios from "axios";
 import qs from "querystring";
 //import * as morphCore from "@karmakast/morph-dbms-core";
 
-//import icon1 from "../assets/ic_more_vert_18px.svg";
-import iconBase from "./icons/iconBase";
-import IconHamburger1 from "./icons/IconHamburger1";
-
 export default {
   name: "MindMapModule",
   components: {
-    MindMapCanvas,
+    MindMapCanvas: () =>
+      import(/* webpackChunkName: "chunk-mindmap-canvas" */ "./MindMapCanvas"),
     statusBar,
-    aboutPage,
+    aboutPage: () =>
+      import(/* webpackChunkName: "chunk-about-page" */ "./aboutPage"),
 
-    buttonOne,
-    buttonTwo,
+    buttonOne: () =>
+      import(/* webpackChunkName: "chunk-button1" */ "./button1"),
+    buttonTwo: () =>
+      import(/* webpackChunkName: "chunk-button2" */ "./button2"),
 
-    iconBase,
-    IconHamburger1,
+    iconBase: () =>
+      import(/* webpackChunkName: "chunk-icon-base" */ "./icons/iconBase"),
+    IconHamburger1: () =>
+      import(
+        /* webpackChunkName: "chunk-icon-Hamburger1" */ "./icons/IconHamburger1"
+      ),
   },
   props: {
     // locationHor: {'left':value} or {'right':value}
@@ -145,8 +141,7 @@ export default {
       showMenu: false,
       apiUrl: "",
       apiValidity: false,
-      collection: null,
-      entities: [],
+      collection: { Entities: [], ID: "", Label: "", Relations: [] },
       aboutPageLoaded: false,
       showAboutPage: false,
       grid: {
@@ -169,7 +164,7 @@ export default {
           background: { h: 0, s: 0, l: 10, a: 1 },
           backgroundShade1: { h: 0, s: 0, l: 40, a: 1 },
           backgroundShade2: { h: 0, s: 0, l: 5, a: 1 },
-          text: { h: 0, s: 0, l: 50, a: 1 },
+          text: { h: 0, s: 0, l: 60, a: 1 },
           theme: { h: 151, s: 70, l: 50, a: 1 },
           theme_light: { h: 151, s: 85, l: 32, a: 0.6 },
         },
@@ -344,7 +339,7 @@ export default {
     },
     loadCollection() {
       let url_ = this.apiUrl;
-      this.entities = [];
+      this.collection = { Entities: [], ID: "", Label: "", Relations: [] };
       // todo: directly using testCollection for now. Later a collection explorer feature need to be added.
       axios({
         method: "POST",
@@ -361,15 +356,15 @@ export default {
     },
     getCollection() {
       let url_ = this.apiUrl;
-      this.entities = [];
+      this.collection = { Entities: [], ID: "", Label: "", Relations: [] };
       // todo: get a list of entityIDs and create a list of entitys in the canvas
       console.log(`getting list of entitys\n${url_}`);
       axios
         .get(url_ + "/collection/get")
         .then((response) => {
-          //console.log(response);
+          //console.log(response["data"]);
           this.collection = response["data"];
-          this.entities = response.data.Entities.map((ID) => {
+          this.collection.Entities = response.data.Entities.map((ID) => {
             return { ID: ID };
           });
           this.refreshCanvas();
@@ -419,7 +414,7 @@ export default {
     createNewEntity(entityLocationDef_) {
       if (!this.apiValidity) {
         alert("Connect to API");
-      } else if (!this.entities.length >= this.entityLimit) {
+      } else if (!this.collection.Entities.length >= this.entityLimit) {
         alert(
           `Sorry! Max entitys are limited to : ${this.entityLimit} for now.`
         );
@@ -442,27 +437,49 @@ export default {
             //console.log("getting response");
             console.log(response);
             //this.entity_ID = response.data.entityID;
-            this.entities.push({
+            this.collection.Entities = [
+              ...this.collection.Entities,
+              {
+                ID: response.data.entityID,
+                entityLocationDef: entityLocationDef_,
+              },
+            ];
+            /*this.collection.Entities.push({
               ID: response.data.entityID,
               entityLocationDef: entityLocationDef_,
-            });
+            });*/
           })
           .catch((err) => console.log("Error: ", err));
       }
       /*
-      this.entities.push({
+      this.collection.Entities.push({
         ID: `__test_ID__${uuid.v1()}`,
         newNode: true,
         entityLocationDef: entityLocationDef_,
       });*/
     },
     dropEntity(entityID, claimantIDs) {
-      for (const index in this.entities) {
-        if (this.entities[index].ID === entityID) {
-          this.$delete(this.entities, index);
+      for (const index in this.collection.Entities) {
+        if (this.collection.Entities[index].ID === entityID) {
+          this.$delete(this.collection.Entities, index);
           break;
         }
       }
+    },
+    getRelation(relationID) {
+      //
+      axios({
+        method: "GET",
+        baseURL: this.apiUrl,
+        url: `/collection/getRelation`,
+        data: qs.stringify({
+          relationID,
+        }),
+      }).then((response) => {
+        console.log(response);
+        //this.collection.Relations[relationID] = response.data;
+        Vue.set(this.collection.Relations, relationID, response.data);
+      });
     },
     aboutPageDisplay(showOrHide) {
       this.showAboutPage = showOrHide;
@@ -488,7 +505,7 @@ export default {
     apiValidity() {
       if (!this.apiValidity && this.apiUrl === "") {
         this.refreshCanvas();
-        this.entities = [];
+        this.collection = null;
         localStorage.setItem("apiUrl", "");
       }
     },

@@ -8,9 +8,10 @@
         backgroundColor: 'blue',
       }"
     ></div>
-    <div v-if="!prerender" id="mindMapContainer" :style="mindMapContainerStyle">
+    <div id="mindMapContainer" :style="mindMapContainerStyle">
       <!-- <MindMapModule :colors="MindMapColors" :entityLimit="entityLimit" />-->
-      <mind-map-module :entityLimit="entityLimit" />
+      <mind-map-module v-if="!prerender" :entityLimit="entityLimit" />
+      <mind-map-module-loading v-if="prerender" />
     </div>
   </div>
 </template>
@@ -49,9 +50,12 @@ export default {
   },
   components: {
     MindMapModule: () => ({
-      component: import("./components/MindMapModule.vue"),
+      component: import(
+        /* webpackChunkName: "chunk-mindmap-module" */ "./components/MindMapModule.vue"
+      ),
       loading: MindMapModuleLoading,
     }),
+    MindMapModuleLoading,
   },
   data: function () {
     return {

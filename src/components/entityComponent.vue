@@ -55,11 +55,23 @@
       </v-stage>
     </div>
     <div class="relationLabelsContainer" :style="{ position: 'absolute' }">
-      <div
-        class="relationLabel"
+      <relation-label
         v-for="(relClaim, index) in entityData.source.RelationClaims"
         :key="index"
-      ></div>
+        :stylePart="relationLabelsStyle[relClaim.To]"
+        :colors="colors"
+        :apiUrl="apiUrl"
+        :colorsProcessed="colorsProcessed"
+        :relWireColor="relWireColor"
+        :ID="relClaim.Relation"
+        :label="
+          relationLabels &&
+          Object.keys(relationLabels).includes(relClaim.Relation)
+            ? relationLabels[relClaim.Relation]
+            : 'Error !'
+        "
+        :direction="relClaim.Direction"
+      />
     </div>
     <div
       v-show="entitySelectedFinal"
@@ -153,9 +165,12 @@ export default {
   name: "entityComponent",
   components: {
     //ColorPicker,
+    relationLabel: () =>
+      import(/* webpackChunkName: "chunk-relation-label" */ "./relationLabel"),
   },
   props: {
     colors: Object,
+    colorsProcessed: Object,
     entityID: { type: String, required: true },
     apiUrl: String,
     apiValidity: Boolean,
@@ -199,6 +214,7 @@ export default {
       },
       type: Object,
     },
+    relationLabels: Object,
     targetRelSpots: Object,
     updateEntityData: {
       default: false,
@@ -558,6 +574,47 @@ export default {
       );
       return res;
     },
+    relationLabelsStyle: function () {
+      const res = {};
+      const radiusOffset = 100;
+      Object.entries(this.relationWirePointsPart1).forEach(([key, value]) => {
+        const temp = value.points;
+        const totalDist = Math.sqrt(
+          Math.pow(temp[2] - temp[0], 2) + Math.pow(temp[3] - temp[1], 2)
+        );
+        const distanceRatio = radiusOffset / totalDist;
+        const slope = (temp[3] - temp[1]) / (temp[2] - temp[0]);
+
+        const angle = (Math.atan(slope) * 180) / Math.PI;
+        //console.log("angle: ", angle);
+
+        const delta_x = temp[0] - temp[2];
+        const delta_y = temp[1] - temp[3];
+        let theta_radians = (Math.atan2(delta_y, delta_x) * 180) / Math.PI;
+        theta_radians = theta_radians < 0 ? 360 + theta_radians : theta_radians;
+        //console.log("angle2: ", theta_radians);
+        const left =
+          (1 - distanceRatio) * temp[0] +
+          distanceRatio * temp[2] -
+          this.entityLocation_.x +
+          this.entityBoundingBoxSize.width / 2;
+        const top =
+          (1 - distanceRatio) * temp[1] +
+          distanceRatio * temp[3] -
+          this.entityLocation_.y +
+          this.entityBoundingBoxSize.height / 2;
+        res[key] = {
+          left: "0px",
+          top: "0px",
+
+          /*transform: `translate(-50%,-50%) rotate(${theta_radians}deg)`,
+          __angle: angle - theta_radians,*/
+          transform: `translate(calc(${left}px - 50%),calc(${top}px - 50%)) rotate(${theta_radians}deg)`,
+          __angle: angle - theta_radians,
+        };
+      });
+      return res;
+    },
     relationWirePointsPart2: function () {
       const res = {};
       if (this.relationWirePointsPart1)
@@ -811,10 +868,9 @@ export default {
         const temp = this.entityData;
         temp.source.RelationClaims.push(JSON.parse(response.data.relClaim));
         this.entityData = Object.assign({}, temp);
-        this.$emit(
-          "assignTargetRelSpots",
-          JSON.parse(response.data.relClaim).To
-        );
+        const relClaim = JSON.parse(response.data.relClaim);
+        this.$emit("assignTargetRelSpots", relClaim.To);
+        this.$emit("getRelation", relClaim.Relation);
       });
     },
   },
@@ -978,6 +1034,14 @@ export default {
         this.entityLabel = this.entityData.source.Label;
       // todo: watch relation claims. check if the canvas has the relation already.
       // if not emit to canvas so it can add it to know relations
+      /*if (this.relationLabels && this.entityData.source.RelationClaims) {
+        //
+        Object.entries(this.entityData.source.RelationClaims).forEach(
+          (key, value) => {
+            //
+          }
+        );
+      }*/
     },
     entityLabel() {
       // doing: updating entity's bounding box width and height
