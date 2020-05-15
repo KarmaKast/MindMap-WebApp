@@ -90,9 +90,11 @@ export default {
   methods: {
     emitremoveRelationClaim() {
       this.$emit("emitremoveRelationClaim");
+      alert("deleting relation claim not implemented yet");
     },
     emitSwitchDirection() {
       this.$emit("emitSwitchDirection");
+      alert("switching relation direction not implemented yet");
     },
     toggleSelectedState() {
       this.labelSelected = !this.labelSelected;
@@ -116,6 +118,9 @@ export default {
           relationLabel: this.labelFinal,
         }),
       });
+    },
+    label() {
+      if (this.label !== this.labelFinal) this.labelFinal = this.label;
     },
   },
 };
@@ -215,5 +220,8 @@ export default {
   font-size: 80%;
   box-sizing: border-box;
   background: none;
+}
+.labelInput:active {
+  border: ;
 }
 </style>
