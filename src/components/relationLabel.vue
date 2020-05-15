@@ -4,7 +4,12 @@
       {{ labelFinal }}
     </p>
     <div class="labelInputContainer">
-      <input class="labelInput" v-model="labelFinal" :style="labelInputStyle" />
+      <input
+        class="labelInput"
+        type="text"
+        v-model="labelFinal"
+        :style="labelInputStyle"
+      />
     </div>
     <button
       class="direction"
@@ -25,10 +30,15 @@
 </template>
 
 <script>
+import axios from "axios";
+import qs from "querystring";
+
 export default {
   name: "relationLabel",
   props: {
+    ID: String,
     stylePart: Object,
+    apiUrl: String,
     colors: Object,
     colorsProcessed: Object,
     relWireColor: String,
@@ -94,6 +104,18 @@ export default {
     },
     labelFinal() {
       // todo update rel label to api
+      axios({
+        method: "POST",
+        baseURL: this.apiUrl,
+        url: `/collection/updateRelation/`,
+        params: {
+          relationID: this.ID,
+        },
+        paramsSerializer: qs.stringify,
+        data: qs.stringify({
+          relationLabel: this.labelFinal,
+        }),
+      });
     },
   },
 };
@@ -126,7 +148,7 @@ export default {
   min-width: 40px;
   max-width: 90px;
   height: var(--size);
-  padding: 6px;
+  padding: var(--padding);
 
   white-space: nowrap;
   overflow: hidden;
@@ -166,18 +188,19 @@ export default {
   position: absolute;
   width: 100%;
   height: 100%;
-  padding-left: calc(var(--size) + 4px);
-  padding-right: calc(var(--size) + 4px);
   border-radius: inherit;
   box-sizing: border-box;
   pointer-events: none;
 }
 .labelInput {
   display: inline-block;
-  position: relative;
-  background: none;
+  position: absolute;
+  right: 0px;
+  top: 0px;
   margin: 0px;
-  width: 100%;
+  margin-left: calc(var(--size) + 4px);
+  margin-right: calc(var(--size) + 4px);
+  width: calc(100% - calc(calc(var(--size) + 4px) * 2));
   height: 100%;
 
   box-sizing: border-box;
@@ -191,8 +214,6 @@ export default {
 
   font-size: 80%;
   box-sizing: border-box;
-}
-.labelInput:hover {
-  overflow: visible;
+  background: none;
 }
 </style>

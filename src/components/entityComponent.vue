@@ -60,8 +60,10 @@
         :key="index"
         :stylePart="relationLabelsStyle[relClaim.To]"
         :colors="colors"
+        :apiUrl="apiUrl"
         :colorsProcessed="colorsProcessed"
         :relWireColor="relWireColor"
+        :ID="relClaim.Relation"
         :label="
           relationLabels &&
           Object.keys(relationLabels).includes(relClaim.Relation)
