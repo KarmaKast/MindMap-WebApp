@@ -11,7 +11,7 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build --mode production --target app --modern",
     "build:prerender": "vue-cli-service build --mode prerender --target app --modern",
-    "build:prerender:local": "vue-cli-service build --mode prerenderLocal --target app --modern",
+    "build:prerender:noSubDir": "vue-cli-service build --mode prerenderNoSubDir --target app --modern",
     "build:deployment": "vue-cli-service build --mode deployment --target app --modern",
     "build:serve": "serve ./dist",
     "test:e2e": "vue-cli-service test:e2e",

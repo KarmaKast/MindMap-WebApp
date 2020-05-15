@@ -10,9 +10,10 @@ console.log(__dirname);
 //console.log(process.env.NODE_ENV);
 //console.log(process.env);
 //console.log(process.env.BASE_URL);
+const githubSubDir = "/MindMap-WebApp";
 
 module.exports = {
-  publicPath: process.env.BUILD_MODE === "prerender" ? "/MindMap-WebApp/" : "/",
+  publicPath: process.env.BUILD_MODE === "prerender" ? githubSubDir : "/",
   //outputDir: process.env.BUILD_MODE === "prerender" ? "./dist" : "./dist",
   outputDir: path.join(__dirname, "dist"),
   configureWebpack: {
@@ -34,13 +35,13 @@ module.exports = {
             process.env.BUILD_MODE === "prerender"
               ? {
                   proxy: {
-                    "/MindMap-WebApp": {
+                    [githubSubDir]: {
                       target: "http://localhost:8000",
                       router: function (req) {
                         return "http://" + req.headers.host;
                       },
                       pathRewrite: {
-                        "^/MindMap-WebApp": "",
+                        [`^${githubSubDir}`]: "",
                       },
                     },
                   },
