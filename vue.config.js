@@ -10,11 +10,12 @@ console.log(__dirname);
 //console.log(process.env.NODE_ENV);
 //console.log(process.env);
 //console.log(process.env.BASE_URL);
+const githubSubDir = "/MindMap-WebApp";
 
 module.exports = {
-  publicPath: process.env.NODE_ENV === "production" ? "/MindMap-WebApp/" : "/",
+  publicPath: process.env.BUILD_MODE === "prerender" ? githubSubDir : "/",
   //outputDir: process.env.BUILD_MODE === "prerender" ? "./dist" : "./dist",
-  outputDir: process.env.BUILD_MODE === "prerender" ? "./dist" : "./dist",
+  outputDir: path.join(__dirname, "dist"),
   configureWebpack: {
     devtool: process.env.NODE_ENV === "development" ? "source-map" : false,
     output: {
@@ -22,7 +23,7 @@ module.exports = {
     },
   },
   chainWebpack: (config) => {
-    if (process.env.NODE_ENV !== "development")
+    if (process.env.NODE_ENV === "production")
       config.plugin("PrerenderSPAPlugin").use(PrerenderSPAPlugin, [
         {
           staticDir: path.join(__dirname, "dist"),
@@ -30,19 +31,22 @@ module.exports = {
           outputDir: path.join(__dirname, "dist"),
           routes: ["/"],
           //routes: [process.env.NODE_ENV === "production" ? "/" : "/"],
-          server: {
-            proxy: {
-              "/MindMap-WebApp": {
-                target: "http://localhost:8000",
-                router: function (req) {
-                  return "http://" + req.headers.host;
-                },
-                pathRewrite: {
-                  "^/MindMap-WebApp": "",
-                },
-              },
-            },
-          },
+          server:
+            process.env.BUILD_MODE === "prerender"
+              ? {
+                  proxy: {
+                    [githubSubDir]: {
+                      target: "http://localhost:8000",
+                      router: function (req) {
+                        return "http://" + req.headers.host;
+                      },
+                      pathRewrite: {
+                        [`^${githubSubDir}`]: "",
+                      },
+                    },
+                  },
+                }
+              : {},
           renderer: new Renderer({
             // We need to inject a value so we're able to
             // detect if the page is currently pre-rendered.
@@ -63,5 +67,6 @@ module.exports = {
     display: "fullscreen",
     //manifestOptions: { CacheControl: "must-revalidate, max-age=600" },
     iconPaths: {},
+    //manifestOptions: { start_url: "./MindMap-WebApp/" },
   },
 };
