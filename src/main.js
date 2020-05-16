@@ -1,6 +1,6 @@
 import Vue from "vue";
 //import axios from "axios";
-import VueKonva from "vue-konva";
+//import VueKonva from "vue-konva";
 import Vue2TouchEvents from "vue2-touch-events";
 import VueMeta from "vue-meta";
 
@@ -14,7 +14,7 @@ if ("serviceWorker" in navigator) {
 
 Vue.config.productionTip = false;
 Vue.use(VueMeta);
-Vue.use(VueKonva);
+//Vue.use(VueKonva);
 Vue.use(Vue2TouchEvents, {});
 
 new Vue({

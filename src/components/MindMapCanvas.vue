@@ -12,6 +12,7 @@
     v-touch:tap.self="handleCanvasTap"
   >
     <div
+      v-if="vueKonvaLoaded"
       class="canvas-grid"
       :style="{ pointerEvents: 'none', position: 'absolute' }"
     >
@@ -105,6 +106,7 @@
       <entityComponent
         v-for="(value, key_) in processedEntitiesBetter"
         :key="key_"
+        :vueKonvaLoaded="vueKonvaLoaded"
         :colors="colors"
         :colorsProcessed="colorsProcessed"
         :entityID="key_"
@@ -190,6 +192,7 @@ export default {
   data: function () {
     return {
       mindmapCanvas: null,
+      vueKonvaLoaded: false,
       dragItemId: null,
       canvasLocation: { x: 0, y: 0 },
       canvasMousePos: { x: 0, y: 0 },
@@ -800,6 +803,12 @@ export default {
       };
     }
     this.initiateProcessedEntities();
+    import(/* webpackChunkName: "chunk-vue-konva" */ "vue-konva").then(
+      (VueKonva) => {
+        Vue.use(VueKonva);
+        this.vueKonvaLoaded = true;
+      }
+    );
   },
   beforeUpdate: function () {},
   updated: function () {},

@@ -5,6 +5,8 @@ process.env.VUE_APP_MODE = process.env.NODE_ENV;
 const path = require("path");
 const PrerenderSPAPlugin = require("prerender-spa-plugin");
 const Renderer = PrerenderSPAPlugin.PuppeteerRenderer;
+const CompressionPlugin = require("compression-webpack-plugin");
+const zopfli = require("@gfx/zopfli");
 
 console.log(__dirname);
 //console.log(process.env.NODE_ENV);
@@ -23,7 +25,18 @@ module.exports = {
     },
   },
   chainWebpack: (config) => {
-    if (process.env.NODE_ENV === "production")
+    if (process.env.NODE_ENV === "production") {
+      //config.plugins.delete("prefetch");
+      config.plugin("CompressionPlugin").use(CompressionPlugin, [
+        {
+          compressionOptions: {
+            numiterations: 15,
+          },
+          algorithm(input, compressionOptions, callback) {
+            return zopfli.gzip(input, compressionOptions, callback);
+          },
+        },
+      ]);
       config.plugin("PrerenderSPAPlugin").use(PrerenderSPAPlugin, [
         {
           staticDir: path.join(__dirname, "dist"),
@@ -62,6 +75,7 @@ module.exports = {
           }),
         },
       ]);
+    }
   },
   pwa: {
     display: "fullscreen",

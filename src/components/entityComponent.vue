@@ -36,7 +36,11 @@
         ></div>
       </div>
     </div>
-    <div class="relationWires" :style="relationWiresStyle">
+    <div
+      v-if="vueKonvaLoaded"
+      class="relationWires"
+      :style="relationWiresStyle"
+    >
       <v-stage
         :config="{
           width: this.relStageSize.width,
@@ -170,6 +174,7 @@ export default {
   },
   props: {
     colors: Object,
+    vueKonvaLoaded: Boolean,
     colorsProcessed: Object,
     entityID: { type: String, required: true },
     apiUrl: String,
