@@ -31,7 +31,18 @@
       @click.left="testAPI"
       @mouseover="setButtonHovered('test')"
       @mouseout="unsetButtonHovered('test')"
-    ></button>
+    >
+      <icon-base
+        iconName="Connect to API"
+        :iconColor="colorsProcessed['theme']"
+        height="100%"
+        width="100%"
+        role="button"
+        viewBox="0 0 48 48"
+        :style="{ transform: 'rotate(180deg)' }"
+        ><icon-direction-left />
+      </icon-base>
+    </button>
   </div>
 </template>
 
@@ -39,6 +50,10 @@
 import { mapState } from "vuex";
 export default {
   name: "buttonOne",
+  components: {
+    iconBase: () => import("./icons/iconBase"),
+    iconDirectionLeft: () => import("./icons/iconDirectionLeft"),
+  },
   props: {
     colors: Object,
     colorsProcessed: Object,
