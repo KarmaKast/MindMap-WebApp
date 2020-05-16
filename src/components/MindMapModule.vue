@@ -358,7 +358,7 @@ export default {
       let url_ = this.apiUrl;
       this.collection = { Entities: [], ID: "", Label: "", Relations: [] };
       // todo: get a list of entityIDs and create a list of entitys in the canvas
-      console.log(`getting list of entitys\n${url_}`);
+      console.log(`getting list of entities\n${url_}`);
       axios
         .get(url_ + "/collection/get")
         .then((response) => {
