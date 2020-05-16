@@ -80,7 +80,7 @@
                 canvasSize.height,
               ],
               stroke: canvasGridColors[1],
-              x: this.canvasLocation.x,
+              x: canvasLocation.x,
               draggable: false,
               closed: false,
             }"
@@ -94,19 +94,35 @@
                 canvasSize.height / 2,
               ],
               stroke: canvasGridColors[2],
-              y: this.canvasLocation.y,
+              y: canvasLocation.y,
               draggable: false,
               closed: false,
             }"
           ></v-line>
+        </v-layer>
+        <v-layer
+          :config="{
+            x: canvasLocation.x,
+            y: canvasLocation.y,
+          }"
+        >
+          <v-group
+            v-for="(valueGroup, key_) in relationLineConfigs"
+            :key="'r-group-' + key_"
+          >
+            <v-line
+              v-for="(value, key_2) in valueGroup"
+              :key="'r-line-' + key_2"
+              :config="value"
+            ></v-line>
+          </v-group>
         </v-layer>
       </v-stage>
     </div>
     <div id="entities" :style="entitiesStyle">
       <entityComponent
         v-for="(value, key_) in processedEntitiesBetter"
-        :key="key_"
-        :vueKonvaLoaded="vueKonvaLoaded"
+        :key="'entity-' + key_"
         :colors="colors"
         :colorsProcessed="colorsProcessed"
         :entityID="key_"
@@ -131,6 +147,7 @@
         @setSelfRelSpots="setSelfRelSpots(key_, $event)"
         @assignTargetRelSpots="assignTargetRelSpots(key_, $event)"
         @getRelation="emitGetRelation"
+        @relationLineConfigs="setRelationLineConfigs(key_, $event)"
       >
       </entityComponent>
     </div>
@@ -217,6 +234,7 @@ export default {
       },
       relClaimTargetSpots: {},
       relClaimSpots: {},
+      relationLineConfigs: {},
       entitiesToUpdate: [],
       processedEntitiesBetter: {}, // better optimized updates
       canvasSize: { height: 0, width: 0 },
@@ -621,6 +639,9 @@ export default {
     emitGetRelation(relationID) {
       console.log({ relationID });
       this.$emit("getRelation", relationID);
+    },
+    setRelationLineConfigs(entityID, relationLineConfigs) {
+      Vue.set(this.relationLineConfigs, entityID, relationLineConfigs);
     },
   },
   watch: {
