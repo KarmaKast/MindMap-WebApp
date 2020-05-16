@@ -36,28 +36,6 @@
         ></div>
       </div>
     </div>
-    <div
-      v-if="vueKonvaLoaded"
-      class="relationWires"
-      :style="relationWiresStyle"
-    >
-      <v-stage
-        :config="{
-          width: this.relStageSize.width,
-          height: this.relStageSize.height,
-        }"
-      >
-        <v-layer>
-          <v-group
-            v-for="(relClaim, index) in entityData.source.RelationClaims"
-            :key="index"
-            :config="relationWiresGroupConfig"
-          >
-            <v-line :config="relationLineConfigs[relClaim.To]"></v-line>
-          </v-group>
-        </v-layer>
-      </v-stage>
-    </div>
     <div class="relationLabelsContainer" :style="{ position: 'absolute' }">
       <relation-label
         v-for="(relClaim, index) in entityData.source.RelationClaims"
@@ -174,7 +152,6 @@ export default {
   },
   props: {
     colors: Object,
-    vueKonvaLoaded: Boolean,
     colorsProcessed: Object,
     entityID: { type: String, required: true },
     apiUrl: String,
@@ -257,6 +234,7 @@ export default {
         outline: "none",
       },
       relationLineConfigs: {},
+      entityOutOfCanvas: false,
       //relationWirePointsPart1: {},
       /*showSpots: {
         left: false,
@@ -267,20 +245,6 @@ export default {
     };
   },
   computed: {
-    entityOutOfCanvas: function () {
-      if (this.entityLocation_)
-        if (
-          Math.abs(this.entityLocation_.x + this.canvasLocation.x) >
-          this.canvasSize.width / 2
-        )
-          return true;
-        else if (
-          Math.abs(this.entityLocation_.y + this.canvasLocation.y) >
-          this.canvasSize.height / 2
-        )
-          return true;
-      return false;
-    },
     relWireColor: function () {
       return `hsla(${this.colors["backgroundShade1"].h},${this.colors["backgroundShade1"].s}%,${this.colors["backgroundShade1"].l}%, 1)`;
     },
@@ -414,12 +378,6 @@ export default {
         pointerEvents: "none",
         position: "absolute",
       };
-    },
-    relationWiresStyle: function () {
-      return Object.assign({}, this.relationWiresStylePart1, {
-        left: this.relationWiresStylePart1.left - this.canvasLocation.x + "px",
-        top: this.relationWiresStylePart1.top - this.canvasLocation.y + "px",
-      });
     },
     relationSpots: function () {
       //console.log("I should not be seen when dragging canvas");
@@ -643,13 +601,6 @@ export default {
         );
       return res;
     },
-    relationWiresGroupConfig: function () {
-      // doing: accounting for canvas location changes
-      return {
-        x: this.canvasLocation.x,
-        y: this.canvasLocation.y,
-      };
-    },
     relationWirePoints: function () {
       // doing: accounting for canvas resize
       const res = {};
@@ -665,10 +616,6 @@ export default {
           }
         );
       return res;
-    },
-
-    relStageSize: function () {
-      return this.canvasSize;
     },
     relSelfSpotsStylePart1: function () {
       return {
@@ -881,18 +828,32 @@ export default {
   },
   watch: {
     apiValidity() {},
-    canvasLocation: {
-      handler() {
-        //this.$emit("setSelfRelSpots", this.relationSpots);
-      },
-      deep: true,
-    },
     entitySelected: {
       handler() {
         this.entitySelectedFinal = this.entitySelected ? true : false;
       },
       deep: true,
     },
+    /*canvasLocation: {
+      handler() {
+        // enitity out of canvas
+        if (this.entityLocation_)
+          if (
+            Math.abs(this.entityLocation_.x + this.canvasLocation.x) >
+            this.canvasSize.width / 2
+          )
+            if (!this.entityOutOfCanvas) this.entityOutOfCanvas = true;
+            else;
+          else if (
+            Math.abs(this.entityLocation_.y + this.canvasLocation.y) >
+            this.canvasSize.height / 2
+          )
+            if (!this.entityOutOfCanvas) this.entityOutOfCanvas = true;
+            else;
+          else if (this.entityOutOfCanvas) this.entityOutOfCanvas = false;
+      },
+      deep: true,
+    },*/
     relationSpots() {
       //console.log("I should not be seen when dragging canvas");
       this.$emit("setSelfRelSpots", this.relationSpots);
@@ -989,6 +950,9 @@ export default {
           })
         );
       });
+    },
+    relationLineConfigs() {
+      this.$emit("relationLineConfigs", this.relationLineConfigs);
     },
     entityLocation_() {
       // todo: save entity location to database on drag end
