@@ -1,5 +1,9 @@
 <template>
-  <div ref="entityContainer" :style="entityContainerStyleFinal">
+  <div
+    class="entityContainer"
+    ref="entityContainer"
+    :style="entityContainerStyleFinal"
+  >
     <div
       v-if="true"
       class="relSpotsContainer"
@@ -42,6 +46,7 @@
         :key="index"
         :stylePart="relationLabelsStyle[relClaim.To]"
         :colors="colors"
+        :entityColor="entityColor"
         :apiUrl="apiUrl"
         :colorsProcessed="colorsProcessed"
         :relWireColor="relWireColor"
@@ -225,14 +230,7 @@ export default {
       draggingDeltas: { x: 0, y: 0 },
       editingLabel: false,
       relClaimMode: { mode: false, targetID: null },
-      entityContainerStylePartStatic: {
-        position: "absolute",
-        boxSizing: "border-box",
-        display: "grid",
-        //gridTemplateColumns: "100%",
-        padding: "4px",
-        outline: "none",
-      },
+
       relationLineConfigs: {},
       entityOutOfCanvas: false,
       //relationWirePointsPart1: {},
@@ -273,23 +271,25 @@ export default {
       };
     },
     entityContainerStylePart2: function () {
+      const top =
+        this.canvasSize.height / 2 +
+        this.entityLocation_.y -
+        this.entityBoundingBoxSize.height / 2;
+      const left =
+        this.canvasSize.width / 2 +
+        this.entityLocation_.x -
+        this.entityBoundingBoxSize.width / 2;
       return {
-        top: `${
-          this.canvasSize.height / 2 +
-          this.entityLocation_.y -
-          this.entityBoundingBoxSize.height / 2
-        }px`,
-        left: `${
-          this.canvasSize.width / 2 +
-          this.entityLocation_.x -
-          this.entityBoundingBoxSize.width / 2
-        }px`,
+        transform: `translate(
+          ${left + "px"},
+          ${top + "px"}
+        )`,
+        willChange: this.dragging.state ? "transform" : "unset",
       };
     },
     entityContainerStyleFinal: function () {
       return Object.assign(
         {},
-        this.entityContainerStylePartStatic,
         this.entityContainerStylePart1,
         this.entityContainerStylePart2
       );
@@ -567,13 +567,9 @@ export default {
           this.entityLocation_.y +
           this.entityBoundingBoxSize.height / 2;
         res[key] = {
-          left: "0px",
-          top: "0px",
-
-          /*transform: `translate(-50%,-50%) rotate(${theta_radians}deg)`,
-          __angle: angle - theta_radians,*/
           transform: `translate(calc(${left}px - 50%),calc(${top}px - 50%)) rotate(${theta_radians}deg)`,
           __angle: angle - theta_radians,
+          willChange: this.pressed.state ? "transform" : "unset",
         };
       });
       return res;
@@ -1101,5 +1097,14 @@ export default {
 .selfSpot {
   border-radius: 50%;
   position: absolute;
+}
+.entityContainer {
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  box-sizing: border-box;
+  display: grid;
+  padding: 4px;
+  outline: none;
 }
 </style>

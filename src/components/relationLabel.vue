@@ -41,6 +41,7 @@ export default {
     stylePart: Object,
     apiUrl: String,
     colors: Object,
+    entityColor: Object,
     colorsProcessed: Object,
     relWireColor: String,
     label: String,
@@ -83,25 +84,38 @@ export default {
         }%,${this.colors["background"].l}%,${
           CSS.supports("backdrop-filter", "blur(6px)") ? 0.5 : 1
         })`,
-        backdropFilter: "blur(6px)",
       });
     },
     labelInputStyle: function () {
       return {
         transform: `rotate(${this.stylePart.__angle}deg)`,
-        color: this.colorsProcessed["text"],
+        color: `hsla(${this.entityColor.h},${this.entityColor.s}%, ${
+          this.entityColor.l
+        }%, ${1})`,
       };
     },
     removeRelationClaimBttnStyle: function () {
       return {
-        background: this.colorsProcessed["backgroundShade2"],
-        color: this.colorsProcessed["text"],
+        backgroundColor: `hsla(${this.colors["backgroundShade2"].h},${
+          this.colors["backgroundShade2"].s
+        }%,${this.colors["backgroundShade2"].l}%,${
+          CSS.supports("backdrop-filter", "blur(6px)") ? 0.5 : 1
+        })`,
+        color: `hsla(${this.entityColor.h},${this.entityColor.s}%, ${
+          this.entityColor.l
+        }%, ${1})`,
       };
     },
     directionStyle: function () {
       return {
-        background: this.colorsProcessed["backgroundShade2"],
-        color: this.colorsProcessed["text"],
+        backgroundColor: `hsla(${this.colors["backgroundShade2"].h},${
+          this.colors["backgroundShade2"].s
+        }%,${this.colors["backgroundShade2"].l}%,${
+          CSS.supports("backdrop-filter", "blur(6px)") ? 0.5 : 1
+        })`,
+        color: `hsla(${this.entityColor.h},${this.entityColor.s}%, ${
+          this.entityColor.l
+        }%, ${1})`,
       };
     },
   },
@@ -171,6 +185,8 @@ export default {
 }
 .relationLabelContainer {
   position: absolute;
+  left: 0px;
+  top: 0px;
   display: grid;
   grid-template-columns: calc(var(--size) - 2px) max-content auto;
   column-gap: 2px;
@@ -181,6 +197,11 @@ export default {
   transform-origin: center;
 
   user-select: none;
+}
+@supports (backdrop-filter: blur(6px)) {
+  .relationLabelContainer {
+    backdrop-filter: blur(6px);
+  }
 }
 .relationLabel {
   order: 2;

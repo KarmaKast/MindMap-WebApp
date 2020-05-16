@@ -255,6 +255,7 @@ export default {
           ${this.canvasLocation.x + "px"},
           ${this.canvasLocation.y + "px"}
         )`,
+        willChange: this.canvas.dragging.state ? "transform" : "unset",
       };
     },
     canvasContainerStyle: function () {
