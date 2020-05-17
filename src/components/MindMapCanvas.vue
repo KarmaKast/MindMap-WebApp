@@ -80,6 +80,7 @@
                 canvasSize.height,
               ],
               stroke: canvasGridColors[1],
+              strokeWidth: grid.width,
               x: canvasLocation.x,
               draggable: false,
               closed: false,
@@ -94,6 +95,7 @@
                 canvasSize.height / 2,
               ],
               stroke: canvasGridColors[2],
+              strokeWidth: grid.width,
               y: canvasLocation.y,
               draggable: false,
               closed: false,
@@ -255,6 +257,7 @@ export default {
           ${this.canvasLocation.x + "px"},
           ${this.canvasLocation.y + "px"}
         )`,
+        willChange: this.canvas.dragging.state ? "transform" : "unset",
       };
     },
     canvasContainerStyle: function () {

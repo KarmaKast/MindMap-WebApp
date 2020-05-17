@@ -1,5 +1,9 @@
 <template>
-  <div ref="entityContainer" :style="entityContainerStyleFinal">
+  <div
+    class="entityContainer"
+    ref="entityContainer"
+    :style="entityContainerStyleFinal"
+  >
     <div
       v-if="true"
       class="relSpotsContainer"
@@ -27,7 +31,13 @@
           :style="relSelfSpotsTopStyle"
         ></div>
       </div>
-      <div class="targetSpots">
+      <div
+        class="targetSpots"
+        :style="{
+          '--radius': (relationSpotsOffset / 2) * 2 + 'px',
+          '--color': colorsProcessed['background'],
+        }"
+      >
         <div
           class="targetSpot"
           v-for="(style, index) in relTargetSpotsStyles"
@@ -36,12 +46,14 @@
         ></div>
       </div>
     </div>
+
     <div class="relationLabelsContainer" :style="{ position: 'absolute' }">
       <relation-label
         v-for="(relClaim, index) in entityData.source.RelationClaims"
         :key="index"
         :stylePart="relationLabelsStyle[relClaim.To]"
         :colors="colors"
+        :entityColor="entityColor"
         :apiUrl="apiUrl"
         :colorsProcessed="colorsProcessed"
         :relWireColor="relWireColor"
@@ -53,6 +65,7 @@
             : 'Error !'
         "
         :direction="relClaim.Direction"
+        :transforming="pressed.state"
       />
     </div>
     <div
@@ -225,14 +238,7 @@ export default {
       draggingDeltas: { x: 0, y: 0 },
       editingLabel: false,
       relClaimMode: { mode: false, targetID: null },
-      entityContainerStylePartStatic: {
-        position: "absolute",
-        boxSizing: "border-box",
-        display: "grid",
-        //gridTemplateColumns: "100%",
-        padding: "4px",
-        outline: "none",
-      },
+
       relationLineConfigs: {},
       entityOutOfCanvas: false,
       //relationWirePointsPart1: {},
@@ -265,31 +271,33 @@ export default {
             : `${this.entitySize["width"]}px`,
         boxShadow: `${
           this.dragging.state || this.entitySelectedFinal
-            ? `hsla(${this.entityColor.h},0%,${this.colors["backgroundShade1"].l}%,0.2) 0px 0px 0px 4px, `
+            ? `hsla(${this.entityColor.h},0%,${this.colors["backgroundShade1a"].l}%,1) 0px 0px 0px 4px, `
             : ""
         } inset 0px 0px 0 4px hsla(${this.entityColor.h},
         ${this.entityColor.s}%,
-        ${this.colors["backgroundShade1"].l}%, 0.2)`,
+        ${this.colors["backgroundShade1a"].l}%, 1)`,
       };
     },
     entityContainerStylePart2: function () {
+      const top =
+        this.canvasSize.height / 2 +
+        this.entityLocation_.y -
+        this.entityBoundingBoxSize.height / 2;
+      const left =
+        this.canvasSize.width / 2 +
+        this.entityLocation_.x -
+        this.entityBoundingBoxSize.width / 2;
       return {
-        top: `${
-          this.canvasSize.height / 2 +
-          this.entityLocation_.y -
-          this.entityBoundingBoxSize.height / 2
-        }px`,
-        left: `${
-          this.canvasSize.width / 2 +
-          this.entityLocation_.x -
-          this.entityBoundingBoxSize.width / 2
-        }px`,
+        transform: `translate(
+          ${left + "px"},
+          ${top + "px"}
+        )`,
+        //willChange: this.dragging.state ? "transform" : "unset",
       };
     },
     entityContainerStyleFinal: function () {
       return Object.assign(
         {},
-        this.entityContainerStylePartStatic,
         this.entityContainerStylePart1,
         this.entityContainerStylePart2
       );
@@ -299,27 +307,24 @@ export default {
         position: "relative",
         borderRadius: "inherit",
         border: `1px solid hsla(${this.entityColor.h},${this.entityColor.s}%, ${this.entityColor.l}%, 0.8)`,
-        backdropFilter: "blur(2px)",
         cursor: this.dragging.state ? "grabbing" : "grab",
-        backgroundColor: CSS.supports("backdrop-filter: blur(3px)")
-          ? this.editingLabel && this.entitySelectedFinal
-            ? `white`
-            : `hsla(0,0%,${this.colors["background"].l + 5}%,0.2)`
-          : this.editingLabel && this.entitySelectedFinal
-          ? `white`
-          : `hsla(0,0%,${this.colors["background"].l + 5}%,1)`,
+        backgroundColor:
+          (this.editingLabel && this.entitySelectedFinal) || this.dragging.state
+            ? this.colorsProcessed["background"]
+            : `hsla(0,0%,${this.colors["background"].l + 5}%,1)`,
         pointerEvents: "all",
         display: "grid",
         placeItems: "center",
         boxSizing: "border-box",
         padding: "10px 15px 10px 15px",
+        //willChange: this.dragging.state ? "transform" : "unset",
       };
     },
     entityTextStyle: function () {
       return {
         pointerEvents: "none",
         margin: "0px",
-        maxWidth: "100px",
+        maxWidth: "250px",
         overflowWrap: "break-word",
         color: `hsla(${this.entityColor.h},${this.entityColor.s}%, ${
           this.entityColor.l
@@ -484,6 +489,7 @@ export default {
         border: `1px solid ${this.relWireColor}`,
         borderRadius: "50%",
         //backgroundColor: `${this.relWireColor}`,
+
         boxSizing: "border-box",
         //boxShadow: `hsla(0,0%,${this.colors["backgroundShade2"].l}%,0.5) 0px 0px 0px 4px inset, ${this.relWireColor} 0px 0px 0px 8px inset`,
       };
@@ -567,13 +573,9 @@ export default {
           this.entityLocation_.y +
           this.entityBoundingBoxSize.height / 2;
         res[key] = {
-          left: "0px",
-          top: "0px",
-
-          /*transform: `translate(-50%,-50%) rotate(${theta_radians}deg)`,
-          __angle: angle - theta_radians,*/
           transform: `translate(calc(${left}px - 50%),calc(${top}px - 50%)) rotate(${theta_radians}deg)`,
           __angle: angle - theta_radians,
+          //willChange: this.pressed.state ? "transform" : "unset",
         };
       });
       return res;
@@ -834,7 +836,7 @@ export default {
       },
       deep: true,
     },
-    /*canvasLocation: {
+    canvasLocation: {
       handler() {
         // enitity out of canvas
         if (this.entityLocation_)
@@ -853,7 +855,7 @@ export default {
           else if (this.entityOutOfCanvas) this.entityOutOfCanvas = false;
       },
       deep: true,
-    },*/
+    },
     relationSpots() {
       //console.log("I should not be seen when dragging canvas");
       this.$emit("setSelfRelSpots", this.relationSpots);
@@ -1051,23 +1053,6 @@ export default {
         this.getEntityData();
       }
     },
-    pressed: {
-      handler() {
-        /*console.log(
-          ` ${this.entityID} If i haven't pressed any entity I should not be seen`
-        );*/
-        //if (this.pressed.state)
-        /*if (this.entitySelected !== undefined) {
-          console.log(
-            "im called",
-            this.entitySelectedFinal,
-            this.entitySelected
-          );
-          this.entitySelectedFinal = this.entitySelected;
-        }*/
-      },
-      deep: true,
-    },
   },
   created: function () {},
   mounted: function () {
@@ -1101,5 +1086,14 @@ export default {
 .selfSpot {
   border-radius: 50%;
   position: absolute;
+}
+.entityContainer {
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  box-sizing: border-box;
+  display: grid;
+  padding: 4px;
+  outline: none;
 }
 </style>
