@@ -46,6 +46,7 @@ export default {
     relWireColor: String,
     label: String,
     direction: String,
+    transforming: Boolean,
   },
   data: function () {
     return {
@@ -79,16 +80,16 @@ export default {
       return Object.assign({}, this.stylePart, {
         //
         border: `1px solid ${this.relWireColor}`,
-        backgroundColor: `hsla(${this.colors["background"].h},${
-          this.colors["background"].s
-        }%,${this.colors["background"].l}%,${
-          CSS.supports("backdrop-filter", "blur(6px)") ? 0.5 : 1
-        })`,
+        backgroundColor: `hsla(${this.colors["background"].h},${this.colors["background"].s}%,${this.colors["background"].l}%,1
+        )`,
       });
     },
     labelInputStyle: function () {
       return {
         transform: `rotate(${this.stylePart.__angle}deg)`,
+        //willChange: this.transforming ? "transform" : "unset",
+        pointerEvents: this.labelSelected ? "all" : "none",
+        userSelect: "none",
         color: `hsla(${this.entityColor.h},${this.entityColor.s}%, ${
           this.entityColor.l
         }%, ${1})`,
@@ -96,11 +97,8 @@ export default {
     },
     removeRelationClaimBttnStyle: function () {
       return {
-        backgroundColor: `hsla(${this.colors["backgroundShade2"].h},${
-          this.colors["backgroundShade2"].s
-        }%,${this.colors["backgroundShade2"].l}%,${
-          CSS.supports("backdrop-filter", "blur(6px)") ? 0.5 : 1
-        })`,
+        backgroundColor: `hsla(${this.colors["backgroundShade2"].h},${this.colors["backgroundShade2"].s}%,${this.colors["backgroundShade2"].l}%,1
+        )`,
         color: `hsla(${this.entityColor.h},${this.entityColor.s}%, ${
           this.entityColor.l
         }%, ${1})`,
@@ -108,11 +106,7 @@ export default {
     },
     directionStyle: function () {
       return {
-        backgroundColor: `hsla(${this.colors["backgroundShade2"].h},${
-          this.colors["backgroundShade2"].s
-        }%,${this.colors["backgroundShade2"].l}%,${
-          CSS.supports("backdrop-filter", "blur(6px)") ? 0.5 : 1
-        })`,
+        backgroundColor: `hsla(${this.colors["backgroundShade2"].h},${this.colors["backgroundShade2"].s}%,${this.colors["backgroundShade2"].l}%,1)`,
         color: `hsla(${this.entityColor.h},${this.entityColor.s}%, ${
           this.entityColor.l
         }%, ${1})`,
@@ -198,11 +192,6 @@ export default {
 
   user-select: none;
 }
-@supports (backdrop-filter: blur(6px)) {
-  .relationLabelContainer {
-    backdrop-filter: blur(6px);
-  }
-}
 .relationLabel {
   order: 2;
   display: inline-block;
@@ -211,6 +200,7 @@ export default {
   max-width: 90px;
   height: var(--size);
   padding: var(--padding);
+  user-select: none;
 
   white-space: nowrap;
   overflow: hidden;
@@ -272,6 +262,7 @@ export default {
   width: calc(100% - calc(calc(var(--size) + 4px) * 1));
   height: 100%;
   padding: var(--padding);
+  user-select: none;
 
   box-sizing: border-box;
   border: none;

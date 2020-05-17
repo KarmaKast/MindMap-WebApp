@@ -155,6 +155,7 @@ export default {
         theme_light: {
           background: { h: 0, s: 0, l: 95, a: 1 },
           backgroundShade1: { h: 0, s: 0, l: 75, a: 1 },
+          backgroundShade1a: { h: 0, s: 0, l: 75 * 1.2, a: 1 },
           backgroundShade2: { h: 0, s: 0, l: 100, a: 1 },
           text: { h: 0, s: 0, l: 30, a: 1 },
           theme: { h: 358, s: 97, l: 50, a: 1 },
@@ -163,6 +164,7 @@ export default {
         theme_dark: {
           background: { h: 0, s: 0, l: 10, a: 1 },
           backgroundShade1: { h: 0, s: 0, l: 40, a: 1 },
+          backgroundShade1a: { h: 0, s: 0, l: 40 * 0.5, a: 1 },
           backgroundShade2: { h: 0, s: 0, l: 5, a: 1 },
           text: { h: 0, s: 0, l: 60, a: 1 },
           theme: { h: 151, s: 70, l: 50, a: 1 },
