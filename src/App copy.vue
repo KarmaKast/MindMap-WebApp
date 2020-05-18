@@ -11,14 +11,14 @@
     <div id="mindMapContainer" :style="mindMapContainerStyle">
       <!-- <MindMapModule :colors="MindMapColors" :entityLimit="entityLimit" />-->
       <mind-map-module v-if="!prerender" :entityLimit="entityLimit" />
-      <module-loading-component v-if="prerender" />
+      <mind-map-module-loading v-if="prerender" />
     </div>
   </div>
 </template>
 
 <script>
 //import MindMapModule from "./components/MindMapModule.vue";
-import ModuleLoadingComponent from "./components/MindMapModule/loading/ModuleLoadingComponent.vue";
+import MindMapModuleLoading from "./components/loading/MindMapModule.vue";
 
 export default {
   name: "app",
@@ -51,11 +51,11 @@ export default {
   components: {
     MindMapModule: () => ({
       component: import(
-        /* webpackChunkName: "chunk-mindmap-module" */ "./components/MindMapModule/ModuleComponent.vue"
+        /* webpackChunkName: "chunk-mindmap-module" */ "./components/MindMapModule.vue"
       ),
-      loading: ModuleLoadingComponent,
+      loading: MindMapModuleLoading,
     }),
-    ModuleLoadingComponent,
+    MindMapModuleLoading,
   },
   data: function () {
     return {
