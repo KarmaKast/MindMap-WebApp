@@ -1,5 +1,9 @@
 <template>
-  <layout-handler id="mind-map--module-interface" :gridElements="gridElements">
+  <layout-handler
+    id="mind-map--module-interface"
+    :gridElements="gridElements"
+    axis="y"
+  >
     <template v-slot:[gridElements[0].name]
       ><header-bar class="header-bar"
     /></template>
@@ -25,11 +29,11 @@ export default {
       gridElements: [
         {
           name: "HeaderBar",
-          config: { y: 1 },
+          y: 1,
         },
         {
           name: "StatusBar",
-          config: { y: -1 },
+          y: -1,
         },
       ],
     };

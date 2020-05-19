@@ -1,6 +1,6 @@
 <template>
   <header id="mind-map-header-bar">
-    <layout-handler></layout-handler>
+    <layout-handler axis="x"></layout-handler>
   </header>
 </template>
 

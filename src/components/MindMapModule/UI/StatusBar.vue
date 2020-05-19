@@ -1,10 +1,13 @@
 <template>
   <footer id="mind-map-status-bar">
-    <layout-handler :gridElements="gridElements">
+    <layout-handler :gridElements="gridElements" axis="x">
       <template v-slot:[gridElements[0].name]>
         <div id="themeToggle"></div
       ></template>
       <template v-slot:[gridElements[1].name]>
+        <div id="themeToggle2"></div
+      ></template>
+      <template v-slot:[gridElements[2].name]>
         <div id="apiState"></div></template
     ></layout-handler>
   </footer>
@@ -22,8 +25,9 @@ export default {
   data() {
     return {
       gridElements: [
-        { name: "themeToggle", config: { x: 1 } },
-        { name: "apiState", config: { x: -1 } },
+        { name: "themeToggle", x: 1 },
+        { name: "themeToggle2", x: 2 },
+        { name: "apiState", x: -1 },
       ],
     };
   },
@@ -35,7 +39,9 @@ footer#mind-map-status-bar {
   height: 25px;
 }
 #themeToggle,
+#themeToggle2,
 #apiState {
   width: 20px;
+  height: 100%;
 }
 </style>

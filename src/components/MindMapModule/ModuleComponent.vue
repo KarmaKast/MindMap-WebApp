@@ -2,20 +2,15 @@
   <div class="mind-map-module">
     <canvas-component />
     <module-interface />
-    <!--<LayoutHandler id="layout-test" :gridElements="[]">
-      <div></div>
-      <div></div>
-      <div></div>
-      <div></div>
-      <div></div>
-      <div></div>
-    </LayoutHandler>-->
   </div>
 </template>
 
 <script>
 export default {
   name: "ModuleComponent",
+  data() {
+    return {};
+  },
   components: {
     CanvasComponent: () =>
       import(
@@ -25,11 +20,8 @@ export default {
       import(
         /* webpackChunkName: "chunk-module-interface" */ "./UI/ModuleInterface"
       ),
-    //LayoutHandler: () =>
-    //  import(
-    //    /* webpackChunkName: "chunk-mindmap-layout-handler" */ "./UI/helpers/LayoutHandler"
-    //  ),
   },
+  methods: {},
 };
 </script>
 
