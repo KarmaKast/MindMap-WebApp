@@ -84,7 +84,10 @@ export default {
         /**
          * @type {Array}
          */
-        let res = this.gridElements.map((value) => value.config.y);
+        let res = [];
+        this.gridElements.forEach((value) => {
+          if (value.config.y !== undefined) res.push(value.config.y);
+        });
         console.log({ res });
         this.rowFillers.forEach((value) => {
           console.log(value);
@@ -166,7 +169,10 @@ export default {
         /**
          * @type {Array}
          */
-        let res = this.gridElements.map((value) => value.config.x);
+        let res = [];
+        this.gridElements.forEach((value) => {
+          if (value.config.x !== undefined) res.push(value.config.x);
+        });
         console.log({ res });
         this.columnFillers.forEach((value) => {
           console.log(value);
@@ -178,6 +184,10 @@ export default {
         });
         return res;
       } else return [];
+    },
+    gridElementOrders() {
+      let res = [];
+      return res;
     },
     gridTemplateColumns: function () {
       if (this.columns !== undefined) {

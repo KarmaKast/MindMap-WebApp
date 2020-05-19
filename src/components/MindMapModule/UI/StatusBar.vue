@@ -1,8 +1,11 @@
 <template>
   <footer id="mind-map-status-bar">
     <layout-handler :gridElements="gridElements">
-      <div id="themeToggle" :slot="gridElements[0].name"></div>
-      <div id="apiState" :slot="gridElements[1].name"></div
+      <template v-slot:[gridElements[0].name]>
+        <div id="themeToggle"></div
+      ></template>
+      <template v-slot:[gridElements[1].name]>
+        <div id="apiState"></div></template
     ></layout-handler>
   </footer>
 </template>
@@ -31,7 +34,8 @@ export default {
 footer#mind-map-status-bar {
   height: 25px;
 }
-#themeToggle {
-  layout-column: 1 2;
+#themeToggle,
+#apiState {
+  width: 20px;
 }
 </style>

@@ -1,7 +1,9 @@
 <template>
   <layout-handler id="mind-map--module-interface" :gridElements="gridElements">
-    <header-bar class="header-bar" :slot="gridElements[0].name" />
-    <status-bar :slot="gridElements[1].name" />
+    <template v-slot:[gridElements[0].name]
+      ><header-bar class="header-bar"
+    /></template>
+    <template v-slot:[gridElements[1].name]><status-bar /></template>
   </layout-handler>
 </template>
 
