@@ -55,14 +55,41 @@ export default {
       if (this.rawOrdersSorted) {
         let res = [];
         this.rawOrdersSorted.forEach((value, index) => {
+          /**
+           * -2, -1 => true
+           * @type {Boolean}
+           */
+          const condition1 = this.rawOrdersSorted[index] < 0 && index === 0;
+
+          /**
+           * 1 , 3 => true | 1 , 2 => false | -3, -1 => true
+           * @type {Boolean}
+           */
+          const condition2 =
+            index < this.rawOrdersSorted.length - 1 &&
+            Math.abs(this.rawOrdersSorted[index + 1]) >
+              Math.abs(this.rawOrdersSorted[index]) + 1;
+          /**
+           * 1 , -2 => true | 1 , 2 => false
+           * @type {Boolean}
+           */
+          const condition3 =
+            this.rawOrdersSorted[index] > 0 &&
+            this.rawOrdersSorted[index + 1] < 0;
+
+          /**
+           * 1 , 3 => true | 1 , 2 => false | -3, -1 => true
+           * @type {Boolean}
+           */
+          const condition4 =
+            this.rawOrdersSorted.length > 1 &&
+            index !== 0 &&
+            Math.abs(this.rawOrdersSorted[index - 1]) >
+              Math.abs(this.rawOrdersSorted[index]) + 1;
+          //console.table({ condition1, condition2, condition3, condition4 });
           //
-          if (
-            (index < this.rawOrdersSorted.length - 1 &&
-              this.rawOrdersSorted[index + 1] >
-                this.rawOrdersSorted[index] + 1) ||
-            (this.rawOrdersSorted[index] > 0 &&
-              this.rawOrdersSorted[index + 1] < 0)
-          ) {
+          if (condition1 || condition4) res.push(index - 1);
+          else if (condition3 || condition2) {
             res.push(index);
           }
         });
@@ -78,24 +105,28 @@ export default {
         this.gridElements.forEach((value) => {
           if (value[this.axis] !== undefined) res.push(value[this.axis]);
         });
-        console.log("-------------------------------------");
-        console.table(res);
+        //console.log("-------------------------------------");
+        //console.table(res);
         this.fillers.forEach((value, index) => {
-          console.log(value);
-          res.splice(value + index + 1, 0, res[value + index] + 1);
+          //console.log(value);
+          if (value > 0)
+            res.splice(value + index + 1, 0, res[value + index] + 1);
+          else res.unshift(1);
         });
-        console.table(res);
+        //console.table(res);
         res.forEach((value, index) => {
           //
           if (value < 0) res[index] = res[index - 1] + 1;
         });
-        console.table(res);
-        console.log("-------------------------------------");
+        //console.table(res);
+        //console.log("-------------------------------------");
         return res;
       } else return [];
     },
     fillersFinal() {
-      return this.fillers.map((value, index) => value + index);
+      return this.fillers.map((value, index) =>
+        value >= 0 ? value + index : this.fillers.length + value - index - 1
+      );
     },
     gridElementsOrders() {
       return this.orders.filter(
@@ -103,33 +134,30 @@ export default {
       );
     },
     gridTemplate: function () {
-      if (this.rawOrdersSorted !== undefined) {
-        if (this.rawOrdersSorted.length === 1) return "auto";
-        if (this.gridElements) {
-          //let res = this.gridElements.map(() => "auto");
-          let res = [];
-          this.rawOrdersSorted.forEach((value) => {
-            if (value) res.push("auto");
-          });
-          //console.table(res);
-          this.gridElements.forEach((value, index) => {
-            //
-            //console.log(value);
-            //if (res.length <= index) res.push("auto");
-            let y = value[this.axis];
-            y = y > 0 ? y - 1 : res.length + y;
-            //console.log(y);
-            if (this.fillersFinal.includes(y)) {
-              res[y + 1] = "auto";
-              res[y + 2] = "max-content";
-            }
-            res[y] = "max-content";
-          });
-          let resF = "";
-          res.forEach((value) => (resF += value + " "));
-          // todo: add auto between gaps
-          return resF;
-        }
+      if (this.orders && this.gridElements) {
+        if (this.orders.length === 0) return "auto";
+
+        //let res = this.gridElements.map(() => "auto");
+        let res = [];
+        this.orders.forEach((value) => {
+          if (value) res.push("auto");
+        });
+        console.log("-------------------------------------");
+        console.table(res);
+        this.gridElements.forEach((value, index) => {
+          let y = value[this.axis];
+          y = y > 0 ? y - 1 : res.length + y;
+          if (this.fillersFinal.includes(y)) {
+            res[y + 1] = "auto";
+            res[y + 2] = "max-content";
+          }
+          res[y] = "max-content";
+        });
+        console.table(res);
+        let resF = "";
+        res.forEach((value) => (resF += value + " "));
+        console.log("-------------------------------------");
+        return resF;
       }
       return "unset";
     },
@@ -149,6 +177,8 @@ export default {
   grid-template-columns: var(--gridTemplateColumns);
 
   box-sizing: border-box;
+  border-radius: inherit;
+  border: 1px solid rgb(90, 203, 255);
 }
 .gridElement {
   border: 1px solid rgb(118, 255, 90);

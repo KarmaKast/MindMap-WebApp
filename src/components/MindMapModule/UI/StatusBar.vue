@@ -7,9 +7,7 @@
       <template v-slot:[gridElements[1].name]>
         <div id="themeToggle2"></div
       ></template>
-      <template v-slot:[gridElements[2].name]>
-        <div id="apiState"></div></template
-    ></layout-handler>
+    </layout-handler>
   </footer>
 </template>
 
@@ -27,7 +25,6 @@ export default {
       gridElements: [
         { name: "themeToggle", x: 1 },
         { name: "themeToggle2", x: 3 },
-        { name: "apiState", x: -1 },
       ],
     };
   },
