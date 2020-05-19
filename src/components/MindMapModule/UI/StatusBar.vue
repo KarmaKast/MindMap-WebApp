@@ -26,7 +26,7 @@ export default {
     return {
       gridElements: [
         { name: "themeToggle", x: 1 },
-        { name: "themeToggle2", x: 2 },
+        { name: "themeToggle2", x: 3 },
         { name: "apiState", x: -1 },
       ],
     };

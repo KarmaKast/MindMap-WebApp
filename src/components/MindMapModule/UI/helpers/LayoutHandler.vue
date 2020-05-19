@@ -78,21 +78,28 @@ export default {
         this.gridElements.forEach((value) => {
           if (value[this.axis] !== undefined) res.push(value[this.axis]);
         });
-        console.log({ res });
-        this.fillers.forEach((value) => {
+        console.log("-------------------------------------");
+        console.table(res);
+        this.fillers.forEach((value, index) => {
           console.log(value);
-          res.splice(value + 1, 0, res[value] + 1);
+          res.splice(value + index + 1, 0, res[value + index] + 1);
         });
+        console.table(res);
         res.forEach((value, index) => {
           //
           if (value < 0) res[index] = res[index - 1] + 1;
         });
+        console.table(res);
+        console.log("-------------------------------------");
         return res;
       } else return [];
     },
+    fillersFinal() {
+      return this.fillers.map((value, index) => value + index);
+    },
     gridElementsOrders() {
       return this.orders.filter(
-        (value, index) => !this.fillers.includes(index - 1)
+        (value, index) => !this.fillersFinal.includes(index - 1)
       );
     },
     gridTemplate: function () {
@@ -112,7 +119,7 @@ export default {
             let y = value[this.axis];
             y = y > 0 ? y - 1 : res.length + y;
             //console.log(y);
-            if (this.fillers.includes(y)) {
+            if (this.fillersFinal.includes(y)) {
               res[y + 1] = "auto";
               res[y + 2] = "max-content";
             }
