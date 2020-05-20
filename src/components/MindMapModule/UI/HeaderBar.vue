@@ -2,11 +2,15 @@
   <header id="mind-map-header-bar">
     <layout-handler axis="x" :gridElements="gridElements">
       <template v-slot:[gridElements[0].name]>
-        <div id="apiState"></div
-      ></template>
+        <button id="mainMenu">
+          <p>Menu</p>
+        </button></template
+      >
       <template v-slot:[gridElements[1].name]>
-        <div id="apiState2"></div
-      ></template>
+        <div id="versionState">
+          <p>{{ appVersion }}</p>
+        </div></template
+      >
     </layout-handler>
   </header>
 </template>
@@ -23,9 +27,10 @@ export default {
   data() {
     return {
       gridElements: [
-        { name: "apiState", x: -1 },
-        { name: "apiState2", x: -3 },
+        { name: "mainMenu", x: -1 },
+        { name: "versionState", x: -3 },
       ],
+      appVersion: "v" + process.env.VUE_APP_VERSION,
     };
   },
 };
@@ -33,11 +38,48 @@ export default {
 
 <style scoped>
 header#mind-map-header-bar {
+  --endPadding: 10px;
   height: 25px;
+  background-color: rgb(240, 64, 99);
 }
-#apiState,
-#apiState2 {
-  width: 20px;
+#mainMenu,
+#versionState {
+  width: max-content;
   height: 100%;
+  background-color: rgba(253, 52, 92, 0.781);
+  border-right: 1px solid rgba(255, 255, 255, 0.315);
+  border-left: 1px solid rgba(255, 255, 255, 0.315);
+  box-sizing: border-box;
+  padding: 0px 6px;
+  color: white;
+  display: table;
+  align-items: center;
+}
+#mainMenu {
+  padding-left: var(--endPadding);
+}
+#versionState {
+  padding-right: var(--endPadding);
+}
+p {
+  margin: 0px;
+}
+div > p {
+  display: table-cell;
+  vertical-align: middle;
+  font-size: 0.8em;
+}
+button {
+  border: none;
+  padding: 0px;
+
+  margin: 0px auto;
+  cursor: pointer;
+  text-align: center;
+}
+button > p {
+  cursor: inherit;
+  display: inline-block;
+  font-size: 1.1em;
 }
 </style>

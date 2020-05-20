@@ -83,8 +83,9 @@ export default {
         marginTop: "0px",
         marginLeft: "0px",
         boxSizing: "border-box",
-        borderRadius: "15px 15px 10px 10px",
-        padding: this.APP_MODE === "development" ? "20px" : "2px",
+        borderRadius:
+          this.APP_MODE === "development" ? "15px 15px 10px 10px" : "0px",
+        padding: this.APP_MODE === "development" ? "20px" : "0px",
       };
     },
   },
@@ -97,7 +98,7 @@ export default {
     window.addEventListener("resize", this.handleResize);
   },
   mounted() {
-    console.log({ __PRERENDER_INJECTED: window.__PRERENDER_INJECTED });
+    //console.log({ __PRERENDER_INJECTED: window.__PRERENDER_INJECTED });
     if (window.__PRERENDER_INJECTED)
       setTimeout(() => {
         document.dispatchEvent(new Event("app-rendered"));

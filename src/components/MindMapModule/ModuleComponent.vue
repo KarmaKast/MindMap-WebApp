@@ -34,5 +34,6 @@ export default {
   position: relative;
   touch-action: none;
   border: 1px solid rgb(255, 90, 90);
+  box-sizing: border-box;
 }
 </style>

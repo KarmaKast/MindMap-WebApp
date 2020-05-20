@@ -177,10 +177,8 @@ export default {
 
   box-sizing: border-box;
   border-radius: inherit;
-  border: 1px solid rgb(90, 203, 255);
 }
 .gridElement {
-  border: 1px solid rgb(118, 255, 90);
   box-sizing: border-box;
 }
 </style>

@@ -5,7 +5,7 @@
         <div id="themeToggle"></div
       ></template>
       <template v-slot:[gridElements[1].name]>
-        <div id="themeToggle2"></div
+        <div id="apiState"></div
       ></template>
     </layout-handler>
   </footer>
@@ -24,7 +24,7 @@ export default {
     return {
       gridElements: [
         { name: "themeToggle", x: 1 },
-        { name: "themeToggle2", x: -1 },
+        { name: "apiState", x: -1 },
       ],
     };
   },
@@ -34,11 +34,15 @@ export default {
 <style scoped>
 footer#mind-map-status-bar {
   height: 25px;
+  background-color: crimson;
+  background-color: rgb(240, 64, 99);
 }
 #themeToggle,
-#themeToggle2,
 #apiState {
-  width: 20px;
+  width: 25px;
   height: 100%;
+  background-color: rgba(253, 52, 92, 0.781);
+  border-right: 1px solid rgba(255, 255, 255, 0.315);
+  border-left: 1px solid rgba(255, 255, 255, 0.315);
 }
 </style>
