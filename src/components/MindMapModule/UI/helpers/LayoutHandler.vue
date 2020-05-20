@@ -98,11 +98,6 @@ export default {
         return res;
       } else return undefined;
     },
-    fillersFinal() {
-      return this.fillers.map((value, index) => {
-        return { [getKey(value)]: getVal(value) + index };
-      });
-    },
     orders() {
       if (this.fillers && this.gridElements) {
         /**
@@ -148,6 +143,11 @@ export default {
         //console.log("-------------------------------------");
         return res;
       } else return [];
+    },
+    fillersFinal() {
+      return this.fillers.map((value, index) => {
+        return { [getKey(value)]: getVal(value) + index };
+      });
     },
     gridElementsOrders() {
       let res = {};

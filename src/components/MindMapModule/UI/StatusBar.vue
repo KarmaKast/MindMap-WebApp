@@ -7,6 +7,9 @@
       <template v-slot:[gridElements[1].name]>
         <div id="apiState"></div
       ></template>
+      <template v-slot:[gridElements[2].name]>
+        <div id="moduleLogs"></div
+      ></template>
     </layout-handler>
   </footer>
 </template>
@@ -25,6 +28,7 @@ export default {
       gridElements: [
         { name: "themeToggle", x: 1 },
         { name: "apiState", x: -1 },
+        { name: "moduleLogs", x: -2 },
       ],
     };
   },
@@ -33,16 +37,23 @@ export default {
 
 <style scoped>
 footer#mind-map-status-bar {
-  height: 25px;
+  height: 30px;
   background-color: crimson;
-  background-color: rgb(240, 64, 99);
+  background-color: var(--color-primary-lighter5);
+}
+#themeToggle,
+#apiState,
+#moduleLogs {
+  height: 100%;
+  color: var(--color-primary);
+  border-right: 1px solid rgba(255, 255, 255, 0.315);
+  border-left: 1px solid rgba(255, 255, 255, 0.315);
 }
 #themeToggle,
 #apiState {
   width: 25px;
-  height: 100%;
-  background-color: rgba(253, 52, 92, 0.781);
-  border-right: 1px solid rgba(255, 255, 255, 0.315);
-  border-left: 1px solid rgba(255, 255, 255, 0.315);
+}
+#moduleLogs {
+  width: 300px;
 }
 </style>

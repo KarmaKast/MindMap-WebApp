@@ -11,11 +11,15 @@
           <p>{{ appVersion }}</p>
         </div></template
       >
+      <!--<template v-slot:[gridElements[2].name]>
+        <div id="searchBar"></div
+      ></template>-->
     </layout-handler>
   </header>
 </template>
 
 <script>
+// todo: mainmenu and versionstate should have been in opposite places
 export default {
   name: "HeaderBar",
   components: {
@@ -29,8 +33,12 @@ export default {
       gridElements: [
         { name: "mainMenu", x: 1 },
         { name: "versionState", x: -1 },
+        //{ name: "searchBar", x: 2 },
       ],
-      appVersion: "v" + process.env.VUE_APP_VERSION,
+      appVersion:
+        "v" +
+        process.env.VUE_APP_VERSION +
+        (process.env.VUE_APP_MODE === "development" ? "-dev" : ""),
     };
   },
 };
@@ -39,19 +47,18 @@ export default {
 <style scoped>
 header#mind-map-header-bar {
   --endPadding: 10px;
-  height: 25px;
-  background-color: rgb(240, 64, 99);
+  height: 30px;
+  background-color: var(--color-primary-lighter5);
 }
 #mainMenu,
 #versionState {
   width: max-content;
   height: 100%;
-  background-color: rgba(255, 53, 93, 0.904);
+  color: var(--color-primary);
   border-right: 1px solid rgba(255, 255, 255, 0.315);
   border-left: 1px solid rgba(255, 255, 255, 0.315);
   box-sizing: border-box;
   padding: 0px 6px;
-  color: white;
   display: table;
   align-items: center;
 }
@@ -70,6 +77,7 @@ div > p {
   font-size: 0.8em;
 }
 button {
+  background-color: unset;
   border: none;
   padding: 0px;
 
@@ -78,7 +86,7 @@ button {
   text-align: center;
 }
 button#mainMenu:hover {
-  background-color: rgb(240, 22, 65);
+  background-color: var(--color-primary-darker2);
 }
 button > p {
   cursor: inherit;

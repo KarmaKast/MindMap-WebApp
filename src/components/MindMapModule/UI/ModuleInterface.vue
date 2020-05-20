@@ -7,7 +7,9 @@
     <template v-slot:[gridElements[0].name]
       ><header-bar class="header-bar"
     /></template>
-    <template v-slot:[gridElements[1].name]><status-bar /></template>
+    <template v-slot:[gridElements[1].name]
+      ><status-bar class="status-bar"
+    /></template>
   </layout-handler>
 </template>
 
@@ -42,4 +44,12 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+#mind-map--module-interface {
+  padding: 4px;
+}
+.header-bar,
+.status-bar {
+  border-radius: 15px;
+}
+</style>

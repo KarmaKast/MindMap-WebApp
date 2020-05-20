@@ -1,5 +1,5 @@
 <template>
-  <div class="mind-map-module">
+  <div class="mind-map-module light-theme">
     <canvas-component />
     <module-interface />
   </div>
@@ -26,6 +26,22 @@ export default {
 </script>
 
 <style scoped>
+.mind-map-module.light-theme {
+  --color-primary: rgb(255, 53, 93);
+  --color-primary-darker1: rgb(240, 64, 99);
+  --color-primary-darker2: rgb(240, 22, 65);
+  --color-primary-lighter5: rgb(255, 233, 237);
+  --color-bg-primary: rgb(247, 247, 247);
+  --color-text: white;
+}
+.mind-map-module.dark-theme {
+  --color-primary: rgb(151, 1, 31);
+  --color-primary-darker1: rgb(129, 5, 30);
+  --color-primary-darker2: rgb(121, 1, 25);
+  --color-primary-lighter5: rgb(87, 87, 87);
+  --color-bg-primary: rgb(44, 44, 44);
+  --color-text: white;
+}
 .mind-map-module {
   height: 100%;
   width: 100%;
@@ -33,7 +49,8 @@ export default {
   border-radius: inherit;
   position: relative;
   touch-action: none;
-  border: 1px solid rgb(255, 90, 90);
+  border: 1px solid var(--color-primary);
+  background-color: var(--color-bg-primary);
   box-sizing: border-box;
 }
 </style>
