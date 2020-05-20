@@ -11,7 +11,7 @@
       v-for="(value, index) in gridElements"
       :key="index"
       :style="{
-        order: gridElementsOrders[index],
+        order: gridElementsOrders[value.name],
       }"
     >
       <slot :name="value.name"></slot>
@@ -20,12 +20,14 @@
       v-for="(filler, index) in fillersFinal"
       :key="'filler' + index"
       class="gridElementEmpty"
-      :style="{ order: orders[filler + 1] }"
+      :style="{ order: Object.values(orders[Object.values(filler)[0] + 1])[0] }"
     ></div>
   </section>
 </template>
 
 <script>
+const getVal = (val) => Object.values(val)[0];
+const getKey = (val) => Object.keys(val)[0];
 export default {
   name: "LayoutHandler",
   props: {
@@ -44,12 +46,16 @@ export default {
       if (this.gridElements)
         this.gridElements.forEach((value) => {
           const pushVal = value[this.axis] ? value[this.axis] : 1;
-          if (!r.includes(pushVal)) r.push(pushVal);
+          if (!r.includes(pushVal)) r.push({ [value.name]: pushVal });
         });
       return r
-        .filter((value) => value > 0)
-        .sort((a, b) => a - b)
-        .concat(...r.filter((value) => value < 0).sort((a, b) => a - b));
+        .filter((value) => getVal(value) > 0)
+        .sort((a, b) => getVal(a) - getVal(b))
+        .concat(
+          ...r
+            .filter((value) => getVal(value) < 0)
+            .sort((a, b) => getVal(a) - getVal(b))
+        );
     },
     fillers() {
       if (this.rawOrdersSorted) {
@@ -60,7 +66,7 @@ export default {
            * @type {Boolean}
            */
           const condition1 =
-            this.rawOrdersSorted[index] < 0 &&
+            getVal(this.rawOrdersSorted[index]) < 0 &&
             this.rawOrdersSorted.length === 1;
 
           /**
@@ -68,7 +74,7 @@ export default {
            * @type {Boolean}
            */
           const condition3 =
-            this.rawOrdersSorted[index] > 0 &&
+            getVal(this.rawOrdersSorted[index]) > 0 &&
             this.rawOrdersSorted.length === 1;
 
           /**
@@ -78,21 +84,24 @@ export default {
           const condition2 =
             index < this.rawOrdersSorted.length - 1 &&
             Math.abs(
-              this.rawOrdersSorted[index + 1] - this.rawOrdersSorted[index]
+              getVal(this.rawOrdersSorted[index + 1]) -
+                getVal(this.rawOrdersSorted[index])
             ) > 1;
 
           //console.table({ condition1, condition2, condition3 });
           //
-          if (condition1) res.push(index - 1);
+          if (condition1) res.push({ [getKey(value)]: index - 1 });
           else if (condition3 || condition2 || condition3) {
-            res.push(index);
+            res.push({ [getKey(value)]: index });
           }
         });
         return res;
       } else return undefined;
     },
     fillersFinal() {
-      return this.fillers.map((value, index) => value + index);
+      return this.fillers.map((value, index) => {
+        return { [getKey(value)]: getVal(value) + index };
+      });
     },
     orders() {
       if (this.fillers && this.gridElements) {
@@ -100,27 +109,40 @@ export default {
          * @type {Array}
          */
         let res = [];
-        this.gridElements.forEach((value) => {
-          if (value[this.axis] !== undefined) res.push(value[this.axis]);
+        this.rawOrdersSorted.forEach((value) => {
+          res.push(value);
         });
         //console.log("-------------------------------------");
         //console.table(res);
         this.fillers.forEach((value, index) => {
           //console.log(value);
-          if (value > 0)
-            res.splice(value + index + 1, 0, res[value + index] + 1);
-          else {
-            res.unshift(1);
+          const val = getVal(value);
+          if (this.gridElements.length === 1) {
+            if (val < 0) res.unshift({ filler: 1 });
+            else res.push({ filler: -1 });
+          } else {
+            // -3, -1 : filler 0 => -3, -2 , -1
             //console.table(res);
-            res = res.map((value, index) =>
-              index === 0 ? value : value > 0 ? value + 1 : value
-            );
+            //console.table({ val, index });
+            if (val === -1) {
+              res.unshift({ filler: 1 });
+            } else {
+              const fillerVal = getVal(res[val + index]) + 1;
+              res.splice(val + index + 1, 0, {
+                filler: fillerVal,
+              });
+            }
             //console.table(res);
           }
+          //console.table(res);
         });
         //console.table(res);
         res.forEach((value, index) => {
-          if (value < 0) res[index] = res[index - 1] + 1;
+          const val = getVal(value);
+          if (val < 0)
+            if (index !== 0)
+              res[index] = { [getKey(value)]: getVal(res[index - 1]) + 1 };
+            else res[index] = { [getKey(value)]: 1 };
         });
         //console.table(res);
         //console.log("-------------------------------------");
@@ -128,9 +150,11 @@ export default {
       } else return [];
     },
     gridElementsOrders() {
-      return this.orders.filter(
-        (value, index) => !this.fillersFinal.includes(index - 1)
-      );
+      let res = {};
+      this.fillers.forEach((value) => {
+        this.orders.forEach((value2) => (res[getKey(value2)] = getVal(value2)));
+      });
+      return res;
     },
     gridTemplate: function () {
       if (this.orders && this.gridElements) {
@@ -138,8 +162,8 @@ export default {
 
         //let res = this.gridElements.map(() => "auto");
         let res = [];
-        this.orders.forEach((value) => {
-          if (value) res.push("auto");
+        this.orders.forEach(() => {
+          res.push("auto");
         });
         //console.log("-------------------------------------");
         //console.table(res);

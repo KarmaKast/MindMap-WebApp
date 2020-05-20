@@ -27,8 +27,8 @@ export default {
   data() {
     return {
       gridElements: [
-        { name: "mainMenu", x: -1 },
-        { name: "versionState", x: -3 },
+        { name: "mainMenu", x: 1 },
+        { name: "versionState", x: -1 },
       ],
       appVersion: "v" + process.env.VUE_APP_VERSION,
     };
@@ -46,7 +46,7 @@ header#mind-map-header-bar {
 #versionState {
   width: max-content;
   height: 100%;
-  background-color: rgba(253, 52, 92, 0.781);
+  background-color: rgba(255, 53, 93, 0.904);
   border-right: 1px solid rgba(255, 255, 255, 0.315);
   border-left: 1px solid rgba(255, 255, 255, 0.315);
   box-sizing: border-box;
@@ -76,6 +76,9 @@ button {
   margin: 0px auto;
   cursor: pointer;
   text-align: center;
+}
+button#mainMenu:hover {
+  background-color: rgb(240, 22, 65);
 }
 button > p {
   cursor: inherit;
