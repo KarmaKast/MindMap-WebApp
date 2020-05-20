@@ -17,7 +17,7 @@
       <slot :name="value.name"></slot>
     </div>
     <div
-      v-for="(filler, index) in fillers"
+      v-for="(filler, index) in fillersFinal"
       :key="'filler' + index"
       class="gridElementEmpty"
       :style="{ order: orders[filler + 1] }"
@@ -56,10 +56,20 @@ export default {
         let res = [];
         this.rawOrdersSorted.forEach((value, index) => {
           /**
-           * -2, -1 => true
+           * -1 => true
            * @type {Boolean}
            */
-          const condition1 = this.rawOrdersSorted[index] < 0 && index === 0;
+          const condition1 =
+            this.rawOrdersSorted[index] < 0 &&
+            this.rawOrdersSorted.length === 1;
+
+          /**
+           * 1 => true
+           * @type {Boolean}
+           */
+          const condition3 =
+            this.rawOrdersSorted[index] > 0 &&
+            this.rawOrdersSorted.length === 1;
 
           /**
            * 1 , 3 => true | 1 , 2 => false | -3, -1 => true
@@ -67,34 +77,22 @@ export default {
            */
           const condition2 =
             index < this.rawOrdersSorted.length - 1 &&
-            Math.abs(this.rawOrdersSorted[index + 1]) >
-              Math.abs(this.rawOrdersSorted[index]) + 1;
-          /**
-           * 1 , -2 => true | 1 , 2 => false
-           * @type {Boolean}
-           */
-          const condition3 =
-            this.rawOrdersSorted[index] > 0 &&
-            this.rawOrdersSorted[index + 1] < 0;
+            Math.abs(
+              this.rawOrdersSorted[index + 1] - this.rawOrdersSorted[index]
+            ) > 1;
 
-          /**
-           * 1 , 3 => true | 1 , 2 => false | -3, -1 => true
-           * @type {Boolean}
-           */
-          const condition4 =
-            this.rawOrdersSorted.length > 1 &&
-            index !== 0 &&
-            Math.abs(this.rawOrdersSorted[index - 1]) >
-              Math.abs(this.rawOrdersSorted[index]) + 1;
-          //console.table({ condition1, condition2, condition3, condition4 });
+          //console.table({ condition1, condition2, condition3 });
           //
-          if (condition1 || condition4) res.push(index - 1);
-          else if (condition3 || condition2) {
+          if (condition1) res.push(index - 1);
+          else if (condition3 || condition2 || condition3) {
             res.push(index);
           }
         });
         return res;
       } else return undefined;
+    },
+    fillersFinal() {
+      return this.fillers.map((value, index) => value + index);
     },
     orders() {
       if (this.fillers && this.gridElements) {
@@ -111,22 +109,23 @@ export default {
           //console.log(value);
           if (value > 0)
             res.splice(value + index + 1, 0, res[value + index] + 1);
-          else res.unshift(1);
+          else {
+            res.unshift(1);
+            //console.table(res);
+            res = res.map((value, index) =>
+              index === 0 ? value : value > 0 ? value + 1 : value
+            );
+            //console.table(res);
+          }
         });
         //console.table(res);
         res.forEach((value, index) => {
-          //
           if (value < 0) res[index] = res[index - 1] + 1;
         });
         //console.table(res);
         //console.log("-------------------------------------");
         return res;
       } else return [];
-    },
-    fillersFinal() {
-      return this.fillers.map((value, index) =>
-        value >= 0 ? value + index : this.fillers.length + value - index - 1
-      );
     },
     gridElementsOrders() {
       return this.orders.filter(
@@ -142,21 +141,21 @@ export default {
         this.orders.forEach((value) => {
           if (value) res.push("auto");
         });
-        console.log("-------------------------------------");
-        console.table(res);
+        //console.log("-------------------------------------");
+        //console.table(res);
         this.gridElements.forEach((value, index) => {
           let y = value[this.axis];
           y = y > 0 ? y - 1 : res.length + y;
-          if (this.fillersFinal.includes(y)) {
+          if (this.fillers.includes(y)) {
             res[y + 1] = "auto";
             res[y + 2] = "max-content";
           }
           res[y] = "max-content";
         });
-        console.table(res);
+        //console.table(res);
         let resF = "";
         res.forEach((value) => (resF += value + " "));
-        console.log("-------------------------------------");
+        //console.log("-------------------------------------");
         return resF;
       }
       return "unset";

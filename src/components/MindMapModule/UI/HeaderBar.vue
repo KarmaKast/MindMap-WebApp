@@ -4,6 +4,9 @@
       <template v-slot:[gridElements[0].name]>
         <div id="apiState"></div
       ></template>
+      <template v-slot:[gridElements[1].name]>
+        <div id="apiState2"></div
+      ></template>
     </layout-handler>
   </header>
 </template>
@@ -19,7 +22,10 @@ export default {
   },
   data() {
     return {
-      gridElements: [{ name: "apiState", x: -1 }],
+      gridElements: [
+        { name: "apiState", x: -1 },
+        { name: "apiState2", x: -3 },
+      ],
     };
   },
 };
@@ -29,7 +35,8 @@ export default {
 header#mind-map-header-bar {
   height: 25px;
 }
-#apiState {
+#apiState,
+#apiState2 {
   width: 20px;
   height: 100%;
 }
