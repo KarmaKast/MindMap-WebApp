@@ -10,6 +10,9 @@
     <template v-slot:[gridElements[1].name]
       ><status-bar class="status-bar"
     /></template>
+    <template v-slot:[gridElements[2].name]
+      ><div class="mid-UI-section"><tools-bar /></div
+    ></template>
   </layout-handler>
 </template>
 
@@ -21,6 +24,9 @@ export default {
       import(/* webpackChunkName: "chunk-mindmap-status-bar" */ "./StatusBar"),
     HeaderBar: () =>
       import(/* webpackChunkName: "chunk-mindmap-header-bar" */ "./HeaderBar"),
+    ToolsBar: () =>
+      import(/* webpackChunkName: "chunk-mindmap-tools-bar" */ "./ToolsBar"),
+
     LayoutHandler: () =>
       import(
         /* webpackChunkName: "chunk-mindmap-layout-handler" */ "./helpers/LayoutHandler"
@@ -37,6 +43,10 @@ export default {
           name: "StatusBar",
           y: -1,
         },
+        {
+          name: "mindContent",
+          y: 3,
+        },
       ],
     };
   },
@@ -49,7 +59,8 @@ export default {
   padding: 4px;
 }
 .header-bar,
-.status-bar {
+.status-bar,
+.mid-UI-section {
   border-radius: 15px;
 }
 </style>

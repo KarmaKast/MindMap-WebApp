@@ -11,9 +11,9 @@
           <p>{{ appVersion }}</p>
         </div></template
       >
-      <!--<template v-slot:[gridElements[2].name]>
+      <template v-slot:[gridElements[2].name]>
         <div id="searchBar"></div
-      ></template>-->
+      ></template>
     </layout-handler>
   </header>
 </template>
@@ -33,7 +33,7 @@ export default {
       gridElements: [
         { name: "mainMenu", x: 1 },
         { name: "versionState", x: -1 },
-        //{ name: "searchBar", x: 2 },
+        { name: "searchBar", x: 2 },
       ],
       appVersion:
         "v" +
@@ -46,27 +46,20 @@ export default {
 
 <style scoped>
 header#mind-map-header-bar {
-  --endPadding: 10px;
-  height: 30px;
+  height: 25px;
   background-color: var(--color-primary-lighter5);
+  padding: 4px;
 }
 #mainMenu,
 #versionState {
   width: max-content;
   height: 100%;
   color: var(--color-primary);
-  border-right: 1px solid rgba(255, 255, 255, 0.315);
-  border-left: 1px solid rgba(255, 255, 255, 0.315);
+  border-radius: 15px;
   box-sizing: border-box;
   padding: 0px 6px;
   display: table;
   align-items: center;
-}
-#mainMenu {
-  padding-left: var(--endPadding);
-}
-#versionState {
-  padding-right: var(--endPadding);
 }
 p {
   margin: 0px;
@@ -81,12 +74,14 @@ button {
   border: none;
   padding: 0px;
 
+  border: 1px solid var(--color-primary-lighter3);
+
   margin: 0px auto;
   cursor: pointer;
   text-align: center;
 }
 button#mainMenu:hover {
-  background-color: var(--color-primary-darker2);
+  border: 1px solid var(--color-primary);
 }
 button > p {
   cursor: inherit;

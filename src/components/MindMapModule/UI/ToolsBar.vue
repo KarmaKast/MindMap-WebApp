@@ -1,17 +1,14 @@
 <template>
-  <footer id="mind-map-status-bar">
-    <layout-handler :gridElements="gridElements" axis="x">
+  <section id="mind-map-status-bar">
+    <layout-handler :gridElements="gridElements" axis="y">
       <template v-slot:[gridElements[0].name]>
         <div id="themeToggle"></div
       ></template>
       <template v-slot:[gridElements[1].name]>
         <div id="apiState"></div
       ></template>
-      <template v-slot:[gridElements[2].name]>
-        <div id="moduleLogs"></div
-      ></template>
     </layout-handler>
-  </footer>
+  </section>
 </template>
 
 <script>
@@ -26,9 +23,8 @@ export default {
   data() {
     return {
       gridElements: [
-        { name: "themeToggle", x: 1 },
-        { name: "apiState", x: -1 },
-        { name: "moduleLogs", x: -2 },
+        { name: "themeToggle", y: 1 },
+        { name: "apiState", y: -1 },
       ],
     };
   },
@@ -36,24 +32,22 @@ export default {
 </script>
 
 <style scoped>
-footer#mind-map-status-bar {
-  height: 25px;
+section#mind-map-status-bar {
+  width: 35px;
   background-color: crimson;
   background-color: var(--color-primary-lighter5);
+  border-radius: 25px;
 }
 #themeToggle,
 #apiState,
 #moduleLogs {
-  height: 100%;
+  width: 100%;
   color: var(--color-primary);
   border-right: 1px solid rgba(255, 255, 255, 0.315);
   border-left: 1px solid rgba(255, 255, 255, 0.315);
 }
 #themeToggle,
 #apiState {
-  width: 25px;
-}
-#moduleLogs {
-  width: 300px;
+  height: 35px;
 }
 </style>

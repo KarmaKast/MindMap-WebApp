@@ -30,6 +30,7 @@ export default {
   --color-primary: rgb(255, 53, 93);
   --color-primary-darker1: rgb(240, 64, 99);
   --color-primary-darker2: rgb(240, 22, 65);
+  --color-primary-lighter3: rgb(255, 198, 208);
   --color-primary-lighter5: rgb(255, 233, 237);
   --color-bg-primary: rgb(247, 247, 247);
   --color-text: white;
