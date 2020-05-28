@@ -1,30 +1,25 @@
 <template>
   <section id="mind-map-status-bar">
-    <layout-handler :gridElements="gridElements" axis="y">
+    <layout-manager :gridElements="gridElements" axis="y">
       <template v-slot:[gridElements[0].name]>
         <div id="themeToggle"></div
       ></template>
       <template v-slot:[gridElements[1].name]>
         <div id="apiState"></div
       ></template>
-    </layout-handler>
+    </layout-manager>
   </section>
 </template>
 
 <script>
 export default {
   name: "StatusBar",
-  components: {
-    LayoutHandler: () =>
-      import(
-        /* webpackChunkName: "chunk-mindmap-layout-handler" */ "./helpers/LayoutHandler"
-      ),
-  },
+  components: {},
   data() {
     return {
       gridElements: [
-        { name: "themeToggle", y: 1 },
-        { name: "apiState", y: -1 },
+        { name: "themeToggle", position: 1 },
+        { name: "apiState", position: -1 },
       ],
     };
   },

@@ -1,6 +1,6 @@
 <template>
   <header id="mind-map-header-bar">
-    <layout-handler axis="x" :gridElements="gridElements">
+    <layout-manager axis="x" :gridElements="gridElements">
       <template v-slot:[gridElements[0].name]>
         <button id="mainMenu">
           <p>Menu</p>
@@ -14,7 +14,7 @@
       <template v-slot:[gridElements[2].name]>
         <div id="searchBar"></div
       ></template>
-    </layout-handler>
+    </layout-manager>
   </header>
 </template>
 
@@ -22,18 +22,13 @@
 // todo: mainmenu and versionstate should have been in opposite places
 export default {
   name: "HeaderBar",
-  components: {
-    LayoutHandler: () =>
-      import(
-        /* webpackChunkName: "chunk-mindmap-layout-handler" */ "./helpers/LayoutHandler"
-      ),
-  },
+  components: {},
   data() {
     return {
       gridElements: [
-        { name: "mainMenu", x: 1 },
-        { name: "versionState", x: -1 },
-        { name: "searchBar", x: 2 },
+        { name: "mainMenu", position: 1 },
+        { name: "versionState", position: -1 },
+        { name: "searchBar", position: 2 },
       ],
       appVersion:
         "v" +

@@ -1,5 +1,6 @@
 <template>
-  <layout-handler
+  <layout-manager
+    v-if="loaded"
     id="mind-map--module-interface"
     :gridElements="gridElements"
     axis="y"
@@ -13,10 +14,11 @@
     <template v-slot:[gridElements[2].name]
       ><div class="mid-UI-section"><tools-bar /></div
     ></template>
-  </layout-handler>
+  </layout-manager>
 </template>
 
 <script>
+import Vue from "vue";
 export default {
   name: "ModuleInterface",
   components: {
@@ -27,30 +29,44 @@ export default {
     ToolsBar: () =>
       import(/* webpackChunkName: "chunk-mindmap-tools-bar" */ "./ToolsBar"),
 
-    LayoutHandler: () =>
-      import(
-        /* webpackChunkName: "chunk-mindmap-layout-handler" */ "./helpers/LayoutHandler"
-      ),
+    //LayoutHandler: () =>
+    //  import(
+    //    /* webpackChunkName: "chunk-mindmap-layout-handler" */ "./helpers/LayoutHandler"
+    //  ),
+    //LayoutHandler: () =>
+    //  import(
+    //    /* webpackChunkName: "chunk-mindmap-layout-handler" */ "vue-layout-manager"
+    //  ).then(({ LayoutManager }) => LayoutManager),
   },
   data() {
     return {
       gridElements: [
         {
           name: "HeaderBar",
-          y: 1,
+          position: 1,
         },
         {
           name: "StatusBar",
-          y: -1,
+          position: -1,
         },
         {
           name: "mindContent",
-          y: 3,
+          position: 3,
         },
       ],
+      loaded: false,
     };
   },
+  computed: {},
   methods: {},
+  mounted() {
+    import(
+      /* webpackChunkName: "chunk-mindmap-layout-manager" */ "vue-layout-manager"
+    ).then(({ LayoutManager }) => {
+      Vue.component("LayoutManager", LayoutManager);
+      this.loaded = true;
+    });
+  },
 };
 </script>
 
