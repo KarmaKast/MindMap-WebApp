@@ -2,7 +2,7 @@
   <header id="mind-map-header-bar">
     <layout-manager axis="x" :gridElements="gridElements">
       <template v-slot:[gridElements[0].name]>
-        <button id="mainMenu">
+        <button id="mainMenuBttn">
           <p>Menu</p>
         </button></template
       >
@@ -26,7 +26,7 @@ export default {
   data() {
     return {
       gridElements: [
-        { name: "mainMenu", position: 1 },
+        { name: "mainMenuBttn", position: 1 },
         { name: "versionState", position: -1 },
         { name: "searchBar", position: 2 },
       ],
@@ -41,11 +41,13 @@ export default {
 
 <style scoped>
 header#mind-map-header-bar {
-  min-height: 25px;
+  min-height: 30px;
   background-color: var(--color-primary);
+}
+header#mind-map-header-bar > section {
   padding: 4px;
 }
-#mainMenu,
+#mainMenuBttn,
 #versionState {
   width: max-content;
   height: 100%;
@@ -55,6 +57,9 @@ header#mind-map-header-bar {
   padding: 0px 6px;
   display: table;
   align-items: center;
+}
+#mainMenuBttn {
+  box-shadow: 0px 0px 2px 2px hsla(0, 0%, 0%, 0.15);
 }
 #versionState {
   color: var(--color-bg-primary);
@@ -72,19 +77,19 @@ button {
   border: none;
   padding: 0px;
 
-  border: 1px solid var(--color-primary);
+  border: 1px solid var(--color-bg-primary);
   outline: none;
-  background-color: var(--color-bg-primary);
-  color: var(--color-primary);
+  background-color: var(--color-primary);
+  color: var(--color-bg-primary);
 
   margin: 0px auto;
   cursor: pointer;
   text-align: center;
 }
-button#mainMenu:hover {
-  border: 1px solid var(--color-bg-primary);
-  background-color: var(--color-primary);
-  color: var(--color-bg-primary);
+button#mainMenuBttn:hover {
+  border: 1px solid var(--color-primary);
+  background-color: var(--color-bg-primary);
+  color: var(--color-primary);
 }
 button > p {
   cursor: inherit;

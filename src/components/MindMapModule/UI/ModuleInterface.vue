@@ -95,7 +95,7 @@ export default {
 
 <style scoped>
 #mind-map--module-interface {
-  padding: 4px;
+  padding: 0px;
 }
 .header-bar,
 .status-bar {

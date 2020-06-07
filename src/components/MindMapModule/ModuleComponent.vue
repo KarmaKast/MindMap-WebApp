@@ -33,26 +33,26 @@ export default {
 
 <style scoped>
 .mind-map-module.light-theme {
-  --color-primary: rgb(255, 53, 93);
-  --color-primary-darker1: rgb(240, 64, 99);
-  --color-primary-darker2: rgb(240, 22, 65);
-  --color-primary-lighter1: rgb(245, 126, 148);
+  --color-primary: hsl(348, 100%, 60%);
+  --color-primary-darker1: hsl(348, 85%, 60%);
+  --color-primary-darker2: hsl(348, 88%, 51%);
+  --color-primary-lighter1: hsl(349, 86%, 73%);
   --color-primary-lighter3: hsl(349, 100%, 89%);
-  --color-primary-lighter5: rgb(255, 233, 237);
+  --color-primary-lighter5: hsl(349, 100%, 96%);
   --color-bg-primary: hsl(0, 0%, 97%);
   --color-bg-lighter1: hsl(0, 0%, 98%);
   --color-bg-darker1: hsl(0, 0%, 85%);
   --color-text: white;
 }
 .mind-map-module.dark-theme {
-  --color-primary: rgb(151, 1, 31);
-  --color-primary-darker1: rgb(129, 5, 30);
-  --color-primary-darker2: rgb(121, 1, 25);
-  --color-primary-lighter1: rgb(87, 87, 87);
-  --color-primary-lighter3: rgb(87, 87, 87);
-  --color-primary-lighter5: rgb(87, 87, 87);
-  --color-bg-primary: rgb(44, 44, 44);
-  --color-bg-lighter1: rgb(44, 44, 44);
+  --color-primary: hsl(348, 75%, 50%);
+  --color-primary-darker1: hsl(348, 93%, 26%);
+  --color-primary-darker2: hsl(348, 98%, 24%);
+  --color-primary-lighter1: hsl(0, 0%, 34%);
+  --color-primary-lighter3: hsl(0, 0%, 34%);
+  --color-primary-lighter5: hsl(0, 0%, 34%);
+  --color-bg-primary: hsl(0, 0%, 17%);
+  --color-bg-lighter1: hsl(0, 0%, 17%);
   --color-text: white;
 }
 .mind-map-module {
@@ -65,5 +65,6 @@ export default {
   border: 1px solid var(--color-primary);
   background-color: var(--color-bg-primary);
   box-sizing: border-box;
+  padding: 4px;
 }
 </style>
