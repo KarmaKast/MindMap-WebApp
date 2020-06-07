@@ -18,7 +18,7 @@
 
 <script>
 //import MindMapModule from "./components/MindMapModule.vue";
-import ModuleLoadingComponent from "./components/MindMapModule/loading/ModuleLoadingComponent.vue";
+import ModuleLoadingComponent from "./components/MindMapModule/ModuleLoadingComponent.vue";
 
 export default {
   name: "app",
@@ -84,7 +84,9 @@ export default {
         marginLeft: "0px",
         boxSizing: "border-box",
         borderRadius:
-          this.APP_MODE === "development" ? "15px 15px 10px 10px" : "0px",
+          this.APP_MODE === "development"
+            ? "15px 15px 10px 10px"
+            : "15px 15px 10px 10px",
         padding: this.APP_MODE === "development" ? "20px" : "0px",
       };
     },

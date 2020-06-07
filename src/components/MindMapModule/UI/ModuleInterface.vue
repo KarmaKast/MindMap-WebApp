@@ -9,10 +9,19 @@
       ><header-bar class="header-bar"
     /></template>
     <template v-slot:[gridElements[1].name]
-      ><status-bar class="status-bar"
+      ><status-bar
+        class="status-bar"
+        :apiUrl="apiUrl"
+        :apiValidity="apiValidity"
+        @toggleTheme="toggleTheme"
     /></template>
     <template v-slot:[gridElements[2].name]
-      ><div class="mid-UI-section"><tools-bar /></div
+      ><layout-manager
+        class="mid-UI-section"
+        :gridElements="gridElementsMid"
+        axis="x"
+        ><template v-slot:[gridElementsMid[0].name]
+          ><tools-bar /></template></layout-manager
     ></template>
   </layout-manager>
 </template>
@@ -38,6 +47,10 @@ export default {
     //    /* webpackChunkName: "chunk-mindmap-layout-handler" */ "vue-layout-manager"
     //  ).then(({ LayoutManager }) => LayoutManager),
   },
+  props: {
+    apiUrl: String,
+    apiValidity: Boolean,
+  },
   data() {
     return {
       gridElements: [
@@ -54,14 +67,24 @@ export default {
           position: 3,
         },
       ],
+      gridElementsMid: [
+        {
+          name: "ToolsBar",
+          position: 1,
+        },
+      ],
       loaded: false,
     };
   },
   computed: {},
-  methods: {},
+  methods: {
+    toggleTheme: function () {
+      this.$emit("toggleTheme");
+    },
+  },
   mounted() {
     import(
-      /* webpackChunkName: "chunk-mindmap-layout-manager" */ "vue-layout-manager"
+      /* webpackChunkName: "chunk-vue-layout-manager" */ "vue-layout-manager"
     ).then(({ LayoutManager }) => {
       Vue.component("LayoutManager", LayoutManager);
       this.loaded = true;
@@ -75,8 +98,7 @@ export default {
   padding: 4px;
 }
 .header-bar,
-.status-bar,
-.mid-UI-section {
-  border-radius: 15px;
+.status-bar {
+  border-radius: 999px;
 }
 </style>

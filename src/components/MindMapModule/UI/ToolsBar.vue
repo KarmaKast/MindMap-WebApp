@@ -13,7 +13,7 @@
 
 <script>
 export default {
-  name: "StatusBar",
+  name: "ToolsBar",
   components: {},
   data() {
     return {
@@ -29,8 +29,8 @@ export default {
 <style scoped>
 section#mind-map-status-bar {
   width: 35px;
-  background-color: crimson;
-  background-color: var(--color-primary-lighter5);
+  background-color: var(--color-bg-primary);
+  border: 1px solid var(--color-primary);
   border-radius: 25px;
 }
 #themeToggle,
@@ -38,8 +38,8 @@ section#mind-map-status-bar {
 #moduleLogs {
   width: 100%;
   color: var(--color-primary);
-  border-right: 1px solid rgba(255, 255, 255, 0.315);
-  border-left: 1px solid rgba(255, 255, 255, 0.315);
+  border-top: 1px solid rgba(255, 255, 255, 0.315);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.315);
 }
 #themeToggle,
 #apiState {

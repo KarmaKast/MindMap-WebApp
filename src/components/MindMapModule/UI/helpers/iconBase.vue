@@ -1,0 +1,56 @@
+<template>
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    :width="width"
+    :height="height"
+    :viewBox="viewBox"
+    :aria-labelledby="iconName"
+    :role="role"
+    v-bind="aria"
+    :style="{ margin: '0px' }"
+  >
+    <title :id="iconName" lang="en">{{ iconName }}</title>
+    <g>
+      <slot />
+    </g>
+  </svg>
+</template>
+
+<script>
+export default {
+  name: "iconBase",
+  props: {
+    iconName: {
+      type: String,
+      default: "box",
+    },
+    width: {
+      type: [Number, String],
+      default: 18,
+    },
+    height: {
+      type: [Number, String],
+      default: 18,
+    },
+    viewBox: {
+      type: String,
+      default: "0 0 18 18",
+    },
+    role: {
+      type: String,
+      default: "presentation",
+    },
+    aria: {
+      type: Object,
+    },
+  },
+};
+</script>
+
+<style scoped>
+svg {
+  display: inline-block;
+  vertical-align: baseline;
+  margin-bottom: -2px; /* yes, I'm that particular about formatting */
+}
+</style>

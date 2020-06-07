@@ -41,20 +41,23 @@ export default {
 
 <style scoped>
 header#mind-map-header-bar {
-  height: 25px;
-  background-color: var(--color-primary-lighter5);
+  min-height: 25px;
+  background-color: var(--color-primary);
   padding: 4px;
 }
 #mainMenu,
 #versionState {
   width: max-content;
   height: 100%;
-  color: var(--color-primary);
+
   border-radius: 15px;
   box-sizing: border-box;
   padding: 0px 6px;
   display: table;
   align-items: center;
+}
+#versionState {
+  color: var(--color-bg-primary);
 }
 p {
   margin: 0px;
@@ -69,14 +72,19 @@ button {
   border: none;
   padding: 0px;
 
-  border: 1px solid var(--color-primary-lighter3);
+  border: 1px solid var(--color-primary);
+  outline: none;
+  background-color: var(--color-bg-primary);
+  color: var(--color-primary);
 
   margin: 0px auto;
   cursor: pointer;
   text-align: center;
 }
 button#mainMenu:hover {
-  border: 1px solid var(--color-primary);
+  border: 1px solid var(--color-bg-primary);
+  background-color: var(--color-primary);
+  color: var(--color-bg-primary);
 }
 button > p {
   cursor: inherit;
