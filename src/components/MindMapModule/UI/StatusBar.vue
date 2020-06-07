@@ -67,7 +67,8 @@ export default {
 
 <style scoped>
 footer#mind-map-status-bar {
-  min-height: 25px;
+  --height: 25px;
+  min-height: var(--height);
   background-color: var(--color-primary-lighter5);
 }
 #themeToggle,
@@ -78,10 +79,13 @@ footer#mind-map-status-bar {
 }
 #themeToggle,
 #apiState {
-  min-width: 25px;
   background-color: var(--color-primary);
 }
+#apiState {
+  min-width: var(--height);
+}
 #themeToggle {
+  width: var(--height);
   padding: 1px;
   box-sizing: border-box;
   display: flex;
