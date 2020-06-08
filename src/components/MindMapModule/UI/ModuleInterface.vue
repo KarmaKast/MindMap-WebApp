@@ -28,6 +28,7 @@
 
 <script>
 import Vue from "vue";
+import "../js/TouchCompatibleHover";
 export default {
   name: "ModuleInterface",
   components: {

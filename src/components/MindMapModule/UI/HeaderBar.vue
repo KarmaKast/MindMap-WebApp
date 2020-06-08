@@ -2,10 +2,25 @@
   <header id="mind-map-header-bar">
     <layout-manager axis="x" :gridElements="gridElements">
       <template v-slot:[gridElements[0].name]>
-        <button id="mainMenuBttn">
+        <button
+          id="mainMenuBttn"
+          :class="mainMenuBttnClasses"
+          v-touch-compatible-hover="'hovered'"
+        >
           <p>Menu</p>
-        </button></template
-      >
+        </button>
+        <div
+          :style="{
+            position: 'absolute',
+            height: 'max-content',
+            width: 'max-content',
+            bottom: '0px',
+          }"
+        >
+          <layout-manager axis="y" :gridElements="menuGridElements">
+          </layout-manager>
+        </div>
+      </template>
       <template v-slot:[gridElements[1].name]>
         <div id="versionState">
           <p>{{ appVersion }}</p>
@@ -20,6 +35,11 @@
 
 <script>
 // todo: mainmenu and versionstate should have been in opposite places
+import { classListHandler } from "../js/helpers";
+import { VNode } from "vue";
+let classListHandler2 = import(
+  /* webpackChunkName: "chunk-mindmap-helpers" */ "../js/helpers"
+).then((val) => val.classListHandler);
 export default {
   name: "HeaderBar",
   components: {},
@@ -30,12 +50,15 @@ export default {
         { name: "versionState", position: -1 },
         { name: "searchBar", position: 2 },
       ],
+      menuGridElements: [],
+      mainMenuBttnClasses: [],
       appVersion:
         "v" +
         process.env.VUE_APP_VERSION +
         (process.env.VUE_APP_MODE === "development" ? "-dev" : ""),
     };
   },
+  methods: {},
 };
 </script>
 
@@ -66,6 +89,7 @@ header#mind-map-header-bar > section {
 }
 p {
   margin: 0px;
+  user-select: none;
 }
 div > p {
   display: table-cell;
@@ -86,7 +110,7 @@ button {
   cursor: pointer;
   text-align: center;
 }
-button#mainMenuBttn:hover {
+button#mainMenuBttn.hovered {
   border: 1px solid var(--color-primary);
   background-color: var(--color-bg-primary);
   color: var(--color-primary);
