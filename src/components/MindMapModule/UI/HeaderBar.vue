@@ -14,10 +14,16 @@
             position: 'absolute',
             height: 'max-content',
             width: 'max-content',
-            bottom: '0px',
+            top: '100%',
           }"
         >
           <layout-manager axis="y" :gridElements="menuGridElements">
+            <template v-slot:[menuGridElements[0].name]
+              ><div key="1">{{ menuGridElements[0].name }}</div></template
+            >
+            <template v-slot:[menuGridElements[1].name]
+              ><div key="2">{{ menuGridElements[1].name }}</div></template
+            >-->
           </layout-manager>
         </div>
       </template>
@@ -50,7 +56,10 @@ export default {
         { name: "versionState", position: -1 },
         { name: "searchBar", position: 2 },
       ],
-      menuGridElements: [],
+      menuGridElements: [
+        { name: "Settings", position: 1 },
+        { name: "About", position: 2 },
+      ],
       mainMenuBttnClasses: [],
       appVersion:
         "v" +
@@ -67,7 +76,7 @@ header#mind-map-header-bar {
   min-height: 30px;
   background-color: var(--color-primary);
 }
-header#mind-map-header-bar > section {
+header#mind-map-header-bar > .gridContainer {
   padding: 4px;
 }
 #mainMenuBttn,
