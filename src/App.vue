@@ -120,6 +120,9 @@ export default {
   text-align: center;
   color: #2c3e50;
 }
+html {
+  font-size: 16px;
+}
 body {
   margin: 0px;
   height: 100%;

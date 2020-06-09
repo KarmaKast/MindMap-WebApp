@@ -6,23 +6,29 @@
           id="mainMenuBttn"
           :class="mainMenuBttnClasses"
           v-touch-compatible-hover="'hovered'"
+          v-touch:tap="toggleMenu"
         >
           <p>Menu</p>
         </button>
-        <div
-          :style="{
-            position: 'absolute',
-            height: 'max-content',
-            width: 'max-content',
-            top: '100%',
-          }"
-        >
-          <layout-manager axis="y" :gridElements="menuGridElements">
+        <div :class="mainMenuItemsClasses">
+          <layout-manager axis="y" :gridElements="menuGridElements" gap="4px">
             <template v-slot:[menuGridElements[0].name]
-              ><div key="1">{{ menuGridElements[0].name }}</div></template
+              ><button
+                key="1"
+                :class="['menu-item-container']"
+                v-touch-compatible-hover="'hovered'"
+              >
+                {{ menuGridElements[0].name }}
+              </button></template
             >
             <template v-slot:[menuGridElements[1].name]
-              ><div key="2">{{ menuGridElements[1].name }}</div></template
+              ><button
+                key="2"
+                :class="['menu-item-container']"
+                v-touch-compatible-hover="'hovered'"
+              >
+                {{ menuGridElements[1].name }}
+              </button></template
             >-->
           </layout-manager>
         </div>
@@ -43,9 +49,6 @@
 // todo: mainmenu and versionstate should have been in opposite places
 import { classListHandler } from "../js/helpers";
 import { VNode } from "vue";
-let classListHandler2 = import(
-  /* webpackChunkName: "chunk-mindmap-helpers" */ "../js/helpers"
-).then((val) => val.classListHandler);
 export default {
   name: "HeaderBar",
   components: {},
@@ -61,13 +64,26 @@ export default {
         { name: "About", position: 2 },
       ],
       mainMenuBttnClasses: [],
+      mainMenuItemsClasses: ["menu-items-container"],
       appVersion:
         "v" +
         process.env.VUE_APP_VERSION +
         (process.env.VUE_APP_MODE === "development" ? "-dev" : ""),
     };
   },
-  methods: {},
+  methods: {
+    /**
+     * @param {Event} event
+     */
+    toggleMenu(event) {
+      //event.preventDefault();
+      //console.info("menu toggle called", event);
+      this.mainMenuItemsClasses = classListHandler.toggleClass(
+        this.mainMenuItemsClasses,
+        "show"
+      );
+    },
+  },
 };
 </script>
 
@@ -84,14 +100,35 @@ header#mind-map-header-bar > .gridContainer {
   width: max-content;
   height: 100%;
 
-  border-radius: 15px;
+  border-radius: 999px;
   box-sizing: border-box;
   padding: 0px 6px;
   display: table;
   align-items: center;
 }
 #mainMenuBttn {
-  box-shadow: 0px 0px 2px 2px hsla(0, 0%, 0%, 0.15);
+}
+.menu-items-container {
+  position: absolute;
+  height: max-content;
+  width: max-content;
+  top: 100%;
+  background: var(--color-primary);
+  border-radius: 14px;
+  margin-top: 6px;
+  padding: 4px;
+  display: none;
+}
+.menu-items-container.show {
+  display: block;
+}
+.menu-item-container {
+  color: var(--color-bg-primary);
+  padding: 2px 8px 2px 8px;
+  box-sizing: border-box;
+  font-size: 0.95rem;
+  width: 100%;
+  border-radius: 999px;
 }
 #versionState {
   color: var(--color-bg-primary);
@@ -103,7 +140,7 @@ p {
 div > p {
   display: table-cell;
   vertical-align: middle;
-  font-size: 0.8em;
+  font-size: 0.8rem;
 }
 button {
   background-color: unset;
@@ -111,6 +148,7 @@ button {
   padding: 0px;
 
   border: 1px solid var(--color-bg-primary);
+  box-shadow: 0px 0px 2px 2px hsla(0, 0%, 0%, 0.15);
   outline: none;
   background-color: var(--color-primary);
   color: var(--color-bg-primary);
@@ -119,7 +157,7 @@ button {
   cursor: pointer;
   text-align: center;
 }
-button#mainMenuBttn.hovered {
+button.hovered {
   border: 1px solid var(--color-primary);
   background-color: var(--color-bg-primary);
   color: var(--color-primary);
@@ -127,6 +165,6 @@ button#mainMenuBttn.hovered {
 button > p {
   cursor: inherit;
   display: inline-block;
-  font-size: 1.1em;
+  font-size: 1rem;
 }
 </style>

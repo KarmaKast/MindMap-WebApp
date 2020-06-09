@@ -46,13 +46,29 @@ const options = {
   capture: false,
   view: window,
 };
+/**
+ *
+ * @param {string | [ string, Function ] | { value: string, callback: Function }} value
+ * @returns {{ value: string, callback: Function }}
+ */
+function parseBindingValue(value) {
+  let result_value;
+  let callback;
+  if (typeof value === "string") [result_value, callback] = [value, () => {}];
+  else if (Array.isArray(value)) [result_value, callback] = value;
+  else [result_value, callback] = [value.value, value.callback];
+  return { value: result_value, callback };
+}
 Vue.directive("touchCompatibleHover", {
   /**
    * @param {Element} el
    * @param {VNode} vNode
    */
   bind: function (el, binding, vNode) {
-    bindMap.set(el, binding.value ? binding.value : "hovered");
+    bindMap.set(
+      el,
+      binding.value ? parseBindingValue(binding.value).value : "hovered"
+    );
     el.addEventListener("touchstart", startAction, options);
     el.addEventListener("mouseenter", startAction, options);
 
