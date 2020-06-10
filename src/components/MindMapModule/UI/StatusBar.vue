@@ -76,6 +76,7 @@ footer#mind-map-status-bar {
 #moduleLogs {
   height: 100%;
   color: var(--color-primary);
+  border-radius: inherit;
 }
 #themeToggle,
 #apiState {

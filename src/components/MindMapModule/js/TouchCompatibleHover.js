@@ -13,7 +13,7 @@ import Vue from "vue";
   } catch (e) {}
   return supportsPassive;
 })();*/
-const defaultHoverClassName = "hovered";
+const defaultHoverClassName = "hover";
 /**
  * @typedef { undefined | string} HoverClassName
  * @typedef { function | undefined } Callback
@@ -31,9 +31,9 @@ function parseBindingValue(value) {
   function checkHoverClassName(hoverClassName) {
     return typeof hoverClassName === "string" && hoverClassName !== "";
   }
-  if (typeof value === "string")
+  if (typeof value === "string" || value === undefined)
     [result_value, callbacks] = [
-      value !== "" ? value : defaultHoverClassName,
+      typeof value !== "string" || value === "" ? defaultHoverClassName : value,
       [undefined, undefined],
     ];
   else if (typeof value === "function")

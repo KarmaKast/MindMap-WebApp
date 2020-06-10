@@ -5,7 +5,7 @@
         <button
           id="mainMenuBttn"
           :class="mainMenuBttnClasses"
-          v-touch-compatible-hover="'hovered'"
+          v-touch-compatible-hover
           v-touch:tap="toggleMenu"
         >
           <p>Menu</p>
@@ -16,7 +16,7 @@
               ><button
                 key="1"
                 :class="['menu-item-container']"
-                v-touch-compatible-hover="'hovered'"
+                v-touch-compatible-hover
               >
                 {{ menuGridElements[0].name }}
               </button></template
@@ -25,7 +25,7 @@
               ><button
                 key="2"
                 :class="['menu-item-container']"
-                v-touch-compatible-hover="'hovered'"
+                v-touch-compatible-hover
               >
                 {{ menuGridElements[1].name }}
               </button></template
@@ -77,7 +77,7 @@ export default {
      */
     toggleMenu(event) {
       //event.preventDefault();
-      //console.info("menu toggle called", event);
+      console.info("menu toggle called", event);
       this.mainMenuItemsClasses = classListHandler.toggleClass(
         this.mainMenuItemsClasses,
         "show"
@@ -105,8 +105,6 @@ header#mind-map-header-bar > .gridContainer {
   padding: 0px 6px;
   display: table;
   align-items: center;
-}
-#mainMenuBttn {
 }
 .menu-items-container {
   position: absolute;
@@ -157,7 +155,7 @@ button {
   cursor: pointer;
   text-align: center;
 }
-button.hovered {
+button.hover {
   border: 1px solid var(--color-primary);
   background-color: var(--color-bg-primary);
   color: var(--color-primary);
