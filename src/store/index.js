@@ -18,6 +18,8 @@ export default new Vuex.Store({
       targetID: null,
       claimantID: null,
     },
+
+    classListHandlerLoaded: false,
   },
   mutations: {
     update_window_height(state) {
@@ -45,6 +47,9 @@ export default new Vuex.Store({
         targetID: relClaimMode.targetID,
         claimantID: relClaimMode.claimantID,
       };
+    },
+    update_classListHandlerLoaded(state) {
+      state.classListHandlerLoaded = true;
     },
   },
   getters: {},

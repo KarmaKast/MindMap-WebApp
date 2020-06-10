@@ -6,6 +6,7 @@
 </template>
 
 <script>
+import Vue from "vue";
 export default {
   name: "ModuleComponent",
   data() {
@@ -47,6 +48,16 @@ export default {
     } else {
       localStorage.setItem("theme", this.theme);
     }
+
+    import(
+      /* webpackChunkName: "chunk-vue-custom-helpers" */ "./js/helpers"
+    ).then(({ classListHandler }) => {
+      const part = { classListHandler };
+      Vue.prototype.customs = this.customs
+        ? Object.assign(this.customs, part)
+        : part;
+      this.$store.commit("update_classListHandlerLoaded");
+    });
   },
 };
 </script>

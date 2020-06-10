@@ -26,6 +26,7 @@
                 key="2"
                 :class="['menu-item-container']"
                 v-touch-compatible-hover
+                v-touch:tap="menuGridElements[1].callback"
               >
                 {{ menuGridElements[1].name }}
               </button></template
@@ -61,7 +62,7 @@ export default {
       ],
       menuGridElements: [
         { name: "Settings", position: 1 },
-        { name: "About", position: 2 },
+        { name: "About", position: 2, callback: this.showAboutPage },
       ],
       mainMenuBttnClasses: [],
       mainMenuItemsClasses: ["menu-items-container"],
@@ -77,11 +78,14 @@ export default {
      */
     toggleMenu(event) {
       //event.preventDefault();
-      console.info("menu toggle called", event);
+      //console.info("menu toggle called", event);
       this.mainMenuItemsClasses = classListHandler.toggleClass(
         this.mainMenuItemsClasses,
         "show"
       );
+    },
+    showAboutPage(event) {
+      this.$emit("showAboutPage");
     },
   },
 };
@@ -141,6 +145,7 @@ div > p {
   font-size: 0.8rem;
 }
 button {
+  /** default corrections */
   background-color: unset;
   border: none;
   padding: 0px;
