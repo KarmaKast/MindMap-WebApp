@@ -11,6 +11,7 @@ export default {
   data() {
     return {
       theme: "light",
+      apiUrl: "",
     };
   },
   components: {
@@ -27,6 +28,25 @@ export default {
     toggleTheme() {
       this.theme = this.theme === "light" ? "dark" : "light";
     },
+  },
+  watch: {
+    theme() {
+      localStorage.setItem("theme", this.theme);
+    },
+  },
+  mounted() {
+    const apiUrl = localStorage.getItem("apiUrl");
+    if (apiUrl) {
+      this.apiUrl = apiUrl;
+      this.$store.commit("update_apiUrl", apiUrl);
+      //this.apiValidity = true;
+    }
+    const theme = localStorage.getItem("theme");
+    if (theme) {
+      this.theme = theme;
+    } else {
+      localStorage.setItem("theme", this.theme);
+    }
   },
 };
 </script>
