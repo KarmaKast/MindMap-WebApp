@@ -151,10 +151,11 @@ button {
   padding: 0px;
 
   border: 1px solid var(--color-bg-primary);
-  box-shadow: 0px 0px 2px 2px hsla(0, 0%, 0%, 0.15);
-  outline: none;
   background-color: var(--color-primary);
   color: var(--color-bg-primary);
+
+  box-shadow: 0px 0px 2px 2px hsla(0, 0%, 0%, 0.15);
+  outline: none;
 
   margin: 0px auto;
   cursor: pointer;

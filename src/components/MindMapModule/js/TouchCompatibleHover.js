@@ -15,7 +15,7 @@ import Vue from "vue";
 })();*/
 const defaultHoverClassName = "hover";
 /**
- * @typedef { undefined | string} HoverClassName
+ * @typedef { undefined | string } HoverClassName
  * @typedef { function | undefined } Callback
  * @typedef { [Callback, Callback] } Callbacks
  * @param { HoverClassName | [ string, Callback | Callbacks ] | Callbacks | { value: HoverClassName, callback: Callback | Callbacks }} value

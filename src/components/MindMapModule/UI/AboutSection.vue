@@ -40,7 +40,7 @@
               </icon-base>
               {{ appName }}</a
             >
-            - v{{ appVersion }}</span
+            - {{ appVersion }}</span
           >
           <br />
           <br />
