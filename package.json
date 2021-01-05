@@ -26,7 +26,7 @@
   "main": "background.js",
   "dependencies": {
     "@karmakast/morph-dbms-core": "^0.3.0",
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "color-convert": "^2.0.1",
     "core-js": "^3.6.5",
     "konva": "^6.0.0",
